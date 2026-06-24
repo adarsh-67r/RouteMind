@@ -1,19 +1,74 @@
 @import "tailwindcss";
 
-@theme {
-  --color-app-bg: #0A0A0A;
-  --color-sidebar-bg: #111111;
-  --color-card-bg: #141414;
-  --color-border-app: #262626;
-  --color-accent-blue: #3B82F6;
-  --color-primary: #FAFAFA;
-  --color-secondary: #A1A1AA;
+/* ============================================================
+   TOKYO NIGHT THEME
+   Dark  → tokyo-night-color-theme.json
+   Light → tokyo-night-light-color-theme.json
+   Mapped to RouteMind's 7 semantic color tokens.
+   ============================================================ */
+
+/* ---------- DARK MODE (default) ---------- */
+:root,
+[data-theme="dark"] {
+  /*
+    app-bg    → editor.background        #1a1b26  (the deep navy canvas)
+    sidebar-bg → sideBar.background      #16161e  (one step darker for sidebar)
+    card-bg   → editorWidget.background  #16161e  (panel / widget surface)
+    border-app → sideBar.border          #101014  (subtle near-black border)
+    accent-blue → button.background      #3d59a1  (the TN blue accent)
+    primary   → editor.foreground        #a9b1d6  (soft lavender-white text)
+    secondary → foreground (muted)       #787c99  (dimmed UI text)
+  */
+  --color-app-bg:      #1a1b26;
+  --color-sidebar-bg:  #16161e;
+  --color-card-bg:     #1e202e;
+  --color-border-app:  #292e42;
+  --color-accent-blue: #7aa2f7;
+  --color-primary:     #c0caf5;
+  --color-secondary:   #787c99;
+}
+
+/* ---------- LIGHT MODE ---------- */
+[data-theme="light"] {
+  /*
+    Tokyo Night Light uses warm off-white surfaces and ink-navy text.
+    app-bg    → editor.background        #d5d6db  (warm light canvas)
+    sidebar-bg → sideBar.background      #cbccd1  (slightly darker sidebar)
+    card-bg   → list.hoverBackground     #c0c1c7  (card / widget surface)
+    border-app → sideBar.border          #b0b1b6  (soft grey border)
+    accent-blue → button.background      #34548a  (TN light blue accent)
+    primary   → editor.foreground        #343b58  (dark navy body text)
+    secondary → descriptionForeground    #6172b0  (muted purple-blue)
+  */
+  --color-app-bg:      #d5d6db;
+  --color-sidebar-bg:  #cbccd1;
+  --color-card-bg:     #c0c1c7;
+  --color-border-app:  #b0b1b6;
+  --color-accent-blue: #34548a;
+  --color-primary:     #343b58;
+  --color-secondary:   #6172b0;
+}
+
+/* ---------- SYSTEM PREFERENCE FALLBACK ----------
+   Applies dark mode variables when the user hasn't manually
+   toggled and their OS is set to dark.                    */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-app-bg:      #1a1b26;
+    --color-sidebar-bg:  #16161e;
+    --color-card-bg:     #1e202e;
+    --color-border-app:  #292e42;
+    --color-accent-blue: #7aa2f7;
+    --color-primary:     #c0caf5;
+    --color-secondary:   #787c99;
+  }
 }
 
 html, body {
-  background-color: #0A0A0A;
-  color: #FAFAFA;
+  background-color: var(--color-app-bg);
+  color: var(--color-primary);
   overflow-x: hidden;
   margin: 0;
   padding: 0;
+  transition: background-color 220ms ease, color 220ms ease;
 }
