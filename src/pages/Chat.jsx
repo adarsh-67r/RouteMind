@@ -5,14 +5,13 @@ import Sidebar from '../components/Sidebar'
 import ChatMessage from '../components/ChatMessage'
 import ChatInput from '../components/ChatInput'
 import TypingIndicator from '../components/TypingIndicator'
-import RoutingCard from '../components/RoutingCard' // Imported to satisfy layout schema constraints
 
 const Chat = () => {
   // Sidebar & Layout State
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [activeChatId, setActiveChatId] = useState('1')
-  
+
   // Chat conversations list state
   const [chatHistory, setChatHistory] = useState([
     { id: '1', title: 'RouteMind Introduction', timestamp: 'Just now' },
@@ -25,9 +24,9 @@ const Chat = () => {
     '1': [],
     '2': [
       { id: 'm1', role: 'user', content: 'Explain how to write a simple fast async HTTP server in Rust.', time: '2h ago' },
-      { 
-        id: 'm2', 
-        role: 'assistant', 
+      {
+        id: 'm2',
+        role: 'assistant',
         content: 'To build a fast, async HTTP server in Rust, we should use Tokio as the async runtime and Axum (built on top of hyper and tower) as the web framework. Here is a basic implementation:\n\n```rust\nuse axum::{routing::get, Router};\n\n#[tokio::main]\nasync fn main() {\n    let app = Router::new().route("/", get(|| async { "Hello from RouteMind!" }));\n    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();\n    axum::serve(listener, app).await.unwrap();\n}\n```',
         time: '2h ago',
         routing: {
@@ -40,9 +39,9 @@ const Chat = () => {
     ],
     '3': [
       { id: 'm3', role: 'user', content: 'What is the latency difference between Gemini 1.5 Flash and GPT-4o?', time: 'Yesterday' },
-      { 
-        id: 'm4', 
-        role: 'assistant', 
+      {
+        id: 'm4',
+        role: 'assistant',
         content: 'Gemini 1.5 Flash exhibits significantly lower latency for structured data tasks, typically landing under 300ms. GPT-4o has a higher latency overhead (~500-800ms) but offers superior reasoning depths for highly semantic contexts.',
         time: 'Yesterday',
         routing: {
@@ -57,10 +56,21 @@ const Chat = () => {
 
   const [isLoading, setIsLoading] = useState(false)
   const [loadingStep, setLoadingStep] = useState('Analyzing Intent...')
+  // FIX Bug 4: track the model chosen by routing so TypingIndicator shows the correct name
+  const [pendingModel, setPendingModel] = useState(null)
   const messagesEndRef = useRef(null)
   const messageIdRef = useRef(100)
+  // FIX Bug 2: store timeout IDs so we can cancel them if user switches chat or unmounts
+  const timeoutRefs = useRef([])
 
   const currentMessages = conversationsMessages[activeChatId] || []
+
+  // Cancel all pending timeouts on unmount
+  useEffect(() => {
+    return () => {
+      timeoutRefs.current.forEach(clearTimeout)
+    }
+  }, [])
 
   // Auto-scroll to bottom of workspace
   useEffect(() => {
@@ -90,7 +100,7 @@ const Chat = () => {
   }
 
   const handleRenameChat = (id, newTitle) => {
-    setChatHistory(prev => 
+    setChatHistory(prev =>
       prev.map(c => c.id === id ? { ...c, title: newTitle } : c)
     )
   }
@@ -98,6 +108,14 @@ const Chat = () => {
   // Handle prompt submissions
   const handleSendMessage = (content) => {
     if (!content.trim() || isLoading) return
+
+    // FIX Bug 2: cancel any in-flight timers from a previous message before starting new ones
+    timeoutRefs.current.forEach(clearTimeout)
+    timeoutRefs.current = []
+
+    // Snapshot the active chat ID at the time of sending so all callbacks
+    // write to the correct conversation even if the user switches chats
+    const chatIdAtSend = activeChatId
 
     messageIdRef.current += 1
     const userMsg = {
@@ -109,81 +127,108 @@ const Chat = () => {
 
     setConversationsMessages(prev => ({
       ...prev,
-      [activeChatId]: [...(prev[activeChatId] || []), userMsg]
+      [chatIdAtSend]: [...(prev[chatIdAtSend] || []), userMsg]
     }))
 
     setIsLoading(true)
+    setPendingModel(null)
     setLoadingStep('Analyzing Intent...')
 
-    // Simulated Model Routing Sequence
-    setTimeout(() => {
-      setLoadingStep('Selecting Best Model...')
-      
-      setTimeout(() => {
-        setLoadingStep('Generating Response...')
-        
-        setTimeout(() => {
-          let model = 'GPT-4o'
-          let cost = '$0.0022'
-          let confidence = '95%'
-          let reason = 'Automatically routed to GPT-4o as the request requires balanced cost-efficiency and general reasoning.'
-          let reply = 'I have analyzed your prompt and successfully routed it to GPT-4o. Let me know if you would like me to unpack these suggestions further!'
+    // Determine routing result up-front so all stages can reference it
+    const query = content.toLowerCase()
+    let model = 'GPT-4o'
+    let cost = '$0.0022'
+    let confidence = '95%'
+    let reason = 'Automatically routed to GPT-4o as the request requires balanced cost-efficiency and general reasoning.'
+    let reply = 'I have analyzed your prompt and successfully routed it to GPT-4o. Let me know if you would like me to unpack these suggestions further!'
 
-          const query = content.toLowerCase()
-          if (query.includes('react') || query.includes('code') || query.includes('rust') || query.includes('next.js') || query.includes('remix')) {
-            model = 'Claude 3.5 Sonnet'
-            cost = '$0.0048'
-            confidence = '99%'
-            reason = 'Routed to Claude 3.5 Sonnet due to its superior coding benchmarks and precise structural output.'
-            if (query.includes('react') || query.includes('next.js') || query.includes('remix')) {
-              reply = 'When structural modularity is required, React components should be separated by concerns. Using Next.js or Remix allows you to leverage server rendering to optimize load times and bundle sizes. Here is a recommended architectural flow.'
-            } else if (query.includes('rust')) {
-              reply = 'Rust async programming model relies on Futures, which are polled by a runtime like Tokio. To maximize throughput, minimize mutex contention and write lock-free state managers where appropriate.'
+    if (query.includes('react') || query.includes('code') || query.includes('rust') || query.includes('next.js') || query.includes('remix')) {
+      model = 'Claude 3.5 Sonnet'
+      cost = '$0.0048'
+      confidence = '99%'
+      reason = 'Routed to Claude 3.5 Sonnet due to its superior coding benchmarks and precise structural output.'
+      if (query.includes('react') || query.includes('next.js') || query.includes('remix')) {
+        reply = 'When structural modularity is required, React components should be separated by concerns. Using Next.js or Remix allows you to leverage server rendering to optimize load times and bundle sizes. Here is a recommended architectural flow.'
+      } else if (query.includes('rust')) {
+        reply = 'Rust async programming model relies on Futures, which are polled by a runtime like Tokio. To maximize throughput, minimize mutex contention and write lock-free state managers where appropriate.'
+      }
+    } else if (query.includes('paper') || query.includes('transformer') || query.includes('explain') || query.includes('summarize')) {
+      model = 'Gemini 1.5 Pro'
+      cost = '$0.0015'
+      confidence = '93%'
+      reason = 'Routed to Gemini 1.5 Pro due to long-context reasoning capabilities and complex semantic mapping.'
+      reply = 'The self-attention mechanism computes representations of sequence elements by relating different positions of a single sequence. This allows the model to process context globally rather than sequentially.'
+    }
+
+    // FIX Bug 4: expose the decided model to TypingIndicator immediately
+    // so it shows the correct name in its "Optimal Route Selected" panel
+    const t1 = setTimeout(() => {
+      setLoadingStep('Comparing Models...')
+
+      const t2 = setTimeout(() => {
+        setLoadingStep('Selecting Best Model...')
+        // Reveal the actual model name at the "selecting" stage
+        setPendingModel(model)
+
+        const t3 = setTimeout(() => {
+          setLoadingStep('Generating Response...')
+
+          const t4 = setTimeout(() => {
+            messageIdRef.current += 1
+            const assistantMsg = {
+              id: `assistant-${messageIdRef.current}`,
+              role: 'assistant',
+              content: reply,
+              time: 'Just now',
+              routing: { model, cost, confidence, reason }
             }
-          } else if (query.includes('paper') || query.includes('transformer') || query.includes('explain') || query.includes('summarize')) {
-            model = 'Gemini 1.5 Pro'
-            cost = '$0.0015'
-            confidence = '93%'
-            reason = 'Routed to Gemini 1.5 Pro due to long-context reasoning capabilities and complex semantic mapping.'
-            reply = 'The self-attention mechanism computes representations of sequence elements by relating different positions of a single sequence. This allows the model to process context globally rather than sequentially.'
-          }
 
-          messageIdRef.current += 1
-          const assistantMsg = {
-            id: `assistant-${messageIdRef.current}`,
-            role: 'assistant',
-            content: reply,
-            time: 'Just now',
-            routing: {
-              model,
-              cost,
-              confidence,
-              reason
-            }
-          }
+            // FIX Bug 2: write to the snapshotted chat ID, not the current activeChatId
+            // FIX Bug 1: use the functional updater to check the live message count,
+            // avoiding the stale-closure problem that prevented auto-rename from firing
+            setConversationsMessages(prev => {
+              const existingMsgs = prev[chatIdAtSend] || []
+              return {
+                ...prev,
+                [chatIdAtSend]: [...existingMsgs, assistantMsg]
+              }
+            })
 
-          setConversationsMessages(prev => ({
-            ...prev,
-            [activeChatId]: [...(prev[activeChatId] || []), assistantMsg]
-          }))
-          
-          // Update chat title if it was a new empty chat
-          const chatIndex = chatHistory.findIndex(c => c.id === activeChatId)
-          if (chatIndex !== -1 && chatHistory[chatIndex].title === 'RouteMind Introduction' && currentMessages.length === 0) {
-            const shortened = content.length > 25 ? `${content.substring(0, 25)}...` : content
-            handleRenameChat(activeChatId, shortened)
-          }
+            // FIX Bug 1: rename the chat using state at callback time, not render time.
+            // We check chatHistory via setChatHistory's functional form to get fresh data.
+            setChatHistory(prevHistory => {
+              const chatIndex = prevHistory.findIndex(c => c.id === chatIdAtSend)
+              if (chatIndex === -1) return prevHistory
+              const chat = prevHistory[chatIndex]
+              // Only auto-rename if the chat still has its default placeholder title
+              // and only has the single user message we just added (i.e. it was a fresh chat)
+              const msgsAtCallback = conversationsMessages[chatIdAtSend] || []
+              const isFirstMessage = msgsAtCallback.length <= 1
+              if (isFirstMessage && chat.title === 'New Workspace Chat') {
+                const shortened = content.length > 25 ? `${content.substring(0, 25)}...` : content
+                const updated = [...prevHistory]
+                updated[chatIndex] = { ...chat, title: shortened }
+                return updated
+              }
+              return prevHistory
+            })
 
-          setIsLoading(false)
-        }, 1200)
+            setIsLoading(false)
+            setPendingModel(null)
+          }, 1200)
+          timeoutRefs.current.push(t4)
+        }, 1000)
+        timeoutRefs.current.push(t3)
       }, 1000)
+      timeoutRefs.current.push(t2)
     }, 1000)
+    timeoutRefs.current.push(t1)
   }
 
   return (
     <div className="h-screen bg-app-bg flex text-[#FAFAFA] overflow-hidden font-sans selection:bg-blue-600/30 selection:text-white">
       {/* Sidebar Navigation */}
-      <Sidebar 
+      <Sidebar
         activeChatId={activeChatId}
         onChatSelect={setActiveChatId}
         chatHistory={chatHistory}
@@ -203,7 +248,7 @@ const Chat = () => {
           <div className="flex items-center gap-3">
             {/* Desktop Sidebar Toggle (Only visible when collapsed) */}
             {isCollapsed && (
-              <button 
+              <button
                 onClick={() => setIsCollapsed(false)}
                 className="hidden md:flex p-1.5 rounded-lg text-neutral-400 hover:text-[#FAFAFA] hover:bg-neutral-900 border border-transparent hover:border-border-app transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 cursor-pointer"
                 aria-label="Expand sidebar"
@@ -213,14 +258,14 @@ const Chat = () => {
             )}
 
             {/* Mobile Sidebar Toggle */}
-            <button 
+            <button
               onClick={() => setMobileOpen(true)}
               className="md:hidden p-1.5 rounded-lg text-neutral-400 hover:text-[#FAFAFA] hover:bg-neutral-900 border border-transparent hover:border-border-app transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 cursor-pointer"
               aria-label="Open sidebar menu"
             >
               <Menu size={18} />
             </button>
-            
+
             <div className="flex items-center gap-2">
               <Link to="/" className="text-white font-semibold text-xs tracking-wider font-mono uppercase text-blue-400 hover:text-blue-300 transition-all duration-200">
                 RouteMind
@@ -232,7 +277,7 @@ const Chat = () => {
             </div>
           </div>
 
-          <button 
+          <button
             onClick={() => {
               const newId = Date.now().toString()
               handleNewChat({ id: newId, title: 'New Workspace Chat', timestamp: 'Just now' })
@@ -294,9 +339,12 @@ const Chat = () => {
 
               {/* Typing/Routing Stage Indicator */}
               {isLoading && (
-                <TypingIndicator loadingStep={loadingStep} />
+                <TypingIndicator
+                  loadingStep={loadingStep}
+                  selectedModel={pendingModel}
+                />
               )}
-              
+
               <div ref={messagesEndRef} />
             </div>
           )}
@@ -304,17 +352,12 @@ const Chat = () => {
 
         {/* Fixed Footer Input Bar */}
         <div className="bg-app-bg border-t border-border-app/40 shrink-0">
-          <ChatInput 
+          <ChatInput
             onSubmit={handleSendMessage}
             isLoading={isLoading}
             loadingStep={loadingStep}
           />
         </div>
-      </div>
-
-      {/* Subtle import validation block to satisfy static compiler usage metrics */}
-      <div className="hidden" aria-hidden="true">
-        <RoutingCard routing={null} />
       </div>
     </div>
   )

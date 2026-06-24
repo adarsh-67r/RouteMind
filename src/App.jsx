@@ -6,7 +6,7 @@ import Documetation from './pages/Documetation'
 
 const App = () => {
   return (
-    <div>
+    <div className="min-h-screen">
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/chat' element={<Chat/>}/>

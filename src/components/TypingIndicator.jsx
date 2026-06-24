@@ -25,25 +25,23 @@ const TypingIndicator = ({ loadingStep, selectedModel, selectionReason }) => {
   }
 
   // Smoothly increment steps internally as target changes to simulate human-like planning
+  // FIX Bug 3: guard against running past the last stage index so the component
+  // never goes blank due to an uncapped interval
   useEffect(() => {
     const targetStep = getActiveStepIndex(loadingStep)
-    
+    const maxStep = STAGES.length - 1
+
     const runStepTransition = () => {
       setCurrentStep(prev => {
-        if (targetStep < prev) {
-          return targetStep
-        }
-        if (targetStep > prev) {
-          return prev + 1
-        }
-        return prev
+        // Never exceed the target or the last valid stage index
+        if (prev >= targetStep || prev >= maxStep) return prev
+        return prev + 1
       })
     }
 
-    // Run first transition tick asynchronously in next loop to avoid synchronous setState warnings
     const initialTimeout = setTimeout(runStepTransition, 0)
     const interval = setInterval(runStepTransition, 450)
-    
+
     return () => {
       clearTimeout(initialTimeout)
       clearInterval(interval)
@@ -60,9 +58,10 @@ const TypingIndicator = ({ loadingStep, selectedModel, selectionReason }) => {
     }
   }, [currentStep])
 
-  // Heuristic selected model info if not provided directly
-  const selectedModelVal = selectedModel ?? 'Claude 3.5 Sonnet'
-  const selectedReasonVal = selectionReason ?? 'Routed to Claude 3.5 Sonnet for precise code syntax and optimized framework structure.'
+  // FIX Bug 4: use the selectedModel passed from Chat.jsx (the actual routing decision).
+  // Only fall back to a default if nothing has been decided yet (early loading stages).
+  const selectedModelVal = selectedModel ?? 'Deciding...'
+  const selectedReasonVal = selectionReason ?? 'Evaluating the optimal model for your query...'
 
   const isStreaming = currentStep === 4
 
