@@ -8,7 +8,6 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false)
   const [authModalOpen, setAuthModalOpen] = useState(false)
 
-  // Add scroll listener to update border/background on scroll
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -37,7 +36,6 @@ const Navbar = () => {
           className="flex items-center gap-3 group focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 rounded-lg p-1"
           aria-label="RouteMind Home"
         >
-          {/* Futuristic routing icon */}
           <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-neutral-900 border border-neutral-800 group-hover:border-blue-500/40 transition-colors duration-300">
             <svg 
               className="w-[22px] h-[22px] text-neutral-400 group-hover:text-blue-400 transition-colors duration-300" 
@@ -45,7 +43,6 @@ const Navbar = () => {
               fill="none" 
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* Top routing path (dimmed) */}
               <path 
                 d="M8 10C12 10 14 6 18 6H24" 
                 stroke="currentColor" 
@@ -53,7 +50,6 @@ const Navbar = () => {
                 strokeLinecap="round" 
                 className="text-neutral-700 group-hover:text-neutral-600 transition-colors duration-300" 
               />
-              {/* Active middle routing path (highlighted blue) */}
               <path 
                 d="M8 16H24" 
                 stroke="#0066FF" 
@@ -61,7 +57,6 @@ const Navbar = () => {
                 strokeLinecap="round" 
                 className="drop-shadow-[0_0_4px_rgba(0,102,255,0.6)]" 
               />
-              {/* Bottom routing path (dimmed) */}
               <path 
                 d="M8 22C12 22 14 26 18 26H24" 
                 stroke="currentColor" 
@@ -69,10 +64,8 @@ const Navbar = () => {
                 strokeLinecap="round" 
                 className="text-neutral-700 group-hover:text-neutral-600 transition-colors duration-300" 
               />
-              {/* Router Hub */}
               <rect x="6" y="8" width="4" height="16" rx="1" fill="#171717" stroke="currentColor" strokeWidth="1.5" className="text-neutral-600 group-hover:text-neutral-500 transition-colors duration-300" />
               <circle cx="8" cy="16" r="1.5" fill="#0066FF" />
-              {/* Endpoint models */}
               <circle cx="24" cy="6" r="2" fill="#404040" />
               <circle cx="24" cy="16" r="3" fill="#0066FF" className="animate-pulse" />
               <circle cx="24" cy="26" r="2" fill="#404040" />
@@ -90,7 +83,7 @@ const Navbar = () => {
           </div>
         </Link>
 
-        {/* Center Section: Navigation Links (Desktop & Tablet horizontal) */}
+        {/* Center Section: Navigation Links */}
         <nav 
           className="hidden md:flex items-center gap-x-6 lg:gap-x-8"
           aria-label="Global navigation"
@@ -123,7 +116,6 @@ const Navbar = () => {
 
         {/* Right Section: Actions */}
         <div className="hidden md:flex items-center gap-x-4">
-          {/* GitHub icon link */}
           <a
             href="https://github.com/pritesh-4/RouteMind"
             target="_blank"
@@ -142,7 +134,6 @@ const Navbar = () => {
             </svg>
           </a>
 
-          {/* Sign In (Secondary) - Hidden on tablet, visible on desktop */}
           <button
             onClick={() => setAuthModalOpen(true)}
             className="hidden lg:inline-flex text-neutral-400 hover:text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 cursor-pointer"
@@ -150,7 +141,6 @@ const Navbar = () => {
             Sign In
           </button>
 
-          {/* Get Started (Primary CTA) */}
           <Link
             to="/chat"
             className="bg-[#0066FF] hover:bg-[#0052CC] text-white text-sm font-medium px-4 py-2 rounded-lg border border-blue-500/30 hover:border-blue-400/50 shadow-[0_0_15px_rgba(0,102,255,0.15)] hover:shadow-[0_0_20px_rgba(0,102,255,0.3)] hover:-translate-y-0.5 transition-all duration-200 active:translate-y-0 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-app-bg focus-visible:ring-blue-500"
@@ -159,7 +149,7 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Mobile & Tablet Hamburger Toggle Button */}
+        {/* Mobile Hamburger */}
         <div className="md:hidden flex items-center">
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -170,10 +160,9 @@ const Navbar = () => {
             {isOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
-
       </div>
 
-      {/* Mobile/Tablet Dropdown Menu Panel */}
+      {/* Mobile Dropdown */}
       <div 
         className={`absolute top-[76px] left-0 w-full bg-app-bg border-b border-[#1A1A1A] transition-all duration-300 ease-in-out z-40 md:hidden overflow-hidden ${
           isOpen ? 'max-h-[360px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
@@ -219,8 +208,7 @@ const Navbar = () => {
               <svg 
                 className="w-[18px] h-[18px]" 
                 viewBox="0 0 24 24" 
-                fill="currentColor" 
-                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
                 aria-hidden="true"
               >
                 <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.167 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.164 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
