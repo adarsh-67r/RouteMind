@@ -15,16 +15,52 @@ import {
   ShieldCheck,
   Info,
   ExternalLink,
-  Loader2
+  Loader2,
+  Image,
+  FileText,
+  Code,
+  File
 } from 'lucide-react'
+import { useToast } from '../context/ToastContext'
+
+const formatFileSize = (bytes) => {
+  if (!bytes || bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
+}
+
+const getFileIcon = (fileName) => {
+  if (!fileName) return <File size={13} className="text-neutral-400 shrink-0" />
+  const ext = fileName.split('.').pop().toLowerCase()
+  if (['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext)) {
+    return <Image size={13} className="text-blue-400 shrink-0" />
+  }
+  if (['pdf'].includes(ext)) {
+    return <FileText size={13} className="text-red-400 shrink-0" />
+  }
+  if (['doc', 'docx'].includes(ext)) {
+    return <FileText size={13} className="text-blue-500 shrink-0" />
+  }
+  if (['txt', 'md'].includes(ext)) {
+    return <FileText size={13} className="text-neutral-400 shrink-0" />
+  }
+  if (['js', 'jsx', 'ts', 'tsx', 'py', 'cpp', 'java', 'json', 'html', 'css'].includes(ext)) {
+    return <Code size={13} className="text-green-400 shrink-0" />
+  }
+  return <File size={13} className="text-neutral-400 shrink-0" />
+}
 
 const CodeBlock = ({ language, value }) => {
   const [copied, setCopied] = useState(false)
+  const { showToast } = useToast()
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(value)
       setCopied(true)
+      showToast('Code copied to clipboard!', 'success')
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
       console.error('Failed to copy code: ', err)
@@ -163,6 +199,7 @@ const ChatMessage = ({
   reason: directReason,
   isStreaming: directIsStreaming,
   showRoutingInfo: directShowRoutingInfo,
+  onRegenerate
 }) => {
   const role = message?.role ?? directRole ?? 'assistant'
   const content = message?.content ?? directContent ?? ''
@@ -178,15 +215,43 @@ const ChatMessage = ({
 
   const [copiedMessage, setCopiedMessage] = useState(false)
   const [rated, setRated] = useState(null)
+  const { showToast } = useToast()
 
   const handleCopyMessage = async () => {
     if (!content) return
     try {
       await navigator.clipboard.writeText(content)
       setCopiedMessage(true)
+      showToast('Message copied to clipboard!', 'success')
       setTimeout(() => setCopiedMessage(false), 2000)
     } catch (err) {
       console.error('Failed to copy: ', err)
+      showToast('Failed to copy message.', 'error')
+    }
+  }
+
+  const handleThumbsUp = () => {
+    const nextRated = rated === 'up' ? null : 'up'
+    setRated(nextRated)
+    if (nextRated) {
+      showToast('Thanks for your feedback!', 'success')
+    }
+  }
+
+  const handleThumbsDown = () => {
+    const nextRated = rated === 'down' ? null : 'down'
+    setRated(nextRated)
+    if (nextRated) {
+      showToast('Feedback recorded. We will improve routing parameters.', 'success')
+    }
+  }
+
+  const handleShare = () => {
+    try {
+      navigator.clipboard.writeText(window.location.href)
+      showToast('Shared chat link copied to clipboard!', 'success')
+    } catch (err) {
+      console.error('Failed to share: ', err)
     }
   }
 
@@ -196,11 +261,30 @@ const ChatMessage = ({
 
   if (isUser) {
     return (
-      // animate-slide-in-right: user messages fly in from the right
       <div className="w-full py-6 px-4 border-b border-border-app/20 bg-transparent group relative hover:bg-card-bg/20 transition-colors duration-200 animate-slide-in-right">
         <div className="max-w-[850px] mx-auto flex justify-end gap-4">
           <div className="max-w-[85%] flex flex-col items-end space-y-2 select-text">
             <div className="rounded-2xl px-4 py-2.5 bg-card-bg border border-border-app text-[15px] text-primary leading-relaxed break-words whitespace-pre-wrap selection:bg-blue-600/30 selection:text-white font-sans shadow-sm hover:border-border-app/80 transition-colors duration-200">
+              {/* Attachment Stack inside User Message Bubble */}
+              {message?.files && message.files.length > 0 && (
+                <div className="flex flex-col gap-2 mb-3 border-b border-border-app/40 pb-3">
+                  {message.files.map((file, idx) => (
+                    <div key={idx} className="flex items-center gap-2 p-2 rounded-xl bg-sidebar-bg border border-border-app/50 max-w-sm text-left">
+                      <div className="p-1 rounded bg-card-bg border border-border-app">
+                        {getFileIcon(file.name)}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-primary font-medium text-xs truncate max-w-[200px]" title={file.name}>
+                          {file.name}
+                        </span>
+                        <span className="text-[9px] text-neutral-500 font-mono">
+                          {formatFileSize(file.size)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
               {content}
             </div>
             <div className="flex items-center gap-2 text-[10px] text-secondary font-mono select-none px-1.5">
@@ -224,7 +308,7 @@ const ChatMessage = ({
             {copiedMessage ? <Check size={13} className="text-green-400" /> : <Copy size={13} />}
           </button>
           <button
-            onClick={() => {}}
+            onClick={handleShare}
             className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer"
             title="Share"
             aria-label="Share Message"
@@ -236,7 +320,6 @@ const ChatMessage = ({
     )
   }
 
-  // animate-slide-up-fade: assistant messages rise up from below
   return (
     <div className="w-full py-8 px-4 border-b border-border-app/30 bg-transparent group relative hover:bg-card-bg/40 transition-all duration-300 animate-slide-up-fade">
       <div className="max-w-[850px] mx-auto flex gap-4 sm:gap-6">
@@ -271,7 +354,6 @@ const ChatMessage = ({
             )}
           </div>
 
-          {/* Routing metadata — fade in with a slight delay so it doesn't compete with content */}
           {showRoutingInfo && (model || confidence || reason) && (
             <div className="mt-4 p-3.5 rounded-xl bg-card-bg border border-border-app flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs transition-all duration-200 hover:border-blue-500/10 shadow-sm select-none animate-fade-in stagger-2">
               <div className="flex flex-wrap items-center gap-2">
@@ -313,11 +395,11 @@ const ChatMessage = ({
         <button onClick={handleCopyMessage} className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Copy Message" aria-label="Copy Message">
           {copiedMessage ? <Check size={13} className="text-green-400" /> : <Copy size={13} />}
         </button>
-        <button onClick={() => {}} className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Regenerate Response" aria-label="Regenerate Response">
+        <button onClick={() => onRegenerate && onRegenerate(message.id)} className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Regenerate Response" aria-label="Regenerate Response">
           <RotateCcw size={13} />
         </button>
         <button
-          onClick={() => setRated(rated === 'up' ? null : 'up')}
+          onClick={handleThumbsUp}
           className={`p-1.5 rounded-md hover:bg-card-bg transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer ${
             rated === 'up' ? 'text-blue-500 hover:text-blue-600' : 'text-secondary hover:text-primary'
           }`}
@@ -326,7 +408,7 @@ const ChatMessage = ({
           <ThumbsUp size={13} fill={rated === 'up' ? 'currentColor' : 'none'} />
         </button>
         <button
-          onClick={() => setRated(rated === 'down' ? null : 'down')}
+          onClick={handleThumbsDown}
           className={`p-1.5 rounded-md hover:bg-card-bg transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer ${
             rated === 'down' ? 'text-red-500 hover:text-red-600' : 'text-secondary hover:text-primary'
           }`}
@@ -334,7 +416,7 @@ const ChatMessage = ({
         >
           <ThumbsDown size={13} fill={rated === 'down' ? 'currentColor' : 'none'} />
         </button>
-        <button onClick={() => {}} className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Share" aria-label="Share Message">
+        <button onClick={handleShare} className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Share" aria-label="Share Message">
           <Share2 size={13} />
         </button>
       </div>

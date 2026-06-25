@@ -1,15 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Menu, PanelLeft } from 'lucide-react'
+import { Plus, Menu, PanelLeft, Trash2 } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 import ChatMessage from '../components/ChatMessage'
 import ChatInput from '../components/ChatInput'
 import TypingIndicator from '../components/TypingIndicator'
+import { getMockRouting } from '../utils/mockRouter'
+import { useToast } from '../context/ToastContext'
 
 const Chat = () => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [activeChatId, setActiveChatId] = useState('1')
+  const { showToast } = useToast()
 
   const [chatHistory, setChatHistory] = useState([
     { id: '1', title: 'RouteMind Introduction', timestamp: 'Just now' },
@@ -89,20 +92,31 @@ const Chat = () => {
     setChatHistory(prev => prev.map(c => c.id === id ? { ...c, title: newTitle } : c))
   }
 
-  const handleSendMessage = (content) => {
-    if (!content.trim() || isLoading) return
+  const handleSendMessage = (content, attachedFiles = []) => {
+    const hasText = !!content.trim()
+    const hasFiles = attachedFiles && attachedFiles.length > 0
+    if ((!hasText && !hasFiles) || isLoading) return
 
     timeoutRefs.current.forEach(clearTimeout)
     timeoutRefs.current = []
 
     const chatIdAtSend = activeChatId
-
     messageIdRef.current += 1
+    
+    const filesMetadata = hasFiles
+      ? attachedFiles.map(f => ({
+          name: f.name,
+          size: f.size,
+          type: f.type || f.name.split('.').pop()
+        }))
+      : []
+
     const userMsg = {
       id: `user-${messageIdRef.current}`,
       role: 'user',
       content: content.trim(),
-      time: 'Just now'
+      time: 'Just now',
+      files: filesMetadata
     }
 
     setConversationsMessages(prev => ({
@@ -112,37 +126,37 @@ const Chat = () => {
 
     setIsLoading(true)
     setPendingModel(null)
-    setLoadingStep('Analyzing Intent...')
+    setLoadingStep(hasFiles ? 'Reading attachments...' : 'Analyzing Intent...')
 
-    const query = content.toLowerCase()
-    let model = 'GPT-4o'
-    let cost = '$0.0022'
-    let confidence = '95%'
-    let reason = 'Automatically routed to GPT-4o as the request requires balanced cost-efficiency and general reasoning.'
-    let reply = 'I have analyzed your prompt and successfully routed it to GPT-4o. Let me know if you would like me to unpack these suggestions further!'
+    // Fetch optimal routing parameters
+    const routingResult = getMockRouting(content.trim(), hasFiles ? attachedFiles[0] : null)
+    const { model, cost, confidence, reason } = routingResult
 
-    if (query.includes('react') || query.includes('code') || query.includes('rust') || query.includes('next.js') || query.includes('remix')) {
-      model = 'Claude 3.5 Sonnet'
-      cost = '$0.0048'
-      confidence = '99%'
-      reason = 'Routed to Claude 3.5 Sonnet due to its superior coding benchmarks and precise structural output.'
+    let reply = `I have analyzed your query and successfully routed it to **${model}**. Let me know if you would like me to unpack these suggestions further!`
+    
+    if (model === 'Gemini 1.5 Pro' && hasFiles) {
+      reply = `I have successfully analyzed the attached document: **${attachedFiles[0].name}** (${(attachedFiles[0].size / 1024).toFixed(1)} KB).\n\nBased on its structural context, I have routed it to **Gemini 1.5 Pro** due to its 1M-token context window. Here is the response layout generated.`
+    } else if (model === 'GPT-4o' && hasFiles && attachedFiles[0].name.split('.').pop().toLowerCase().match(/(png|jpg|jpeg|webp)/)) {
+      reply = `I have processed the uploaded image: **${attachedFiles[0].name}** using **GPT-4o**'s vision model capabilities. RouteMind decided this model fits best for multimodal and canvas processing parameters.`
+    } else {
+      const query = content.toLowerCase()
       if (query.includes('react') || query.includes('next.js') || query.includes('remix')) {
         reply = 'When structural modularity is required, React components should be separated by concerns. Using Next.js or Remix allows you to leverage server rendering to optimize load times and bundle sizes. Here is a recommended architectural flow.'
-      } else if (query.includes('rust')) {
+      } else if (query.includes('rust') || query.includes('code')) {
         reply = 'Rust async programming model relies on Futures, which are polled by a runtime like Tokio. To maximize throughput, minimize mutex contention and write lock-free state managers where appropriate.'
+      } else if (query.includes('explain') || query.includes('summarize')) {
+        reply = 'The self-attention mechanism computes representations of sequence elements by relating different positions of a single sequence. This allows the model to process context globally rather than sequentially.'
       }
-    } else if (query.includes('paper') || query.includes('transformer') || query.includes('explain') || query.includes('summarize')) {
-      model = 'Gemini 1.5 Pro'
-      cost = '$0.0015'
-      confidence = '93%'
-      reason = 'Routed to Gemini 1.5 Pro due to long-context reasoning capabilities and complex semantic mapping.'
-      reply = 'The self-attention mechanism computes representations of sequence elements by relating different positions of a single sequence. This allows the model to process context globally rather than sequentially.'
     }
 
+    const step1 = hasFiles ? 'Reading document structure...' : 'Analyzing Intent...'
+    const step2 = hasFiles ? 'Extracting semantic metadata...' : 'Comparing Models...'
+    const step3 = hasFiles ? 'Selecting Best Model...' : 'Selecting Best Model...'
+
     const t1 = setTimeout(() => {
-      setLoadingStep('Comparing Models...')
+      setLoadingStep(step2)
       const t2 = setTimeout(() => {
-        setLoadingStep('Selecting Best Model...')
+        setLoadingStep(step3)
         setPendingModel(model)
         const t3 = setTimeout(() => {
           setLoadingStep('Generating Response...')
@@ -166,7 +180,8 @@ const Chat = () => {
               const msgsAtCallback = conversationsMessages[chatIdAtSend] || []
               const isFirstMessage = msgsAtCallback.length <= 1
               if (isFirstMessage && chat.title === 'New Workspace Chat') {
-                const shortened = content.length > 25 ? `${content.substring(0, 25)}...` : content
+                const titleText = content.trim() ? content : (hasFiles ? `File: ${attachedFiles[0].name}` : 'New Workspace Chat')
+                const shortened = titleText.length > 25 ? `${titleText.substring(0, 25)}...` : titleText
                 const updated = [...prevHistory]
                 updated[chatIndex] = { ...chat, title: shortened }
                 return updated
@@ -183,6 +198,48 @@ const Chat = () => {
       timeoutRefs.current.push(t2)
     }, 1000)
     timeoutRefs.current.push(t1)
+  }
+
+  const handleRegenerateResponse = (messageId) => {
+    if (isLoading) return
+    const messages = conversationsMessages[activeChatId] || []
+    const index = messages.findIndex(m => m.id === messageId)
+    if (index === -1) return
+    
+    // Find the user prompt preceding this message
+    let promptMsg = null
+    for (let i = index - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') {
+        promptMsg = messages[i]
+        break
+      }
+    }
+    
+    if (!promptMsg) return
+    
+    setConversationsMessages(prev => {
+      const chatMsgs = prev[activeChatId] || []
+      return {
+        ...prev,
+        [activeChatId]: chatMsgs.slice(0, index)
+      }
+    })
+    
+    const originalFiles = promptMsg.files ? promptMsg.files.map(f => ({
+      name: f.name,
+      size: f.size,
+      type: f.type
+    })) : []
+    
+    handleSendMessage(promptMsg.content, originalFiles)
+  }
+
+  const handleClearConversation = () => {
+    setConversationsMessages(prev => ({
+      ...prev,
+      [activeChatId]: []
+    }))
+    showToast('Conversation cleared.', 'info')
   }
 
   // Stagger delays for welcome screen prompt cards
@@ -242,18 +299,32 @@ const Chat = () => {
             </div>
           </div>
 
-          <button
-            onClick={() => {
-              const newId = Date.now().toString()
-              handleNewChat({ id: newId, title: 'New Workspace Chat', timestamp: 'Just now' })
-            }}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-primary hover:bg-card-bg border border-transparent hover:border-border-app transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 flex items-center gap-1.5 cursor-pointer shrink-0"
-            aria-label="Start new chat"
-          >
-            <Plus size={16} />
-            {/* Label hidden on very small screens to prevent overflow */}
-            <span className="text-xs font-medium hidden sm:inline">New Chat</span>
-          </button>
+          <div className="flex items-center gap-2">
+            {currentMessages.length > 0 && (
+              <button
+                onClick={handleClearConversation}
+                className="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-card-bg border border-transparent hover:border-border-app transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 flex items-center gap-1.5 cursor-pointer shrink-0"
+                aria-label="Clear active conversation"
+                title="Clear conversation messages"
+              >
+                <Trash2 size={15} />
+                <span className="text-xs font-medium hidden sm:inline">Clear Chat</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => {
+                const newId = Date.now().toString()
+                handleNewChat({ id: newId, title: 'New Workspace Chat', timestamp: 'Just now' })
+              }}
+              className="p-1.5 rounded-lg text-neutral-400 hover:text-primary hover:bg-card-bg border border-transparent hover:border-border-app transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 flex items-center gap-1.5 cursor-pointer shrink-0"
+              aria-label="Start new chat"
+            >
+              <Plus size={16} />
+              {/* Label hidden on very small screens to prevent overflow */}
+              <span className="text-xs font-medium hidden sm:inline">New Chat</span>
+            </button>
+          </div>
         </header>
 
         {/* Scrollable message area */}
@@ -262,11 +333,11 @@ const Chat = () => {
             // Welcome state — staggered entrance on each card
             <div className="min-h-full flex flex-col items-center justify-center max-w-[850px] mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center space-y-10 sm:space-y-12 select-none">
               <div className="space-y-4 animate-slide-up-fade">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/20 bg-blue-950/20 text-xs font-medium text-blue-400">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/20 bg-blue-950/20 text-xs font-medium text-blue-400 font-mono">
                   <span className="flex h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse"></span>
                   Active Proxy Node: US-East-1 Edge
                 </div>
-                <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-primary leading-tight">
+                <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-primary leading-tight font-sans">
                   RouteMind
                 </h2>
                 <p className="text-base sm:text-xl font-medium text-neutral-300">
@@ -299,7 +370,11 @@ const Chat = () => {
           ) : (
             <div className="pb-32">
               {currentMessages.map((msg) => (
-                <ChatMessage key={msg.id} message={msg} />
+                <ChatMessage 
+                  key={msg.id} 
+                  message={msg} 
+                  onRegenerate={handleRegenerateResponse}
+                />
               ))}
               {isLoading && (
                 <TypingIndicator

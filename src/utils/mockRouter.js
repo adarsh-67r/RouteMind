@@ -8,8 +8,33 @@
  * @param {string} query - The user's raw input string
  * @returns {{ model: string, confidence: string, cost: string, reason: string, latency: string }}
  */
-export function getMockRouting(query) {
+export function getMockRouting(query, file = null) {
   const q = query.toLowerCase()
+
+  if (file) {
+    const ext = file.name.split('.').pop().toLowerCase()
+    const isImage = ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext)
+    
+    if (isImage) {
+      return {
+        model: 'GPT-4o',
+        confidence: '98%',
+        cost: '$0.0032',
+        reason: `Routed to GPT-4o Vision layer to parse spatial features and pixel layouts in "${file.name}" with sub-pixel alignment.`,
+        latency: '~1.4s'
+      }
+    }
+    
+    if (['pdf', 'docx', 'doc', 'txt', 'md'].includes(ext)) {
+      return {
+        model: 'Gemini 1.5 Pro',
+        confidence: '97%',
+        cost: '$0.0015',
+        reason: `Routed to Gemini 1.5 Pro because the payload "${file.name}" requires long-context window ingestion and token semantic indexing.`,
+        latency: '~1.8s'
+      }
+    }
+  }
 
   if (
     q.includes('code') || q.includes('function') || q.includes('debug') ||

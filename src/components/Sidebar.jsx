@@ -51,6 +51,41 @@ const Sidebar = ({
     }
   }, [editingId])
 
+  // Global Keyboard Shortcuts & Modal Dismissal
+  useEffect(() => {
+    const handleGlobalShortcuts = (e) => {
+      // Escape closes settings modal
+      if (e.key === 'Escape' && settingsOpen) {
+        setSettingsOpen(false)
+      }
+      
+      // CMD/CTRL+K to focus search input
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        const searchInput = document.querySelector('input[placeholder="Search history..."]')
+        if (searchInput) {
+          searchInput.focus()
+          searchInput.select()
+        }
+      }
+
+      // CMD/CTRL+N to trigger a new chat
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
+        e.preventDefault()
+        handleCreateNewChat()
+      }
+
+      // CMD/CTRL+\ to toggle sidebar open state
+      if ((e.ctrlKey || e.metaKey) && e.key === '\\') {
+        e.preventDefault()
+        setIsCollapsed(!isCollapsed)
+      }
+    }
+
+    window.addEventListener('keydown', handleGlobalShortcuts)
+    return () => window.removeEventListener('keydown', handleGlobalShortcuts)
+  }, [settingsOpen, isCollapsed, chatHistory])
+
   const handleChatSelect = (id) => {
     onChatSelect(id)
     setMobileOpen(false)
