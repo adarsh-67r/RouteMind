@@ -8,6 +8,7 @@ from app.providers.base import BaseProvider
 
 logger = logging.getLogger("routemind.providers.gemini")
 
+
 class GeminiProvider(BaseProvider):
     """
     Gemini provider integration implementing the BaseProvider contract.
@@ -26,7 +27,9 @@ class GeminiProvider(BaseProvider):
         """
         return "gemini"
 
-    def generate_response(self, prompt: str, model: str = None, **kwargs) -> Dict[str, Any]:
+    def generate_response(
+        self, prompt: str, model: str = None, **kwargs
+    ) -> Dict[str, Any]:
         """
         Placeholder method for Gemini response generation.
 
@@ -34,7 +37,9 @@ class GeminiProvider(BaseProvider):
             NotImplementedError: Always raised since the provider is not yet implemented.
         """
         model_to_use = model or "gemini-1.5-pro"
-        logger.warning("Provider selected: gemini (Placeholder triggered. Model: %s)", model_to_use)
+        logger.warning(
+            "Provider selected: gemini (Placeholder triggered. Model: %s)", model_to_use
+        )
         raise NotImplementedError(
             "Gemini integration is not implemented. Please configure OpenAI or implement this provider."
         )

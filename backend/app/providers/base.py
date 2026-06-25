@@ -1,35 +1,44 @@
 """
 Abstract Base Provider interface for RouteMind.
-This module defines the contract that all LLM providers must implement, 
+This module defines the contract that all LLM providers must implement,
 ensuring the platform remains decoupled from any specific LLM provider's SDK.
 
 Why does provider abstraction exist?
-1. Loose Coupling: RouteMind can switch or route dynamically between OpenAI, Claude, 
+1. Loose Coupling: RouteMind can switch or route dynamically between OpenAI, Claude,
    and Gemini without changing core routing, logging, or business logic.
-2. Interface Uniformity: Every provider accepts a uniform prompt and settings, 
+2. Interface Uniformity: Every provider accepts a uniform prompt and settings,
    and returns responses in a unified, predictable structure.
-3. Resiliency & Error Mapping: Unique exceptions from each vendor's SDK are mapped 
+3. Resiliency & Error Mapping: Unique exceptions from each vendor's SDK are mapped
    into standard local RouteMind exception types, allowing robust fallback and retry policies.
 """
 
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 
+
 class ProviderError(Exception):
     """Base exception class for all errors originating in the provider layer."""
+
     pass
+
 
 class ProviderAuthenticationError(ProviderError):
     """Raised when authentication credentials (e.g., API keys) are invalid or missing."""
+
     pass
+
 
 class ProviderAPIError(ProviderError):
     """Raised when an API request fails, returns an error status, or is rate-limited."""
+
     pass
+
 
 class ProviderConnectionError(ProviderError):
     """Raised when network connection problems prevent communication with the provider's endpoint."""
+
     pass
+
 
 class BaseProvider(ABC):
     """
@@ -38,7 +47,9 @@ class BaseProvider(ABC):
     """
 
     @abstractmethod
-    def generate_response(self, prompt: str, model: str = None, **kwargs) -> Dict[str, Any]:
+    def generate_response(
+        self, prompt: str, model: str = None, **kwargs
+    ) -> Dict[str, Any]:
         """
         Generates a non-streaming completion response from the model provider.
 

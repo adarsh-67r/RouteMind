@@ -8,14 +8,19 @@ from abc import ABC, abstractmethod
 from typing import List, Set
 from pydantic import BaseModel, Field
 
+
 class IntentResult(BaseModel):
     """
     Standardized classification response model representing the classified intent details.
     """
+
     intent: str = Field(..., description="The classified task category/intent.")
     confidence: float = Field(..., description="Confidence score from 0.0 to 100.0.")
     matched_keywords: List[str] = Field(..., description="List of matched keywords.")
-    classification_reason: str = Field(..., description="Rationale for this classification.")
+    classification_reason: str = Field(
+        ..., description="Rationale for this classification."
+    )
+
 
 class BaseIntentClassifier(ABC):
     """
@@ -36,6 +41,7 @@ class BaseIntentClassifier(ABC):
         """
         pass
 
+
 class RuleBasedIntentClassifier(BaseIntentClassifier):
     """
     Lightweight rule-based intent classifier using keyword heuristics.
@@ -45,28 +51,96 @@ class RuleBasedIntentClassifier(BaseIntentClassifier):
         # Standardized lists of lowercase keywords for each intent
         self._keyword_rules = {
             "coding": {
-                "code", "debug", "python", "javascript", "react", "html", "css", "programming",
-                "compile", "function", "class", "bug", "git", "api", "json", "develop", "algorithm"
+                "code",
+                "debug",
+                "python",
+                "javascript",
+                "react",
+                "html",
+                "css",
+                "programming",
+                "compile",
+                "function",
+                "class",
+                "bug",
+                "git",
+                "api",
+                "json",
+                "develop",
+                "algorithm",
             },
             "writing": {
-                "write", "essay", "email", "draft", "poem", "story", "paragraph", "letter",
-                "blog", "compose", "editorial", "article", "text", "copywrite"
+                "write",
+                "essay",
+                "email",
+                "draft",
+                "poem",
+                "story",
+                "paragraph",
+                "letter",
+                "blog",
+                "compose",
+                "editorial",
+                "article",
+                "text",
+                "copywrite",
             },
             "document": {
-                "summarize", "pdf", "docx", "document", "file", "xlsx", "csv", "txt", "parse"
+                "summarize",
+                "pdf",
+                "docx",
+                "document",
+                "file",
+                "xlsx",
+                "csv",
+                "txt",
+                "parse",
             },
             "research": {
-                "research", "analyze", "explain", "scientific", "discover", "study", "concept",
-                "history", "literature", "theory", "investigate", "compare", "context"
+                "research",
+                "analyze",
+                "explain",
+                "scientific",
+                "discover",
+                "study",
+                "concept",
+                "history",
+                "literature",
+                "theory",
+                "investigate",
+                "compare",
+                "context",
             },
             "math": {
-                "solve", "x²", "equation", "math", "calculate", "integral", "derivative",
-                "plus", "minus", "algebra", "calculus", "arithmetic", "geometry", "formula"
+                "solve",
+                "x²",
+                "equation",
+                "math",
+                "calculate",
+                "integral",
+                "derivative",
+                "plus",
+                "minus",
+                "algebra",
+                "calculus",
+                "arithmetic",
+                "geometry",
+                "formula",
             },
             "image": {
-                "image", "draw", "paint", "picture", "render", "diagram", "photo", "graphic",
-                "visual", "generate image", "portrait", "sketch"
-            }
+                "image",
+                "draw",
+                "paint",
+                "picture",
+                "render",
+                "diagram",
+                "photo",
+                "graphic",
+                "visual",
+                "generate image",
+                "portrait",
+                "sketch",
+            },
         }
         self._fallback_intent = "general"
 
@@ -118,5 +192,5 @@ class RuleBasedIntentClassifier(BaseIntentClassifier):
             intent=best_intent,
             confidence=confidence,
             matched_keywords=sorted(list(best_matched_keywords)),
-            classification_reason=reason
+            classification_reason=reason,
         )

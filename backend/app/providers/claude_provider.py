@@ -8,6 +8,7 @@ from app.providers.base import BaseProvider
 
 logger = logging.getLogger("routemind.providers.claude")
 
+
 class ClaudeProvider(BaseProvider):
     """
     Claude provider integration implementing the BaseProvider contract.
@@ -26,7 +27,9 @@ class ClaudeProvider(BaseProvider):
         """
         return "claude"
 
-    def generate_response(self, prompt: str, model: str = None, **kwargs) -> Dict[str, Any]:
+    def generate_response(
+        self, prompt: str, model: str = None, **kwargs
+    ) -> Dict[str, Any]:
         """
         Placeholder method for Claude response generation.
 
@@ -34,7 +37,9 @@ class ClaudeProvider(BaseProvider):
             NotImplementedError: Always raised since the provider is not yet implemented.
         """
         model_to_use = model or "claude-3-5-sonnet"
-        logger.warning("Provider selected: claude (Placeholder triggered. Model: %s)", model_to_use)
+        logger.warning(
+            "Provider selected: claude (Placeholder triggered. Model: %s)", model_to_use
+        )
         raise NotImplementedError(
             "Claude integration is not implemented. Please configure OpenAI or implement this provider."
         )

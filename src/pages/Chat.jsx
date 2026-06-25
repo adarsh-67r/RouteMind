@@ -5,7 +5,7 @@ import Sidebar from '../components/Sidebar'
 import ChatMessage from '../components/ChatMessage'
 import ChatInput from '../components/ChatInput'
 import TypingIndicator from '../components/TypingIndicator'
-import { getMockRouting } from '../utils/mockRouter'
+import { chatService } from '../services/chatService'
 import { useToast } from '../context/ToastContext'
 import { defaultStats } from '../data/mockData'
 
@@ -116,7 +116,7 @@ const Chat = () => {
     setChatHistory(prev => prev.map(c => c.id === id ? { ...c, title: newTitle } : c))
   }
 
-  const handleSendMessage = (content, attachedFiles = []) => {
+  const handleSendMessage = async (content, attachedFiles = []) => {
     const hasText = !!content.trim()
     const hasFiles = attachedFiles && attachedFiles.length > 0
     if ((!hasText && !hasFiles) || isLoading) return
@@ -125,7 +125,6 @@ const Chat = () => {
 
     timeoutRefs.current.forEach(clearTimeout)
     timeoutRefs.current = []
-
 
     const chatIdAtSend = activeChatId
     messageIdRef.current += 1
@@ -155,108 +154,137 @@ const Chat = () => {
     setPendingModel(null)
     setLoadingStep(hasFiles ? 'Reading attachments...' : 'Analyzing Intent...')
 
-    // Fetch optimal routing parameters based on active preference
-    const routingResult = getMockRouting(content.trim(), hasFiles ? attachedFiles[0] : null, routingPolicy)
-    const { model, cost, confidence, reason } = routingResult
+    // Extract attachments string array if present
+    const attachments = hasFiles ? attachedFiles.map(f => f.name) : null;
 
-    let reply = `I have analyzed your query and successfully routed it to **${model}**. Let me know if you would like me to unpack these suggestions further!`
-    
-    if (model === 'Gemini 1.5 Pro' && hasFiles) {
-      reply = `I have successfully analyzed the attached document: **${attachedFiles[0].name}** (${(attachedFiles[0].size / 1024).toFixed(1)} KB).\n\nBased on its structural context, I have routed it to **Gemini 1.5 Pro** due to its 1M-token context window. Here is the response layout generated.`
-    } else if (model === 'GPT-4o' && hasFiles && attachedFiles[0].name.split('.').pop().toLowerCase().match(/(png|jpg|jpeg|webp)/)) {
-      reply = `I have processed the uploaded image: **${attachedFiles[0].name}** using **GPT-4o**'s vision model capabilities. RouteMind decided this model fits best for multimodal and canvas processing parameters.`
-    } else {
-      const query = content.toLowerCase()
-      if (query.includes('react') || query.includes('next.js') || query.includes('remix')) {
-        reply = 'When structural modularity is required, React components should be separated by concerns. Using Next.js or Remix allows you to leverage server rendering to optimize load times and bundle sizes. Here is a recommended architectural flow.'
-      } else if (query.includes('rust') || query.includes('code')) {
-        reply = 'Rust async programming model relies on Futures, which are polled by a runtime like Tokio. To maximize throughput, minimize mutex contention and write lock-free state managers where appropriate.'
-      } else if (query.includes('explain') || query.includes('summarize')) {
-        reply = 'The self-attention mechanism computes representations of sequence elements by relating different positions of a single sequence. This allows the model to process context globally rather than sequentially.'
+    // Trigger API call to the backend concurrently
+    const apiCallPromise = chatService.sendMessage(
+      content.trim(),
+      chatIdAtSend,
+      routingPolicy,
+      attachments
+    );
+
+    // Timeline stages execution helper
+    const delay = (ms) => new Promise(resolve => {
+      const t = setTimeout(resolve, ms);
+      timeoutRefs.current.push(t);
+    });
+
+    try {
+      // Stage 1: Wait 1s and show Step 2
+      await delay(1000);
+      setLoadingStep(hasFiles ? 'Extracting semantic metadata...' : 'Comparing Models...');
+
+      // Stage 2: Wait 1s and show Step 3 (Selecting Best Model)
+      await delay(1000);
+      setLoadingStep('Selecting Best Model...');
+
+      // Await backend response here if it hasn't completed yet
+      const backendResponse = await apiCallPromise;
+      
+      const { response: backendResponseDetail, routing: backendRoutingDetail } = backendResponse;
+      const model = backendRoutingDetail.selected_model;
+      const reply = backendResponseDetail.content;
+
+      // Reveal selected model preview badge in loading indicator
+      setPendingModel(model);
+
+      // Stage 3: Wait 1s and show Step 4 (Generating Response)
+      await delay(1000);
+      setLoadingStep('Generating Response...');
+
+      // Append assistant streaming placeholder message
+      const assistantMsgId = `assistant-${messageIdRef.current + 1}`;
+      const assistantMsgPlaceholder = {
+        id: assistantMsgId,
+        role: 'assistant',
+        content: '',
+        time: 'Just now',
+        isStreaming: true,
+        routing: backendRoutingDetail // Pass the direct backend routing object!
+      };
+
+      setConversationsMessages(prev => {
+        const existingMsgs = prev[chatIdAtSend] || [];
+        return { ...prev, [chatIdAtSend]: [...existingMsgs, assistantMsgPlaceholder] };
+      });
+
+      // Stage 4: Wait 1.2s and reveal full answer
+      await delay(1200);
+      messageIdRef.current += 1;
+      
+      const assistantMsg = {
+        id: assistantMsgId,
+        role: 'assistant',
+        content: reply,
+        time: 'Just now',
+        isStreaming: false,
+        routing: backendRoutingDetail // Pass the direct backend routing object!
+      };
+
+      setConversationsMessages(prev => {
+        const existingMsgs = prev[chatIdAtSend] || [];
+        return {
+          ...prev,
+          [chatIdAtSend]: existingMsgs.map(m => m.id === assistantMsgId ? assistantMsg : m)
+        };
+      });
+
+      // Update live telemetry stats in localStorage
+      const storedStats = localStorage.getItem('routingStats');
+      const stats = storedStats ? JSON.parse(storedStats) : defaultStats;
+      stats.totalQueries += 1;
+      
+      // Calculate savings metrics dynamically based on provider
+      let savedAmount = 0.0025;
+      if (model.includes('mini') || model.includes('Flash') || model.includes('Haiku') || model.includes('DeepSeek')) {
+        savedAmount = 0.0038;
+      } else if (model.includes('Pro') || model.includes('Sonnet')) {
+        savedAmount = 0.0010;
       }
+      stats.savings = parseFloat((stats.savings + savedAmount).toFixed(4));
+      stats.models[model] = (stats.models[model] || 0) + 1;
+      localStorage.setItem('routingStats', JSON.stringify(stats));
+      window.dispatchEvent(new Event('telemetry-updated'));
+
+      // Update chat title on first message using content or file
+      setChatHistory(prevHistory => {
+        const chatIndex = prevHistory.findIndex(c => c.id === chatIdAtSend);
+        if (chatIndex === -1) return prevHistory;
+        const chat = prevHistory[chatIndex];
+        if (isFirstMessage && chat.title === 'New Workspace Chat') {
+          const titleText = content.trim() ? content : (hasFiles ? `File: ${attachedFiles[0].name}` : 'New Workspace Chat');
+          const shortened = titleText.length > 25 ? `${titleText.substring(0, 25)}...` : titleText;
+          const updated = [...prevHistory];
+          updated[chatIndex] = { ...chat, title: shortened };
+          return updated;
+        }
+        return prevHistory;
+      });
+
+    } catch (err) {
+      console.error("API request failed:", err);
+      showToast(err.message || "Failed to communicate with RouteMind API.", "error");
+
+      // Append assistant error message
+      const assistantMsgId = `assistant-err-${messageIdRef.current + 1}`;
+      const assistantMsg = {
+        id: assistantMsgId,
+        role: 'assistant',
+        content: `⚠️ **RouteMind API Error:** ${err.message || 'The server returned an unexpected error or is offline. Please check that the backend is running at http://localhost:8000.'}`,
+        time: 'Just now',
+        isStreaming: false
+      };
+      
+      setConversationsMessages(prev => {
+        const existingMsgs = prev[chatIdAtSend] || [];
+        return { ...prev, [chatIdAtSend]: [...existingMsgs, assistantMsg] };
+      });
+    } finally {
+      setIsLoading(false);
+      setPendingModel(null);
     }
-
-    const step2 = hasFiles ? 'Extracting semantic metadata...' : 'Comparing Models...'
-    const step3 = hasFiles ? 'Selecting Best Model...' : 'Selecting Best Model...'
-
-    const t1 = setTimeout(() => {
-      setLoadingStep(step2)
-      const t2 = setTimeout(() => {
-        setLoadingStep(step3)
-        setPendingModel(model)
-        const t3 = setTimeout(() => {
-          setLoadingStep('Generating Response...')
-          
-          // Append streaming placeholder message
-          const assistantMsgId = `assistant-${messageIdRef.current + 1}`
-          const assistantMsgPlaceholder = {
-            id: assistantMsgId,
-            role: 'assistant',
-            content: '',
-            time: 'Just now',
-            isStreaming: true,
-            routing: { model, cost, confidence, reason }
-          }
-          setConversationsMessages(prev => {
-            const existingMsgs = prev[chatIdAtSend] || []
-            return { ...prev, [chatIdAtSend]: [...existingMsgs, assistantMsgPlaceholder] }
-          })
-
-          const t4 = setTimeout(() => {
-            messageIdRef.current += 1
-            const assistantMsg = {
-              id: assistantMsgId,
-              role: 'assistant',
-              content: reply,
-              time: 'Just now',
-              isStreaming: false,
-              routing: { model, cost, confidence, reason }
-            }
-            setConversationsMessages(prev => {
-              const existingMsgs = prev[chatIdAtSend] || []
-              return {
-                ...prev,
-                [chatIdAtSend]: existingMsgs.map(m => m.id === assistantMsgId ? assistantMsg : m)
-              }
-            })
-            
-            // Update live telemetry stats in localStorage
-            const storedStats = localStorage.getItem('routingStats')
-            const stats = storedStats ? JSON.parse(storedStats) : defaultStats
-            stats.totalQueries += 1
-            let savedAmount = 0.0025
-            if (model.includes('mini') || model.includes('Flash') || model.includes('DeepSeek')) {
-              savedAmount = 0.0038
-            } else if (model.includes('Pro') || model.includes('Sonnet')) {
-              savedAmount = 0.0010
-            }
-            stats.savings = parseFloat((stats.savings + savedAmount).toFixed(4))
-            stats.models[model] = (stats.models[model] || 0) + 1
-            localStorage.setItem('routingStats', JSON.stringify(stats))
-            window.dispatchEvent(new Event('telemetry-updated'))
-            setChatHistory(prevHistory => {
-              const chatIndex = prevHistory.findIndex(c => c.id === chatIdAtSend)
-              if (chatIndex === -1) return prevHistory
-              const chat = prevHistory[chatIndex]
-              if (isFirstMessage && chat.title === 'New Workspace Chat') {
-                const titleText = content.trim() ? content : (hasFiles ? `File: ${attachedFiles[0].name}` : 'New Workspace Chat')
-                const shortened = titleText.length > 25 ? `${titleText.substring(0, 25)}...` : titleText
-                const updated = [...prevHistory]
-                updated[chatIndex] = { ...chat, title: shortened }
-                return updated
-              }
-              return prevHistory
-            })
-            setIsLoading(false)
-            setPendingModel(null)
-          }, 1200)
-          timeoutRefs.current.push(t4)
-        }, 1000)
-        timeoutRefs.current.push(t3)
-      }, 1000)
-      timeoutRefs.current.push(t2)
-    }, 1000)
-    timeoutRefs.current.push(t1)
   }
 
   const handleRegenerateResponse = (messageId) => {

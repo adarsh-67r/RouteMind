@@ -30,9 +30,15 @@ const RoutingCard = ({
   const [isExpanded, setIsExpanded] = useState(false)
 
   // Extract props with defaults, giving precedence to fields nested in `routing` prop
-  const modelVal = routing?.model ?? model ?? 'GPT-4o'
-  const costVal = routing?.cost ?? cost ?? '$0.003'
-  const confidenceVal = routing?.confidence ?? confidence ?? '92%'
+  const modelVal = routing?.selected_model ?? routing?.model ?? model ?? 'GPT-4o'
+  
+  const costVal = routing?.estimated_cost !== undefined 
+    ? `$${parseFloat(routing.estimated_cost).toFixed(6)}` 
+    : (routing?.cost ?? cost ?? '$0.003')
+
+  const confidenceVal = routing?.confidence !== undefined 
+    ? (String(routing.confidence).includes('%') ? routing.confidence : `${routing.confidence}%`)
+    : (routing?.confidence ?? confidence ?? '92%')
   
   // Format numeric confidence for radial/circular graphics
   const numericConfidence = parseInt(String(confidenceVal).replace('%', '')) || 92
@@ -141,7 +147,14 @@ const RoutingCard = ({
   const savingsVal = routing?.savings ?? savings ?? defaultSavings
   const speedVal = routing?.speed ?? speed ?? defaultSpeed
   const factorsVal = routing?.factors ?? factors ?? defaultFactors
-  const detailsVal = routing?.details ?? details ?? defaultDetails
+  const detailsVal = { ...(routing?.details ?? details ?? defaultDetails) }
+  
+  if (routing?.intent) {
+    detailsVal.intent = routing.intent.charAt(0).toUpperCase() + routing.intent.slice(1)
+  }
+  if (routing?.provider) {
+    detailsVal.provider = routing.provider.toUpperCase()
+  }
   
   const isLoadingVal = routing?.isLoading ?? isLoading ?? false
   const loadingStepVal = routing?.loadingStep ?? loadingStep ?? 'Analyzing Request Intent...'

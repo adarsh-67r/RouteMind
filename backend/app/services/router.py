@@ -6,18 +6,27 @@ Analyzes intent, policy, and active provider availability to decide the optimal 
 from typing import Dict, List, Literal
 from pydantic import BaseModel, Field
 
+
 class RoutingError(Exception):
     """Raised when the routing engine is unable to make a valid routing decision."""
+
     pass
+
 
 class RoutingDecision(BaseModel):
     """
     Represents the output of a routing decision.
     """
-    provider: str = Field(..., description="The name of the selected provider (e.g., 'openai').")
+
+    provider: str = Field(
+        ..., description="The name of the selected provider (e.g., 'openai')."
+    )
     model: str = Field(..., description="The model assigned to handle the task.")
     reason: str = Field(..., description="Explanation of why this choice was made.")
-    confidence: float = Field(..., description="Confidence score for this decision (0.0 to 100.0).")
+    confidence: float = Field(
+        ..., description="Confidence score for this decision (0.0 to 100.0)."
+    )
+
 
 class LLMRouter:
     """
@@ -35,7 +44,7 @@ class LLMRouter:
             "math": "openai",
             "image": "openai",
         }
-        
+
         # Default model configurations by provider name and policy type
         self._model_policy_mapping: Dict[str, Dict[str, str]] = {
             "openai": {
@@ -55,7 +64,7 @@ class LLMRouter:
                 "speed": "gemini-1.5-flash",
                 "cost": "gemini-1.5-flash",
                 "quality": "gemini-1.5-pro",
-            }
+            },
         }
         self._default_provider = "openai"
 
@@ -63,7 +72,7 @@ class LLMRouter:
         self,
         intent: str,
         routing_policy: Literal["balanced", "speed", "cost", "quality"],
-        available_providers: List[str]
+        available_providers: List[str],
     ) -> RoutingDecision:
         """
         Calculates the optimal target provider and model based on rules and health list.
@@ -84,7 +93,7 @@ class LLMRouter:
 
         normalized_available = [p.lower() for p in available_providers]
         preferred_provider = self._intent_mapping.get(intent.strip().lower())
-        
+
         # Determine selection and fallback
         if preferred_provider and preferred_provider in normalized_available:
             selected_provider = preferred_provider
@@ -114,5 +123,5 @@ class LLMRouter:
             provider=selected_provider,
             model=selected_model,
             reason=reason,
-            confidence=confidence
+            confidence=confidence,
         )

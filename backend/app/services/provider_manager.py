@@ -13,6 +13,7 @@ from app.providers.gemini_provider import GeminiProvider
 
 logger = logging.getLogger("routemind.services.provider_manager")
 
+
 class ProviderManager:
     """
     Manages the lifecycle of AI providers.
@@ -71,7 +72,9 @@ class ProviderManager:
             provider = self.get_provider(name)
             return provider.health_check()
         except Exception as e:
-            logger.error("Health check check failed for provider '%s': %s", name, str(e))
+            logger.error(
+                "Health check check failed for provider '%s': %s", name, str(e)
+            )
             return False
 
     def list_registered_providers(self) -> List[str]:
@@ -96,5 +99,7 @@ class ProviderManager:
                 try:
                     available[name] = self.get_provider(name)
                 except Exception as e:
-                    logger.error("Failed to load available provider '%s': %s", name, str(e))
+                    logger.error(
+                        "Failed to load available provider '%s': %s", name, str(e)
+                    )
         return available

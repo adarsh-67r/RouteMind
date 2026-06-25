@@ -16,9 +16,10 @@ from app.routes.chat import router as chat_router
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger("routemind.main")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -32,12 +33,13 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down RouteMind Backend...")
     # Add future shutdown cleanup here
 
+
 # Initialize FastAPI application with centralized configuration metadata
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.VERSION,
     description="Intelligent AI Orchestration and Routing Platform API.",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Configure CORS Middleware using settings defined in environment
