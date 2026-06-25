@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  CheckCircle2,
-  Cpu,
-  Loader2,
-  Sliders
-} from 'lucide-react'
+import { CheckCircle2, Cpu, Loader2, Sliders } from 'lucide-react'
 
 import { ROUTING_STAGES as STAGES, MODEL_CANDIDATES as CANDIDATES } from '../data/mockData'
 
@@ -18,9 +13,11 @@ const TypingIndicator = ({ loadingStep, selectedModel, selectionReason }) => {
     const text = String(stepText || '').toLowerCase()
     if (text.includes('intent') || text.includes('analyzing')) return 0
     if (text.includes('comparing') || text.includes('models')) return 1
-    if (text.includes('cost') || text.includes('evaluating') || text.includes('calculating')) return 2
+    if (text.includes('cost') || text.includes('evaluating') || text.includes('calculating'))
+      return 2
     if (text.includes('selecting') || text.includes('model') || text.includes('provider')) return 3
-    if (text.includes('generating') || text.includes('response') || text.includes('streaming')) return 4
+    if (text.includes('generating') || text.includes('response') || text.includes('streaming'))
+      return 4
     return 0
   }
 
@@ -32,7 +29,7 @@ const TypingIndicator = ({ loadingStep, selectedModel, selectionReason }) => {
     const maxStep = STAGES.length - 1
 
     const runStepTransition = () => {
-      setCurrentStep(prev => {
+      setCurrentStep((prev) => {
         // Never exceed the target or the last valid stage index
         if (prev >= targetStep || prev >= maxStep) return prev
         return prev + 1
@@ -52,7 +49,7 @@ const TypingIndicator = ({ loadingStep, selectedModel, selectionReason }) => {
   useEffect(() => {
     if (currentStep === 3) {
       const interval = setInterval(() => {
-        setCandidateIndex(prev => (prev + 1) % CANDIDATES.length)
+        setCandidateIndex((prev) => (prev + 1) % CANDIDATES.length)
       }, 350)
       return () => clearInterval(interval)
     }
@@ -122,10 +119,15 @@ const TypingIndicator = ({ loadingStep, selectedModel, selectionReason }) => {
                     ) : (
                       <div className="h-1.5 w-1.5 rounded-full bg-neutral-300 dark:bg-neutral-800 border border-neutral-400/40 dark:border-neutral-700/60 ml-0.5 shrink-0"></div>
                     )}
-                    <span className={`font-medium transition-colors duration-200 ${
-                      isCompleted ? 'text-neutral-400 dark:text-neutral-500 line-through decoration-neutral-300 dark:decoration-neutral-800' :
-                      isActive ? 'text-primary font-semibold' : 'text-neutral-500 dark:text-neutral-600'
-                    }`}>
+                    <span
+                      className={`font-medium transition-colors duration-200 ${
+                        isCompleted
+                          ? 'text-neutral-400 dark:text-neutral-500 line-through decoration-neutral-300 dark:decoration-neutral-800'
+                          : isActive
+                            ? 'text-primary font-semibold'
+                            : 'text-neutral-500 dark:text-neutral-600'
+                      }`}
+                    >
                       {stage.label}
                     </span>
                   </div>
@@ -183,9 +185,15 @@ const TypingIndicator = ({ loadingStep, selectedModel, selectionReason }) => {
 
       {/* Future-Ready Architecture Placeholders */}
       <div className="mt-3.5 pt-3.5 border-t border-border-app/40 flex items-center justify-between text-[9px] font-mono text-neutral-600 opacity-60 select-none pointer-events-none">
-        <div>Est. Cost: <span className="text-neutral-500">Slot Ready</span></div>
-        <div>Latency: <span className="text-neutral-500">Slot Ready</span></div>
-        <div>Confidence: <span className="text-neutral-500">Slot Ready</span></div>
+        <div>
+          Est. Cost: <span className="text-neutral-500">Slot Ready</span>
+        </div>
+        <div>
+          Latency: <span className="text-neutral-500">Slot Ready</span>
+        </div>
+        <div>
+          Confidence: <span className="text-neutral-500">Slot Ready</span>
+        </div>
       </div>
     </div>
   )

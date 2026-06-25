@@ -44,7 +44,9 @@ const ThemeAwareToastProviderValue = ({ showToast, toasts, removeToast, children
               className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-xl w-full text-xs font-medium leading-normal bg-sidebar-bg border-border-app`}
             >
               {toast.type === 'success' && <Check size={14} className="text-green-500 shrink-0" />}
-              {toast.type === 'error' && <AlertCircle size={14} className="text-red-500 shrink-0" />}
+              {toast.type === 'error' && (
+                <AlertCircle size={14} className="text-red-500 shrink-0" />
+              )}
               {toast.type === 'info' && <Info size={14} className="text-blue-500 shrink-0" />}
               <span className="text-primary flex-1 truncate">{toast.message}</span>
               <button

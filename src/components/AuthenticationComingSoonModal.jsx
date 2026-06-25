@@ -9,7 +9,7 @@ const FUTURE_FEATURES = [
   'Saved Conversations',
   'Cross-Device Sync',
   'Team Collaboration',
-  'Usage Analytics'
+  'Usage Analytics',
 ]
 
 const AuthenticationComingSoonModal = ({ isOpen, onClose }) => {
@@ -57,7 +57,7 @@ const AuthenticationComingSoonModal = ({ isOpen, onClose }) => {
     const focusable = modalRef.current?.querySelectorAll('button')
     if (focusable && focusable.length > 0) {
       // Focus on the Got It dismiss button first
-      focusable[focusable.length - 2]?.focus() 
+      focusable[focusable.length - 2]?.focus()
     }
 
     window.addEventListener('keydown', handleKeyDown)
@@ -77,7 +77,7 @@ const AuthenticationComingSoonModal = ({ isOpen, onClose }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div 
+        <div
           ref={backdropRef}
           onClick={handleBackdropClick}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 select-none"
@@ -101,7 +101,9 @@ const AuthenticationComingSoonModal = ({ isOpen, onClose }) => {
                   <Lock size={15} />
                 </div>
                 <div>
-                  <h3 id="modal-title" className="text-sm font-semibold text-primary font-sans">RouteMind Accounts</h3>
+                  <h3 id="modal-title" className="text-sm font-semibold text-primary font-sans">
+                    RouteMind Accounts
+                  </h3>
                 </div>
               </div>
               <span className="px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-500/20 text-[9px] font-mono text-blue-600 dark:text-blue-400 select-none font-semibold">
@@ -111,7 +113,10 @@ const AuthenticationComingSoonModal = ({ isOpen, onClose }) => {
 
             {/* Subtitle / Context info */}
             <div className="space-y-1.5 text-left">
-              <p id="modal-subtitle" className="text-xs text-neutral-600 dark:text-neutral-400 font-medium leading-relaxed">
+              <p
+                id="modal-subtitle"
+                className="text-xs text-neutral-600 dark:text-neutral-400 font-medium leading-relaxed"
+              >
                 Authentication and account features are currently in development.
               </p>
             </div>
@@ -123,7 +128,10 @@ const AuthenticationComingSoonModal = ({ isOpen, onClose }) => {
               </div>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left text-xs text-neutral-700 dark:text-neutral-300 font-sans font-medium">
                 {FUTURE_FEATURES.map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-2.5 bg-sidebar-bg/40 border border-border-app/30 p-2.5 rounded-lg">
+                  <li
+                    key={idx}
+                    className="flex items-center gap-2.5 bg-sidebar-bg/40 border border-border-app/30 p-2.5 rounded-lg"
+                  >
                     <Check size={12} className="text-blue-500 shrink-0" />
                     <span>{feature}</span>
                   </li>
@@ -133,15 +141,19 @@ const AuthenticationComingSoonModal = ({ isOpen, onClose }) => {
 
             {/* Modal footer text */}
             <div className="flex gap-2 p-3 bg-sidebar-bg/60 border border-border-app/40 rounded-xl text-left select-none text-[11px] text-neutral-600 dark:text-neutral-400 leading-normal">
-              <ShieldAlert size={15} className="text-neutral-500 dark:text-neutral-400 shrink-0 mt-0.5" />
+              <ShieldAlert
+                size={15}
+                className="text-neutral-500 dark:text-neutral-400 shrink-0 mt-0.5"
+              />
               <p>
-                RouteMind is currently focused on delivering the best AI routing experience. Account functionality will be introduced in a future release.
+                RouteMind is currently focused on delivering the best AI routing experience. Account
+                functionality will be introduced in a future release.
               </p>
             </div>
 
             {/* Bottom Actions Row */}
             <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border-app/30">
-              <Link 
+              <Link
                 to="/docs#roadmap"
                 onClick={onClose}
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-primary hover:bg-sidebar-bg text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50"
@@ -149,7 +161,7 @@ const AuthenticationComingSoonModal = ({ isOpen, onClose }) => {
                 <span>View Roadmap</span>
                 <ArrowRight size={12} />
               </Link>
-              
+
               <button
                 onClick={onClose}
                 className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs px-4 py-2 rounded-lg border border-blue-500/30 transition-all hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-card-bg focus-visible:ring-blue-500 cursor-pointer"
@@ -166,7 +178,6 @@ const AuthenticationComingSoonModal = ({ isOpen, onClose }) => {
             >
               <X size={15} />
             </button>
-
           </motion.div>
         </div>
       )}

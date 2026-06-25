@@ -33,16 +33,16 @@ export const ThemeProvider = ({ children }) => {
     const root = window.document.documentElement
 
     const handleThemeChange = () => {
-      const isDark = 
-        theme === 'dark' || 
+      const isDark =
+        theme === 'dark' ||
         (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-      
+
       const targetTheme = isDark ? 'dark' : 'light'
       setResolvedTheme(targetTheme)
 
       // Add temporary transition class
       root.classList.add('theme-transition')
-      
+
       if (isDark) {
         root.classList.add('dark')
       } else {
@@ -64,7 +64,7 @@ export const ThemeProvider = ({ children }) => {
       const listener = () => {
         handleThemeChange()
       }
-      
+
       if (mediaQuery.addEventListener) {
         mediaQuery.addEventListener('change', listener)
       } else {

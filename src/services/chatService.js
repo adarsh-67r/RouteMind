@@ -2,12 +2,12 @@
  * Chat Service mapping the frontend chat functions to FastAPI endpoints.
  */
 
-import { api } from './api';
+import { api } from './api'
 
 export const chatService = {
   /**
    * Dispatches the chat prompt and metadata to the backend pipeline.
-   * 
+   *
    * @param {string} message - The prompt message to route.
    * @param {string|null} conversationId - The unique conversation thread id.
    * @param {string} routingPolicy - The selected routing policy preference.
@@ -21,18 +21,18 @@ export const chatService = {
       conversation_id: conversationId,
       routing_policy: routingPolicy,
       attachments,
-      user_id: userId
-    };
+      user_id: userId,
+    }
 
-    return await api.post('/chat', payload);
+    return await api.post('/chat', payload)
   },
 
   /**
    * Queries the API server's health.
-   * 
+   *
    * @returns {Promise<object>} HealthResponse payload.
    */
   async healthCheck() {
-    return await api.get('/health');
-  }
-};
+    return await api.get('/health')
+  },
+}

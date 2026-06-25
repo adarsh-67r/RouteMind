@@ -12,14 +12,11 @@ import {
   Share2,
   Sparkles,
   ExternalLink,
-  Loader2
+  Loader2,
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
 import { formatFileSize, getFileIcon } from '../utils/fileHelpers'
 import RoutingCard from './RoutingCard'
-
-
-
 
 const CodeBlock = ({ language, value }) => {
   const [copied, setCopied] = useState(false)
@@ -48,7 +45,10 @@ const CodeBlock = ({ language, value }) => {
         >
           {copied ? (
             <>
-              <Check size={11} className="text-green-400 animate-in fade-in zoom-in-75 duration-200" />
+              <Check
+                size={11}
+                className="text-green-400 animate-in fade-in zoom-in-75 duration-200"
+              />
               <span className="text-green-400 font-medium">Copied</span>
             </>
           ) : (
@@ -70,10 +70,11 @@ const CodeBlock = ({ language, value }) => {
             background: 'transparent',
             fontSize: '13.5px',
             lineHeight: '1.6',
-            fontFamily: 'Fira Code, JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+            fontFamily:
+              'Fira Code, JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
           }}
           codeTagProps={{
-            style: { background: 'transparent', fontFamily: 'inherit' }
+            style: { background: 'transparent', fontFamily: 'inherit' },
           }}
         >
           {value}
@@ -84,14 +85,40 @@ const CodeBlock = ({ language, value }) => {
 }
 
 const markdownComponents = {
-  h1: ({ children }) => <h1 className="text-xl md:text-2xl font-bold tracking-tight text-primary mt-7 mb-3.5 first:mt-0 font-sans border-b border-border-app/40 pb-2">{children}</h1>,
-  h2: ({ children }) => <h2 className="text-lg md:text-xl font-semibold tracking-tight text-primary mt-6 mb-3 first:mt-0 font-sans">{children}</h2>,
-  h3: ({ children }) => <h3 className="text-base md:text-lg font-semibold tracking-tight text-primary mt-5 mb-2 first:mt-0 font-sans">{children}</h3>,
-  h4: ({ children }) => <h4 className="text-sm md:text-base font-semibold tracking-tight text-primary mt-4 mb-2 first:mt-0 font-sans">{children}</h4>,
-  p: ({ children }) => <p className="text-sm md:text-[15px] text-primary/95 leading-relaxed mb-4 last:mb-0 font-sans font-normal selection:bg-blue-600/30 selection:text-white">{children}</p>,
-  ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-2 text-secondary font-sans">{children}</ul>,
-  ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-2 text-secondary font-sans">{children}</ol>,
-  li: ({ children }) => <li className="text-sm md:text-[15px] leading-relaxed pl-0.5">{children}</li>,
+  h1: ({ children }) => (
+    <h1 className="text-xl md:text-2xl font-bold tracking-tight text-primary mt-7 mb-3.5 first:mt-0 font-sans border-b border-border-app/40 pb-2">
+      {children}
+    </h1>
+  ),
+  h2: ({ children }) => (
+    <h2 className="text-lg md:text-xl font-semibold tracking-tight text-primary mt-6 mb-3 first:mt-0 font-sans">
+      {children}
+    </h2>
+  ),
+  h3: ({ children }) => (
+    <h3 className="text-base md:text-lg font-semibold tracking-tight text-primary mt-5 mb-2 first:mt-0 font-sans">
+      {children}
+    </h3>
+  ),
+  h4: ({ children }) => (
+    <h4 className="text-sm md:text-base font-semibold tracking-tight text-primary mt-4 mb-2 first:mt-0 font-sans">
+      {children}
+    </h4>
+  ),
+  p: ({ children }) => (
+    <p className="text-sm md:text-[15px] text-primary/95 leading-relaxed mb-4 last:mb-0 font-sans font-normal selection:bg-blue-600/30 selection:text-white">
+      {children}
+    </p>
+  ),
+  ul: ({ children }) => (
+    <ul className="list-disc pl-6 mb-4 space-y-2 text-secondary font-sans">{children}</ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="list-decimal pl-6 mb-4 space-y-2 text-secondary font-sans">{children}</ol>
+  ),
+  li: ({ children }) => (
+    <li className="text-sm md:text-[15px] leading-relaxed pl-0.5">{children}</li>
+  ),
   blockquote: ({ children }) => (
     <blockquote className="border-l-2 border-blue-500 bg-card-bg px-4 py-3 my-4 text-secondary italic rounded-r-lg">
       {children}
@@ -105,7 +132,10 @@ const markdownComponents = {
       className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline underline-offset-4 decoration-blue-500/40 hover:decoration-blue-400 inline-flex items-center gap-0.5 transition-colors group/link font-medium"
     >
       {children}
-      <ExternalLink size={10} className="inline opacity-60 group-hover/link:opacity-100 transition-opacity ml-0.5 align-baseline" />
+      <ExternalLink
+        size={10}
+        className="inline opacity-60 group-hover/link:opacity-100 transition-opacity ml-0.5 align-baseline"
+      />
     </a>
   ),
   hr: () => <hr className="border-t border-border-app my-6" />,
@@ -114,7 +144,11 @@ const markdownComponents = {
       <table className="w-full border-collapse text-left text-sm">{children}</table>
     </div>
   ),
-  thead: ({ children }) => <thead className="bg-card-bg border-b border-border-app text-xs font-semibold text-primary uppercase select-none">{children}</thead>,
+  thead: ({ children }) => (
+    <thead className="bg-card-bg border-b border-border-app text-xs font-semibold text-primary uppercase select-none">
+      {children}
+    </thead>
+  ),
   tbody: ({ children }) => <tbody className="divide-y divide-border-app/60">{children}</tbody>,
   tr: ({ children }) => <tr className="hover:bg-card-bg/30 transition-colors">{children}</tr>,
   th: ({ children }) => <th className="px-4 py-3 font-semibold text-primary">{children}</th>,
@@ -129,13 +163,8 @@ const markdownComponents = {
         </code>
       )
     }
-    return (
-      <CodeBlock
-        language={match[1]}
-        value={String(children).replace(/\n$/, '')}
-      />
-    )
-  }
+    return <CodeBlock language={match[1]} value={String(children).replace(/\n$/, '')} />
+  },
 }
 
 const SkeletonMessage = () => (
@@ -225,12 +254,18 @@ const ChatMessage = ({ message, onRegenerate }) => {
               {message?.files && message.files.length > 0 && (
                 <div className="flex flex-col gap-2 mb-3 border-b border-border-app/40 pb-3">
                   {message.files.map((file, idx) => (
-                    <div key={idx} className="flex items-center gap-2 p-2 rounded-xl bg-sidebar-bg border border-border-app/50 max-w-sm text-left">
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 p-2 rounded-xl bg-sidebar-bg border border-border-app/50 max-w-sm text-left"
+                    >
                       <div className="p-1 rounded bg-card-bg border border-border-app">
                         {getFileIcon(file.name)}
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <span className="text-primary font-medium text-xs truncate max-w-[200px]" title={file.name}>
+                        <span
+                          className="text-primary font-medium text-xs truncate max-w-[200px]"
+                          title={file.name}
+                        >
                           {file.name}
                         </span>
                         <span className="text-[9px] text-neutral-500 font-mono">
@@ -329,31 +364,52 @@ const ChatMessage = ({ message, onRegenerate }) => {
       </div>
 
       <div className="absolute right-4 bottom-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-app-bg/90 backdrop-blur-sm border border-border-app rounded-lg p-1 shadow-lg select-none z-10">
-        <button onClick={handleCopyMessage} className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Copy Message" aria-label="Copy Message">
+        <button
+          onClick={handleCopyMessage}
+          className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer"
+          title="Copy Message"
+          aria-label="Copy Message"
+        >
           {copiedMessage ? <Check size={13} className="text-green-400" /> : <Copy size={13} />}
         </button>
-        <button onClick={() => onRegenerate && onRegenerate(message.id)} className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Regenerate Response" aria-label="Regenerate Response">
+        <button
+          onClick={() => onRegenerate && onRegenerate(message.id)}
+          className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer"
+          title="Regenerate Response"
+          aria-label="Regenerate Response"
+        >
           <RotateCcw size={13} />
         </button>
         <button
           onClick={handleThumbsUp}
           className={`p-1.5 rounded-md hover:bg-card-bg transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer ${
-            rated === 'up' ? 'text-blue-500 hover:text-blue-600' : 'text-secondary hover:text-primary'
+            rated === 'up'
+              ? 'text-blue-500 hover:text-blue-600'
+              : 'text-secondary hover:text-primary'
           }`}
-          title="Thumbs Up" aria-label="Thumbs Up"
+          title="Thumbs Up"
+          aria-label="Thumbs Up"
         >
           <ThumbsUp size={13} fill={rated === 'up' ? 'currentColor' : 'none'} />
         </button>
         <button
           onClick={handleThumbsDown}
           className={`p-1.5 rounded-md hover:bg-card-bg transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer ${
-            rated === 'down' ? 'text-red-500 hover:text-red-600' : 'text-secondary hover:text-primary'
+            rated === 'down'
+              ? 'text-red-500 hover:text-red-600'
+              : 'text-secondary hover:text-primary'
           }`}
-          title="Thumbs Down" aria-label="Thumbs Down"
+          title="Thumbs Down"
+          aria-label="Thumbs Down"
         >
           <ThumbsDown size={13} fill={rated === 'down' ? 'currentColor' : 'none'} />
         </button>
-        <button onClick={handleShare} className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Share" aria-label="Share Message">
+        <button
+          onClick={handleShare}
+          className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer"
+          title="Share"
+          aria-label="Share Message"
+        >
           <Share2 size={13} />
         </button>
       </div>

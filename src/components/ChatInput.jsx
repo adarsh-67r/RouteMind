@@ -4,20 +4,33 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useToast } from '../context/ToastContext'
 import { formatFileSize, getFileIcon } from '../utils/fileHelpers'
 
-
 const SUPPORTED_EXTENSIONS = [
-  'pdf', 'txt', 'md', 'doc', 'docx', 
-  'png', 'jpg', 'jpeg', 'webp',
-  'js', 'jsx', 'ts', 'tsx', 'py', 'cpp', 'java', 'json'
+  'pdf',
+  'txt',
+  'md',
+  'doc',
+  'docx',
+  'png',
+  'jpg',
+  'jpeg',
+  'webp',
+  'js',
+  'jsx',
+  'ts',
+  'tsx',
+  'py',
+  'cpp',
+  'java',
+  'json',
 ]
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024 // 20 MB
 
-const ChatInput = ({ 
-  onSubmit, 
-  isLoading = false, 
-  loadingStep = "Analyzing Intent...", 
-  placeholder = "Ask RouteMind a query... (e.g. Write a fast Rust HTTP server)",
-  helperText = "Code, research, writing, reasoning — RouteMind will choose the best model."
+const ChatInput = ({
+  onSubmit,
+  isLoading = false,
+  loadingStep = 'Analyzing Intent...',
+  placeholder = 'Ask RouteMind a query... (e.g. Write a fast Rust HTTP server)',
+  helperText = 'Code, research, writing, reasoning — RouteMind will choose the best model.',
 }) => {
   const [value, setValue] = useState('')
   const [selectedFiles, setSelectedFiles] = useState([])
@@ -33,7 +46,7 @@ const ChatInput = ({
 
     // Reset height to compute scrollHeight accurately
     textarea.style.height = 'auto'
-    
+
     // Set height based on scrollHeight, constrained between 56px and 200px
     const newHeight = Math.min(Math.max(textarea.scrollHeight, 56), 200)
     textarea.style.height = `${newHeight}px`
@@ -46,8 +59,8 @@ const ChatInput = ({
 
   const handleFiles = (filesList) => {
     const files = Array.from(filesList)
-    
-    files.forEach(file => {
+
+    files.forEach((file) => {
       const fileExt = file.name.split('.').pop().toLowerCase()
       if (!SUPPORTED_EXTENSIONS.includes(fileExt)) {
         showToast('This file type is not supported.', 'error')
@@ -58,9 +71,9 @@ const ChatInput = ({
         return
       }
 
-      setSelectedFiles(prev => {
+      setSelectedFiles((prev) => {
         // Prevent duplicate files by checking name and size
-        if (prev.some(f => f.name === file.name && f.size === file.size)) {
+        if (prev.some((f) => f.name === file.name && f.size === file.size)) {
           showToast(`"${file.name}" is already attached.`, 'info')
           return prev
         }
@@ -78,15 +91,15 @@ const ChatInput = ({
   }
 
   const handleRemoveFile = (indexToRemove) => {
-    setSelectedFiles(prev => prev.filter((_, idx) => idx !== indexToRemove))
+    setSelectedFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove))
   }
 
   const handleDrag = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true)
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive(false)
     }
   }
@@ -109,18 +122,18 @@ const ChatInput = ({
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault()
-    
+
     const hasText = !!value.trim()
     const hasFiles = selectedFiles.length > 0
-    
+
     if ((!hasText && !hasFiles) || isLoading) return
-    
+
     if (onSubmit) {
       onSubmit(value.trim(), selectedFiles)
     }
     setValue('')
     setSelectedFiles([])
-    
+
     // Refocus input
     setTimeout(() => {
       textareaRef.current?.focus()
@@ -133,8 +146,6 @@ const ChatInput = ({
       handleSubmit()
     }
   }
-
-
 
   const getFileTypeBadge = (fileName) => {
     return fileName.split('.').pop().toUpperCase()
@@ -188,7 +199,10 @@ const ChatInput = ({
                     {getFileIcon(file.name, 15)}
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="text-primary font-medium truncate max-w-[220px] xs:max-w-[340px] sm:max-w-[480px]" title={file.name}>
+                    <span
+                      className="text-primary font-medium truncate max-w-[220px] xs:max-w-[340px] sm:max-w-[480px]"
+                      title={file.name}
+                    >
                       {file.name}
                     </span>
                     <span className="text-[10px] text-neutral-500 font-mono mt-0.5">
@@ -216,7 +230,7 @@ const ChatInput = ({
       </AnimatePresence>
 
       {/* Input Surface */}
-      <form 
+      <form
         onSubmit={handleSubmit}
         onDragEnter={handleDrag}
         onDragOver={handleDrag}
@@ -251,7 +265,7 @@ const ChatInput = ({
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
           disabled={isLoading}
-          placeholder={isLoading ? "RouteMind is choosing the best model..." : placeholder}
+          placeholder={isLoading ? 'RouteMind is choosing the best model...' : placeholder}
           rows={1}
           aria-label="Ask RouteMind a query"
           className="w-full bg-transparent border-0 ring-0 focus:ring-0 focus:outline-none px-3.5 pt-2.5 pb-1 text-sm text-primary placeholder-[#71717A] resize-none overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-800 scrollbar-track-transparent leading-relaxed"
@@ -286,9 +300,10 @@ const ChatInput = ({
             disabled={isSendDisabled}
             className={`
               p-2 rounded-xl flex items-center justify-center transition-all duration-200 outline-none
-              ${!isSendDisabled
-                ? 'bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:scale-[1.03] active:scale-[0.98] cursor-pointer'
-                : 'bg-blue-50 text-blue-400 border border-blue-100 dark:bg-neutral-900 dark:text-neutral-600 dark:border-neutral-800 cursor-not-allowed'
+              ${
+                !isSendDisabled
+                  ? 'bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:scale-[1.03] active:scale-[0.98] cursor-pointer'
+                  : 'bg-blue-50 text-blue-400 border border-blue-100 dark:bg-neutral-900 dark:text-neutral-600 dark:border-neutral-800 cursor-not-allowed'
               }
             `}
             title="Send Message"
@@ -303,4 +318,3 @@ const ChatInput = ({
 }
 
 export default ChatInput
-

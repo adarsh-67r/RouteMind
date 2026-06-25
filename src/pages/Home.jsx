@@ -10,7 +10,7 @@ import {
   Coins,
   ArrowUpRight,
   Activity,
-  Info
+  Info,
 } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -60,7 +60,7 @@ const TerminalSimulator = () => {
       const printStep = () => {
         if (!active) return
         if (stepIdx < current.steps.length) {
-          setVisibleSteps(prev => [...prev, current.steps[stepIdx]])
+          setVisibleSteps((prev) => [...prev, current.steps[stepIdx]])
           stepIdx++
           timer = setTimeout(printStep, 450)
         } else {
@@ -77,7 +77,7 @@ const TerminalSimulator = () => {
         timer = setTimeout(() => {
           if (!active) return
           setPhase('typing')
-          setExampleIndex(prev => (prev + 1) % EXAMPLES.length)
+          setExampleIndex((prev) => (prev + 1) % EXAMPLES.length)
         }, 4500)
       }, 0)
     }
@@ -97,7 +97,9 @@ const TerminalSimulator = () => {
           <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E] opacity-80" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F] opacity-80" />
         </div>
-        <span className="text-[10px] tracking-wider text-neutral-500 font-mono font-medium">routemind-proxy-edge-01</span>
+        <span className="text-[10px] tracking-wider text-neutral-500 font-mono font-medium">
+          routemind-proxy-edge-01
+        </span>
         <div className="flex items-center gap-1 text-[#22C55E] text-[10px] animate-pulse">
           <Activity size={10} />
           <span>PROXY ACTIVE</span>
@@ -121,7 +123,10 @@ const TerminalSimulator = () => {
             const isLast = idx === visibleSteps.length - 1
             const isCompleted = !isLast || phase === 'result'
             return (
-              <div key={idx} className="flex items-center gap-2 text-neutral-400 animate-in fade-in slide-in-from-left-1 duration-200">
+              <div
+                key={idx}
+                className="flex items-center gap-2 text-neutral-400 animate-in fade-in slide-in-from-left-1 duration-200"
+              >
                 {isCompleted ? (
                   <span className="text-[#22C55E] font-semibold shrink-0">✓</span>
                 ) : (
@@ -166,7 +171,6 @@ const TerminalSimulator = () => {
     </div>
   )
 }
-
 
 const Home = () => {
   return (
@@ -213,7 +217,8 @@ const Home = () => {
               variants={fadeInUp}
               className="text-[#A1A1AA] text-base sm:text-lg max-w-xl mx-auto leading-relaxed"
             >
-              RouteMind automatically selects the best AI model for every task based on intent, cost, latency, and performance requirements.
+              RouteMind automatically selects the best AI model for every task based on intent,
+              cost, latency, and performance requirements.
             </motion.p>
           </div>
 
@@ -257,7 +262,9 @@ const Home = () => {
         className="py-12 border-t border-border-app/40 bg-sidebar-bg/40 backdrop-blur-sm relative select-none"
       >
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-[10px] font-semibold text-neutral-600 font-mono tracking-widest uppercase mb-6">Supported Routing Destinations</p>
+          <p className="text-[10px] font-semibold text-neutral-600 font-mono tracking-widest uppercase mb-6">
+            Supported Routing Destinations
+          </p>
           <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6 text-sm font-semibold font-mono text-neutral-500">
             {['OpenAI', 'Claude', 'Gemini', 'Search Models'].map((name, i) => (
               <motion.div
@@ -268,9 +275,17 @@ const Home = () => {
                 transition={{ delay: i * 0.08, duration: 0.4 }}
                 className="flex items-center gap-2 hover:text-primary transition-colors duration-200"
               >
-                <span className={`h-1.5 w-1.5 rounded-full ${
-                  i === 0 ? 'bg-blue-500/60' : i === 1 ? 'bg-orange-500/60' : i === 2 ? 'bg-red-500/60' : 'bg-green-500/60'
-                }`} />
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    i === 0
+                      ? 'bg-blue-500/60'
+                      : i === 1
+                        ? 'bg-orange-500/60'
+                        : i === 2
+                          ? 'bg-red-500/60'
+                          : 'bg-green-500/60'
+                  }`}
+                />
                 <span>{name}</span>
               </motion.div>
             ))}
@@ -292,9 +307,12 @@ const Home = () => {
               <Sliders size={12} />
               <span>Core Engine Benefits</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-primary">High-Performance Optimization</h2>
+            <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-primary">
+              High-Performance Optimization
+            </h2>
             <p className="text-[#A1A1AA] text-sm sm:text-base leading-relaxed">
-              We manage inference complexity. Reduce cost overheads without sacrificing coding and contextual depths.
+              We manage inference complexity. Reduce cost overheads without sacrificing coding and
+              contextual depths.
             </p>
           </motion.div>
 
@@ -331,7 +349,9 @@ const Home = () => {
                 variants={fadeInUp}
                 className="bg-card-bg/60 backdrop-blur-md border border-border-app rounded-xl p-6 space-y-4 transition-all duration-200 hover:border-border-app/80 hover:shadow-lg hover:-translate-y-1 group"
               >
-                <div className={`p-2 rounded border w-9 h-9 flex items-center justify-center ${iconBg}`}>
+                <div
+                  className={`p-2 rounded border w-9 h-9 flex items-center justify-center ${iconBg}`}
+                >
                   {icon}
                 </div>
                 <h3 className="text-base font-semibold text-primary">{title}</h3>
@@ -351,9 +371,12 @@ const Home = () => {
         className="py-24 border-t border-border-app/40 bg-sidebar-bg/40 backdrop-blur-sm relative"
       >
         <div className="max-w-4xl mx-auto px-4 text-center space-y-8 select-none">
-          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-primary">Experience AI Optimization</h2>
+          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-primary">
+            Experience AI Optimization
+          </h2>
           <p className="text-[#A1A1AA] text-sm sm:text-base max-w-md mx-auto leading-relaxed">
-            Integrate our proxy layer and experience sub-10ms routing decisions without changing your workflow.
+            Integrate our proxy layer and experience sub-10ms routing decisions without changing
+            your workflow.
           </p>
           <div className="flex justify-center pt-2">
             <Link

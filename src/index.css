@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @variant dark (&:where(.dark, .dark *));
 
@@ -20,47 +20,75 @@
   --animate-slide-in-left: slide-in-left 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
 
   --keyframes-slide-up-fade: {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   };
   --keyframes-slide-in-right: {
-    from { opacity: 0; transform: translateX(16px); }
-    to   { opacity: 1; transform: translateX(0); }
+    from {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   };
   --keyframes-fade-in: {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   };
   --keyframes-scale-in: {
-    from { opacity: 0; transform: scale(0.96); }
-    to   { opacity: 1; transform: scale(1); }
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   };
   --keyframes-slide-in-left: {
-    from { opacity: 0; transform: translateX(-24px); }
-    to   { opacity: 1; transform: translateX(0); }
+    from {
+      opacity: 0;
+      transform: translateX(-24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   };
 }
 
 /* ── Light Mode Default variables ── */
 :root {
-  --app-bg: #F9FAFB;
-  --sidebar-bg: #FFFFFF;
-  --card-bg: #F3F4F6;
-  --border-app: #E5E7EB;
-  --accent-blue: #2563EB;
-  --primary: #0F172A;
+  --app-bg: #f9fafb;
+  --sidebar-bg: #ffffff;
+  --card-bg: #f3f4f6;
+  --border-app: #e5e7eb;
+  --accent-blue: #2563eb;
+  --primary: #0f172a;
   --secondary: #475569;
 }
 
 /* ── Dark Mode variables ── */
 .dark {
-  --app-bg: #0A0A0A;
+  --app-bg: #0a0a0a;
   --sidebar-bg: #111111;
   --card-bg: #141414;
   --border-app: #262626;
-  --accent-blue: #3B82F6;
-  --primary: #FAFAFA;
-  --secondary: #A1A1AA;
+  --accent-blue: #3b82f6;
+  --primary: #fafafa;
+  --secondary: #a1a1aa;
 }
 
 /* ── Smooth theme transition ── */
@@ -68,18 +96,32 @@
 .theme-transition *,
 .theme-transition *::before,
 .theme-transition *::after {
-  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease, fill 200ms ease, stroke 200ms ease !important;
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease,
+    fill 200ms ease,
+    stroke 200ms ease !important;
   transition-delay: 0s !important;
 }
 
 /* ── stagger delay utilities ── */
-@utility stagger-1 { animation-delay: 60ms; }
-@utility stagger-2 { animation-delay: 120ms; }
-@utility stagger-3 { animation-delay: 180ms; }
-@utility stagger-4 { animation-delay: 240ms; }
+@utility stagger-1 {
+  animation-delay: 60ms;
+}
+@utility stagger-2 {
+  animation-delay: 120ms;
+}
+@utility stagger-3 {
+  animation-delay: 180ms;
+}
+@utility stagger-4 {
+  animation-delay: 240ms;
+}
 
 /* ── base styles ── */
-html, body {
+html,
+body {
   background-color: var(--app-bg);
   color: var(--primary);
   overflow-x: hidden;
@@ -87,9 +129,10 @@ html, body {
   padding: 0;
 }
 
-
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
