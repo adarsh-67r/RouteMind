@@ -32,30 +32,116 @@ const RoutingCard = ({
   // Extract props with defaults, giving precedence to fields nested in `routing` prop
   const modelVal = routing?.model ?? model ?? 'GPT-4o'
   const costVal = routing?.cost ?? cost ?? '$0.003'
-  const savingsVal = routing?.savings ?? savings ?? '68%'
-  const speedVal = routing?.speed ?? speed ?? 'Fast'
   const confidenceVal = routing?.confidence ?? confidence ?? '92%'
   
   // Format numeric confidence for radial/circular graphics
   const numericConfidence = parseInt(String(confidenceVal).replace('%', '')) || 92
   
   const reasonVal = routing?.reason ?? reason ?? `Routed to ${modelVal} as cost constraints and query latency are balanced for optimal performance.`
-  
-  const factorsVal = routing?.factors ?? factors ?? {
-    intentMatch: 95,
-    quality: 92,
-    latency: 87,
-    costEfficiency: 89
-  }
-  
-  const detailsVal = routing?.details ?? details ?? {
-    intent: 'Coding & Scripting',
-    provider: 'OpenAI Proxy',
+
+  // Dynamically derive stats/details based on the selected model if not provided
+  let defaultSpeed = 'Fast'
+  let defaultSavings = '68%'
+  let defaultFactors = { intentMatch: 95, quality: 92, latency: 87, costEfficiency: 89 }
+  let defaultDetails = {
+    intent: 'General Reasoning',
+    provider: 'OpenAI API',
     version: 'gpt-4o-2024-05-13',
-    contextLength: '16k tokens',
-    score: '93/100',
-    fallbacks: ['Claude 3.5 Sonnet', 'Gemini 1.5 Flash']
+    contextLength: '128k tokens',
+    score: '95/100',
+    fallbacks: ['Claude 3.5 Sonnet', 'Gemini 1.5 Pro']
   }
+
+  if (modelVal.includes('Sonnet') || modelVal.includes('Claude')) {
+    defaultSpeed = 'Moderate'
+    defaultSavings = '62%'
+    defaultFactors = { intentMatch: 99, quality: 98, latency: 85, costEfficiency: 70 }
+    defaultDetails = {
+      intent: 'Coding & Complex Logic',
+      provider: 'Anthropic API',
+      version: 'claude-3-5-sonnet-20240620',
+      contextLength: '200k tokens',
+      score: '99/100',
+      fallbacks: ['GPT-4o', 'Gemini 1.5 Pro']
+    }
+  } else if (modelVal.includes('Gemini 1.5 Pro')) {
+    defaultSpeed = 'Moderate'
+    defaultSavings = '82%'
+    defaultFactors = { intentMatch: 98, quality: 95, latency: 78, costEfficiency: 85 }
+    defaultDetails = {
+      intent: 'Document & Long-Context',
+      provider: 'Google Vertex AI',
+      version: 'gemini-1.5-pro-001',
+      contextLength: '2M tokens',
+      score: '97/100',
+      fallbacks: ['GPT-4o', 'Claude 3.5 Sonnet']
+    }
+  } else if (modelVal.includes('Flash')) {
+    defaultSpeed = 'Ultra Fast'
+    defaultSavings = '95%'
+    defaultFactors = { intentMatch: 92, quality: 90, latency: 97, costEfficiency: 98 }
+    defaultDetails = {
+      intent: 'Low Latency Retrieval',
+      provider: 'Google Vertex AI',
+      version: 'gemini-1.5-flash-001',
+      contextLength: '1M tokens',
+      score: '92/100',
+      fallbacks: ['GPT-4o-mini', 'Llama 3.1']
+    }
+  } else if (modelVal.includes('mini') || modelVal.includes('Mini')) {
+    defaultSpeed = 'Very Fast'
+    defaultSavings = '90%'
+    defaultFactors = { intentMatch: 93, quality: 89, latency: 95, costEfficiency: 96 }
+    defaultDetails = {
+      intent: 'Conversational Utility',
+      provider: 'OpenAI API',
+      version: 'gpt-4o-mini-2024-07-18',
+      contextLength: '128k tokens',
+      score: '91/100',
+      fallbacks: ['Gemini 1.5 Flash', 'Llama 3.1']
+    }
+  } else if (modelVal.includes('DeepSeek')) {
+    defaultSpeed = 'Fast'
+    defaultSavings = '92%'
+    defaultFactors = { intentMatch: 94, quality: 93, latency: 88, costEfficiency: 95 }
+    defaultDetails = {
+      intent: 'Coding & Math Optimization',
+      provider: 'DeepSeek Edge',
+      version: 'deepseek-coder-v2',
+      contextLength: '64k tokens',
+      score: '94/100',
+      fallbacks: ['Claude 3.5 Sonnet', 'GPT-4o-mini']
+    }
+  } else if (modelVal.includes('Sonar') || modelVal.includes('Perplexity')) {
+    defaultSpeed = 'Fast'
+    defaultSavings = '75%'
+    defaultFactors = { intentMatch: 97, quality: 94, latency: 91, costEfficiency: 88 }
+    defaultDetails = {
+      intent: 'Live Search & Synthesis',
+      provider: 'Perplexity API',
+      version: 'sonar-pro-2024',
+      contextLength: '32k tokens',
+      score: '96/100',
+      fallbacks: ['GPT-4o', 'Gemini 1.5 Flash']
+    }
+  } else if (modelVal.includes('o3-mini')) {
+    defaultSpeed = 'Moderate'
+    defaultSavings = '78%'
+    defaultFactors = { intentMatch: 99, quality: 97, latency: 74, costEfficiency: 82 }
+    defaultDetails = {
+      intent: 'Advanced Reasoning & Math',
+      provider: 'OpenAI API',
+      version: 'o3-mini-2025-01',
+      contextLength: '200k tokens',
+      score: '98/100',
+      fallbacks: ['Claude 3.5 Sonnet', 'GPT-4o']
+    }
+  }
+
+  const savingsVal = routing?.savings ?? savings ?? defaultSavings
+  const speedVal = routing?.speed ?? speed ?? defaultSpeed
+  const factorsVal = routing?.factors ?? factors ?? defaultFactors
+  const detailsVal = routing?.details ?? details ?? defaultDetails
   
   const isLoadingVal = routing?.isLoading ?? isLoading ?? false
   const loadingStepVal = routing?.loadingStep ?? loadingStep ?? 'Analyzing Request Intent...'

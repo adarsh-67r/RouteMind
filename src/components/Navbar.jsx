@@ -47,25 +47,24 @@ const Navbar = () => {
           className="flex items-center gap-3 group focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 rounded-lg p-1"
           aria-label="RouteMind Home"
         >
-          <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-neutral-900 border border-neutral-800 group-hover:border-blue-500/40 transition-colors duration-300">
+          <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-card-bg border border-border-app group-hover:border-blue-500/40 transition-colors duration-300">
             <svg
               className="w-[22px] h-[22px] text-neutral-400 group-hover:text-blue-400 transition-colors duration-300"
               viewBox="0 0 32 32"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path d="M8 10C12 10 14 6 18 6H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-neutral-700 group-hover:text-neutral-600 transition-colors duration-300" />
+              <path d="M8 10C12 10 14 6 18 6H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-neutral-300 dark:text-neutral-700 group-hover:text-neutral-400 dark:group-hover:text-neutral-600 transition-colors duration-300" />
               <path d="M8 16H24" stroke="#0066FF" strokeWidth="2" strokeLinecap="round" className="drop-shadow-[0_0_4px_rgba(0,102,255,0.6)]" />
-              <path d="M8 22C12 22 14 26 18 26H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-neutral-700 group-hover:text-neutral-600 transition-colors duration-300" />
-              <rect x="6" y="8" width="4" height="16" rx="1" fill="#171717" stroke="currentColor" strokeWidth="1.5" className="text-neutral-600 group-hover:text-neutral-500 transition-colors duration-300" />
+              <path d="M8 22C12 22 14 26 18 26H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-neutral-300 dark:text-neutral-700 group-hover:text-neutral-400 dark:group-hover:text-neutral-600 transition-colors duration-300" />
+              <rect x="6" y="8" width="4" height="16" rx="1" className="fill-neutral-200 dark:fill-neutral-800 stroke-neutral-300 dark:stroke-neutral-700 group-hover:fill-neutral-300 dark:group-hover:fill-neutral-900 transition-colors duration-300" strokeWidth="1.5" />
               <circle cx="8" cy="16" r="1.5" fill="#0066FF" />
-              <circle cx="24" cy="6" r="2" fill="#404040" />
+              <circle cx="24" cy="6" r="2" className="fill-neutral-400 dark:fill-neutral-600 transition-colors duration-300" />
               <circle cx="24" cy="16" r="3" fill="#0066FF" className="animate-pulse" />
-              <circle cx="24" cy="26" r="2" fill="#404040" />
+              <circle cx="24" cy="26" r="2" className="fill-neutral-400 dark:fill-neutral-600 transition-colors duration-300" />
             </svg>
             <div className="absolute inset-0 bg-blue-500/5 blur-md rounded-lg group-hover:bg-blue-500/10 transition-colors duration-300 -z-10"></div>
           </div>
-
           <div className="flex flex-col">
             <span className="text-primary font-semibold text-[17px] tracking-tight leading-none group-hover:text-primary/80 transition-colors">
               RouteMind

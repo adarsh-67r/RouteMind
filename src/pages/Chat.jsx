@@ -63,6 +63,21 @@ const Chat = () => {
   const messageIdRef = useRef(100)
   const timeoutRefs = useRef([])
 
+  const [routingPolicy, setRoutingPolicy] = useState(() => {
+    return localStorage.getItem('routingPolicy') || 'balanced'
+  })
+
+  // Sync routing policy updates
+  useEffect(() => {
+    const handlePolicyUpdate = () => {
+      setRoutingPolicy(localStorage.getItem('routingPolicy') || 'balanced')
+    }
+    window.addEventListener('policy-updated', handlePolicyUpdate)
+    return () => {
+      window.removeEventListener('policy-updated', handlePolicyUpdate)
+    }
+  }, [])
+
   const currentMessages = conversationsMessages[activeChatId] || []
 
   useEffect(() => {
@@ -141,8 +156,7 @@ const Chat = () => {
     setLoadingStep(hasFiles ? 'Reading attachments...' : 'Analyzing Intent...')
 
     // Fetch optimal routing parameters based on active preference
-    const activePolicy = localStorage.getItem('routingPolicy') || 'balanced'
-    const routingResult = getMockRouting(content.trim(), hasFiles ? attachedFiles[0] : null, activePolicy)
+    const routingResult = getMockRouting(content.trim(), hasFiles ? attachedFiles[0] : null, routingPolicy)
     const { model, cost, confidence, reason } = routingResult
 
     let reply = `I have analyzed your query and successfully routed it to **${model}**. Let me know if you would like me to unpack these suggestions further!`
@@ -172,18 +186,38 @@ const Chat = () => {
         setPendingModel(model)
         const t3 = setTimeout(() => {
           setLoadingStep('Generating Response...')
+          
+          // Append streaming placeholder message
+          const assistantMsgId = `assistant-${messageIdRef.current + 1}`
+          const assistantMsgPlaceholder = {
+            id: assistantMsgId,
+            role: 'assistant',
+            content: '',
+            time: 'Just now',
+            isStreaming: true,
+            routing: { model, cost, confidence, reason }
+          }
+          setConversationsMessages(prev => {
+            const existingMsgs = prev[chatIdAtSend] || []
+            return { ...prev, [chatIdAtSend]: [...existingMsgs, assistantMsgPlaceholder] }
+          })
+
           const t4 = setTimeout(() => {
             messageIdRef.current += 1
             const assistantMsg = {
-              id: `assistant-${messageIdRef.current}`,
+              id: assistantMsgId,
               role: 'assistant',
               content: reply,
               time: 'Just now',
+              isStreaming: false,
               routing: { model, cost, confidence, reason }
             }
             setConversationsMessages(prev => {
               const existingMsgs = prev[chatIdAtSend] || []
-              return { ...prev, [chatIdAtSend]: [...existingMsgs, assistantMsg] }
+              return {
+                ...prev,
+                [chatIdAtSend]: existingMsgs.map(m => m.id === assistantMsgId ? assistantMsg : m)
+              }
             })
             
             // Update live telemetry stats in localStorage

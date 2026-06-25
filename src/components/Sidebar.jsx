@@ -181,14 +181,14 @@ const Sidebar = ({
                 fill="none" 
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path d="M8 10C12 10 14 6 18 6H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-neutral-700" />
+                <path d="M8 10C12 10 14 6 18 6H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-neutral-300 dark:text-neutral-700 group-hover/logo:text-neutral-400 dark:group-hover/logo:text-neutral-600 transition-colors duration-200" />
                 <path d="M8 16H24" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" className="drop-shadow-[0_0_4px_rgba(59,130,246,0.6)]" />
-                <path d="M8 22C12 22 14 26 18 26H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-neutral-700" />
-                <rect x="6" y="8" width="4" height="16" rx="1" fill="#171717" stroke="currentColor" strokeWidth="1.5" className="text-neutral-600" />
+                <path d="M8 22C12 22 14 26 18 26H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-neutral-300 dark:text-neutral-700 group-hover/logo:text-neutral-400 dark:group-hover/logo:text-neutral-600 transition-colors duration-200" />
+                <rect x="6" y="8" width="4" height="16" rx="1" className="fill-neutral-200 dark:fill-neutral-800 stroke-neutral-300 dark:stroke-neutral-700 transition-colors duration-200" strokeWidth="1.5" />
                 <circle cx="8" cy="16" r="1.5" fill="#3B82F6" />
-                <circle cx="24" cy="6" r="2" fill="#404040" />
+                <circle cx="24" cy="6" r="2" className="fill-neutral-400 dark:fill-neutral-600 transition-colors duration-200" />
                 <circle cx="24" cy="16" r="3" fill="#3B82F6" className="animate-pulse" />
-                <circle cx="24" cy="26" r="2" fill="#404040" />
+                <circle cx="24" cy="26" r="2" className="fill-neutral-400 dark:fill-neutral-600 transition-colors duration-200" />
               </svg>
               <div className="absolute inset-0 bg-blue-500/5 blur-md rounded-lg -z-10"></div>
             </div>
