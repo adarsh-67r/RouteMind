@@ -117,7 +117,7 @@ const TerminalSimulator = () => {
       <div className="p-5 space-y-4 text-[13px] min-h-[290px] leading-relaxed">
         <div className="flex items-start gap-2">
           <span className="text-[#3B82F6] font-bold shrink-0">$</span>
-          <p className="text-[#FAFAFA] font-medium break-words">
+          <p className="text-neutral-900 dark:text-[#FAFAFA] font-medium break-words">
             {typedPrompt}
             {phase === 'typing' && (
               <span className="inline-block w-1.5 h-3.5 bg-blue-500 animate-pulse ml-0.5" />

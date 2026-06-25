@@ -16,14 +16,16 @@ RouteMind is a **React + Vite** single-page app that simulates an intelligent AI
 
 | Layer | Choice |
 |---|---|
-| Framework | React 18 + Vite |
-| Routing | React Router v6 |
-| Styling | Tailwind CSS v3 |
-| Animation | Framer Motion |
-| Icons | Lucide React |
+| Framework | React 19 + Vite 8 |
+| Routing | React Router v7 |
+| Styling | Tailwind CSS v4 |
+| Animation | Framer Motion v12 |
+| Icons | Lucide React v1 |
+| Markdown | react-markdown v10 + remark-gfm v4 |
+| Syntax Highlighting | react-syntax-highlighter v16 |
 | State | `useState` / `useRef` (no Redux/Zustand) |
 | Persistence | `localStorage` (routing policy + telemetry stats) |
-| Testing | Vitest + React Testing Library |
+| Testing | Vitest v4 + React Testing Library v16 |
 | CI | GitHub Actions (lint → test → build) |
 
 ---
@@ -42,11 +44,14 @@ src/
 │   ├── ThemeContext.jsx     # Light/dark/system theme provider
 │   └── ToastContext.jsx     # Global toast notification system
 ├── pages/
-│   └── Chat.jsx            # Main page — holds all app state
+│   ├── Chat.jsx            # Main chat page — holds all app state
+│   ├── Home.jsx            # Landing page with terminal simulator
+│   ├── Benefits.jsx        # Features/benefits page
+│   └── Documetation.jsx    # Documentation page (note: filename has typo)
 ├── utils/
 │   └── mockRouter.js       # Routing logic (keyword matching → model selection)
 ├── data/
-│   └── mockData.js         # Legacy static data (routingStats — now replaced by localStorage)
+│   └── mockData.js         # Static data (TERMINAL_EXAMPLES, legacy routingStats)
 └── main.jsx                # Entry point — wraps app in BrowserRouter > ThemeProvider > ToastProvider
 ```
 
@@ -141,8 +146,6 @@ The `getMockRouting(query, file, policy)` function uses keyword matching — **n
 
 ## 7. File Attachment System
 
-Added in commit `4c6c6ae` ("new features and bug fix").
-
 - `ChatInput.jsx` manages `selectedFiles[]` state locally
 - Files can be added via: click (hidden `<input type="file">`), drag-and-drop on the form, or paste from clipboard
 - Supported extensions: `pdf, txt, md, doc, docx, png, jpg, jpeg, webp, js, jsx, ts, tsx, py, cpp, java, json`
@@ -156,7 +159,7 @@ Added in commit `4c6c6ae` ("new features and bug fix").
 
 ## 8. Toast Notification System
 
-Added in commit `4c6c6ae`. Located in `src/context/ToastContext.jsx`.
+Located in `src/context/ToastContext.jsx`.
 
 - `ToastProvider` wraps the whole app in `main.jsx` (inside `ThemeProvider`)
 - Use anywhere with: `const { showToast } = useToast()`
@@ -178,8 +181,6 @@ Added in commit `4c6c6ae`. Located in `src/context/ToastContext.jsx`.
 
 ## 10. Telemetry Dashboard
 
-Added in commit `abed53e` ("enable real routing data").
-
 - Clicking the "TELEMETRY" badge at the bottom of the Sidebar opens a modal
 - Shows: total queries routed, estimated cost savings, per-model utilisation bars, edge node status
 - Data source: `routingStats` in `localStorage`, synced via the `telemetry-updated` custom event
@@ -198,35 +199,7 @@ Added in commit `abed53e` ("enable real routing data").
 
 ---
 
-## 12. Recent Commits (last 5, all by Pritesh)
-
-### `abed53e` — enable real routing data
-- Sidebar telemetry badge is now a clickable button opening the Telemetry modal
-- New `<TelemetryModal>` inside Sidebar: shows query count, cost savings, model utilisation bars, edge node grid
-- Sidebar reads `routingStats` from localStorage and listens to `telemetry-updated` / `storage` events for live updates
-- Settings modal routing policy picker upgraded: was static 2-option grid → interactive 3-option button list (`cost` / `balanced` / `accuracy`) with active state, icons, and localStorage persistence
-- Keyboard shortcut handler updated to also close the telemetry modal on `Escape`
-- `Command` icon replaced with `<kbd>` HTML elements for keyboard shortcut display
-
-### `4414e08` — fix the CI issue
-- Fixed GitHub Actions pipeline
-
-### `4c6c6ae` — new features and bug fix *(largest commit — 620 line diff)*
-- **`ChatInput.jsx`:** Full file attachment system (drag-drop, paste, click), multi-file preview stack with Framer Motion animations, file type icons, size formatting, duplicate detection, 20 MB limit enforcement via `ToastContext`
-- **`ChatMessage.jsx`:** File attachment rendering inside user bubbles; toast feedback on copy/share/thumbs; `onRegenerate` prop wired; share button now copies URL; thumbs up/down handlers extracted from inline `() => {}`
-- **`Chat.jsx`:** `handleSendMessage` accepts `files[]` param; routing now calls `getMockRouting`; `handleRegenerateResponse` implemented; `handleClearConversation` added; "Clear Chat" button shown in header when messages exist; file-aware chat auto-rename
-- **`ToastContext.jsx`:** Created from scratch — full toast system with `AnimatePresence` animations
-- **`mockRouter.js`:** `file` param added; file-type routing (images → GPT-4o, documents → Gemini 1.5 Pro)
-
-### `bf82b0b` — Text visibility fix in light mode
-- Fixed text contrast issues in light mode (Tailwind colour class corrections)
-
-### `0a55605` — add theme toggle feature new
-- Initial theme toggle implementation in Sidebar
-
----
-
-## 13. Known Issues & TODOs
+## 12. Known Issues & TODOs
 
 | # | File | Issue | Severity |
 |---|---|---|---|
@@ -241,7 +214,7 @@ Added in commit `abed53e` ("enable real routing data").
 
 ---
 
-## 14. Working Conventions
+## 13. Working Conventions
 
 - **No real API calls exist yet.** Every model response is a hardcoded string in `Chat.jsx`'s `handleSendMessage`.
 - **File objects are not persisted.** Only metadata (`name`, `size`, `type`) is stored in message state. If you add server-side file processing, upload the raw `File` before serialising.
