@@ -6,7 +6,7 @@
 // Use VITE_API_URL from environment variables, fallback to local FastAPI default
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
-const DEFAULT_TIMEOUT_MS = 15000 // 15 seconds default timeout
+const DEFAULT_TIMEOUT_MS = 60000 // 60 seconds — increased to handle large model responses
 
 /**
  * Handles HTTP response check and centralizes error throwing.
