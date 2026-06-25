@@ -30,6 +30,9 @@ RouteMind is packed with features designed to provide a premium, seamless AI exp
 
 ### 4. **Scalable Backend & Configuration**
 * **FastAPI Server:** Clean python backend skeleton equipped with server health monitoring checks and standard CORS setup.
+* **Swappable LLM Provider Adapters:** Fully encapsulated client layer with standard error translating wrappers (OpenAI SDK integrated; Claude/Gemini placeholders).
+* **Decoupled Routing Services:** Dynamic model resolution by policy (`cost`, `speed`, `quality`) and auto-fallbacks for offline providers.
+* **Extensible Intent Classification:** Abstract classifier model mapping user messages to categorized intents with confidence heuristics.
 * **Production Configurations:** Production-ready single-page routing configurations (`vercel.json`) to prevent 404s on refresh.
 
 ---
@@ -61,19 +64,33 @@ RouteMind/
 ├── backend/                     # Python FastAPI Backend API
 │   ├── app/
 │   │   ├── __init__.py
+│   │   ├── classifier/          # Deterministic & extensible intent classification
+│   │   │   ├── __init__.py
+│   │   │   └── intent_classifier.py # BaseIntentClassifier contract & RuleBasedIntentClassifier
 │   │   ├── config.py            # Centralized settings loading using dotenv & Pydantic
 │   │   ├── main.py              # Composition root registering CORS, logging, & routers
+│   │   ├── providers/           # Swappable LLM provider integration adapters
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py          # Abstract BaseProvider & custom provider exceptions
+│   │   │   ├── claude_provider.py # Claude API TODO placeholder
+│   │   │   ├── gemini_provider.py # Gemini API TODO placeholder
+│   │   │   └── openai_provider.py # Live OpenAI SDK client integration with latency logs
 │   │   ├── routes/              # Modular API routes
 │   │   │   ├── __init__.py      # Package marker
 │   │   │   ├── chat.py          # /chat endpoint using Pydantic request/response schemas
 │   │   │   └── health.py        # /health and root welcome API routes
-│   │   └── schemas/             # Pydantic data schemas
-│   │       ├── __init__.py      # Schema exports
-│   │       └── chat.py          # ChatRequest and ChatResponse schemas
+│   │   ├── schemas/             # Pydantic data schemas
+│   │   │   ├── __init__.py      # Schema exports
+│   │   │   └── chat.py          # ChatRequest and ChatResponse schemas
+│   │   └── services/            # Orchestration & routing logic
+│   │       ├── __init__.py
+│   │       ├── provider_manager.py # Lazy-loading & availability monitor
+│   │       └── router.py        # Intent-driven rule router & fallback engine
 │   ├── .env                     # Local environment variables
 │   ├── .gitignore               # Python environment git ignores
 │   ├── requirements.txt         # Backend Python dependencies
 │   └── venv/                    # Python virtual environment (ignored)
+```
 ├── src/                         # React Frontend Application
 │   ├── assets/                  # Graphics and static resources
 │   ├── components/              # Shared UI components

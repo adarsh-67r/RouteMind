@@ -90,17 +90,30 @@ RouteMind/
 ├── backend/                    # FastAPI backend (Clean Architecture)
 │   ├── app/
 │   │   ├── __init__.py
+│   │   ├── classifier/          # Deterministic & extensible intent classification
+│   │   │   ├── __init__.py
+│   │   │   └── intent_classifier.py # BaseIntentClassifier contract & RuleBasedIntentClassifier
 │   │   ├── config.py           # Centralized configuration and environment loading (python-dotenv & Pydantic)
 │   │   ├── main.py             # Composition root: CORS middleware, logging, and routing registrations
+│   │   ├── providers/           # Swappable LLM provider integration adapters
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py          # Abstract BaseProvider & custom provider exceptions
+│   │   │   ├── claude_provider.py # Claude API TODO placeholder
+│   │   │   ├── gemini_provider.py # Gemini API TODO placeholder
+│   │   │   └── openai_provider.py # Live OpenAI SDK client integration with latency logs
 │   │   ├── routes/             # Modular API routes
 │   │   │   ├── __init__.py     # Package marker
 │   │   │   ├── chat.py         # POST /chat endpoint (mock routing with schema validation)
 │   │   │   └── health.py       # GET /health & GET / root welcome endpoints
-│   │   └── schemas/            # Request and response contract validations
-│   │       ├── __init__.py     # Exposes schemas for external modules
-│   │       └── chat.py         # Pydantic schemas: ChatRequest and ChatResponse
+│   │   ├── schemas/            # Request and response contract validations
+│   │   │   ├── __init__.py     # Exposes schemas for external modules
+│   │   │   └── chat.py         # Pydantic schemas: ChatRequest and ChatResponse
+│   │   └── services/            # Orchestration & routing logic
+│   │       ├── __init__.py
+│   │       ├── provider_manager.py # Lazy-loading & availability monitor
+│   │       └── router.py        # Intent-driven rule router & fallback engine
 │   ├── .env                    # Local environment variables configuration
-│   ├── requirements.txt        # Python deps: fastapi, uvicorn, pydantic, python-dotenv
+│   ├── requirements.txt        # Python deps: fastapi, uvicorn, pydantic, python-dotenv, openai>=1.0.0
 │   └── .gitignore
 ├── src/
 │   ├── main.jsx                # React entry point — mounts App inside StrictMode
@@ -164,18 +177,33 @@ Uses `python-dotenv` to parse settings from a local `.env` file into a Pydantic 
 * **`ChatRequest`** — Request schema validating `message` length/whitespaces, `conversation_id`, `routing_policy` (Literal: `balanced`, `speed`, `cost`, `quality`), list of `attachments`, `user_id`, and default ISO-8601 UTC `timestamp`.
 * **`ChatResponse`** — Output serialization contract tracking `response`, `selected_model`, `provider`, `reason`, `confidence`, `processing_time_ms`, `estimated_cost`, and `conversation_id`.
 
+#### 5. AI Provider Adapters (`app/providers/`)
+* **`base.py`** — Abstract base class `BaseProvider` and custom local exceptions (`ProviderError`, `ProviderAuthenticationError`, `ProviderAPIError`, `ProviderConnectionError`) mapping vendor SDK errors to RouteMind structures.
+* **`openai_provider.py`** — Live integration with official `openai` SDK client, supporting dynamic API keys, structured logging, latency tracking, and error mapping.
+* **`claude_provider.py`** — Structurally complete placeholder provider returning `NotImplementedError`.
+* **`gemini_provider.py`** — Structurally complete placeholder provider returning `NotImplementedError`.
+
+#### 6. Routing & Orchestration (`app/services/`)
+* **`provider_manager.py`** — Singleton-like manager loading, lazy-caching, and health-checking provider adapter instances.
+* **`router.py`** — Rule-based `LLMRouter` resolving task intent and policy into a `RoutingDecision`, with support for fallback providers when a preferred choice goes offline.
+
+#### 7. Intent Classification (`app/classifier/`)
+* **`intent_classifier.py`** — Defines standard contract `BaseIntentClassifier` and `RuleBasedIntentClassifier` which uses keyword regex heuristics to detect intents and calculate scaling confidence scores.
+
 ### What needs to be built
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| `/chat` (LLM Integration) | POST | Integrate intent classifier (DistilBERT-class CPU model), run weighted routing table logic, call provider SDKs (Gemini, OpenAI, Anthropic), stream response via SSE, and log metadata to Supabase. |
+| `/chat` (Router/Classifier wiring) | POST | Replace static handler in `app/routes/chat.py` with the newly created classifier, router, and provider manager. |
+| `/chat` (SSE Streaming) | POST | Transition response delivery from synchronous JSON to Server-Sent Events (SSE). |
+| `/chat` (Supabase Logging) | POST | Log routing telemetry metadata (prompt hash, model, latency, cost) to Supabase db. |
 | `/feedback` | POST | Log user override/thumbs-down for classifier retraining signal. |
 | `/health/providers` | GET | Return cached provider health status (ping results). |
 
 ### Python dependencies (requirements.txt)
 
-Currently includes: `fastapi 0.138.0`, `uvicorn 0.49.0`, `pydantic 2.13.4`, `python-dotenv 1.2.2`. Missing for full implementation:
-- `openai`, `anthropic`, `google-generativeai` — provider SDKs
+Currently includes: `fastapi 0.138.0`, `uvicorn 0.49.0`, `pydantic 2.13.4`, `python-dotenv 1.2.2`, `openai>=1.0.0` (installed). Missing for full implementation:
+- `anthropic`, `google-generativeai` — provider SDKs (currently mock/placeholder)
 - `httpx` — async HTTP for provider calls + health pings
 - `supabase` — DB client for routing decision logging
 
