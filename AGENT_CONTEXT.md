@@ -119,6 +119,7 @@ RouteMind/
 │   │       └── router.py        # Intent-driven rule router & fallback engine
 │   ├── .env                    # Local environment variables configuration
 │   ├── requirements.txt        # Python deps: fastapi, uvicorn, pydantic, python-dotenv, openai>=1.0.0
+│   ├── tests/                  # Pytest test suite (unit and integration tests)
 │   └── .gitignore
 ├── src/
 │   ├── main.jsx                # React entry point — mounts App inside StrictMode
@@ -130,7 +131,9 @@ RouteMind/
 │   │   ├── Benefits.jsx        # Benefits/features marketing page
 │   │   └── Documentation.jsx  # Docs page
 │   ├── components/
-│   │   ├── Sidebar.jsx         # Chat history, rename/delete, routing policy, telemetry panel
+│   │   ├── Sidebar.jsx         # Chat history orchestration and component wrapper
+│   │   ├── SettingsModal.jsx   # Extracted modal: routing policy, user profile, shortcuts
+│   │   ├── TelemetryModal.jsx  # Extracted modal: live telemetry stats and pie chart
 │   │   ├── ChatMessage.jsx     # Renders user + assistant messages; inline RoutingCard; feedback buttons
 │   │   ├── ChatInput.jsx       # Auto-resizing textarea, file attachment, keyboard shortcuts
 │   │   ├── TypingIndicator.jsx # Animated loading state with step labels and model preview
@@ -223,11 +226,12 @@ Currently includes: `fastapi 0.138.0`, `uvicorn 0.49.0`, `pydantic 2.13.4`, `pyt
 - `httpx` — async HTTP for provider calls + health pings
 - `supabase` — DB client for routing decision logging
 
-### Running locally
+### Running locally & Testing
 
 ```bash
 cd backend
 pip install -r requirements.txt
+python -m pytest tests/ -v      # Run the test suite
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -327,11 +331,11 @@ Supported policies and mapping configurations:
 
 ## `Sidebar.jsx` — Detailed Notes
 
-The sidebar is the most complex component. Key sub-sections:
+The sidebar orchestrates chat history and provides access to workspace modals. Key sub-sections:
 
 - **Chat list** — scrollable, with inline rename (double-click title) and delete (hover → trash icon). Active item: `bg-blue-950/30 text-white` (no colored side border).
-- **Routing policy selector** — `<select>` reads/writes `localStorage('routingPolicy')`. Emits `storage` event on change so `Chat.jsx` reads latest value at send time.
-- **Telemetry panel** — shows `totalQueries`, `savings`, model breakdown pie. Reads from `localStorage('routingStats')` on mount and on `telemetry-updated` window event (fired by `Chat.jsx` after each response). `defaultStats` from `src/data/mockData.js` seeds empty state.
+- **`SettingsModal.jsx`** (Extracted) — `<select>` reads/writes `localStorage('routingPolicy')`. Emits `policy-updated` event so `Chat.jsx` reads latest value. Also shows keyboard shortcuts.
+- **`TelemetryModal.jsx`** (Extracted) — shows `totalQueries`, `savings`, model breakdown pie. Reads from `localStorage('routingStats')` on mount and on `telemetry-updated` window event. `defaultStats` from `src/data/mockData.js` seeds empty state.
 - **Theme toggle** — wired to `ThemeContext`. Cycles `'light'` → `'dark'` → `'system'`. Applied to `<html data-theme="...">` by `ThemeContext.jsx`.
 - **`Tooltip.jsx`** — imported from `src/components/Tooltip.jsx`. Hover-only; not keyboard/screen-reader accessible yet.
 - **Mobile** — controlled by `mobileOpen` prop from `Chat.jsx`. Fixed overlay with backdrop below `md` breakpoint.

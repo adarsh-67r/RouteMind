@@ -252,18 +252,11 @@ const Chat = () => {
       const stats = storedStats ? JSON.parse(storedStats) : defaultStats
       stats.totalQueries += 1
 
-      // Calculate savings metrics dynamically based on provider
-      let savedAmount = 0.0025
-      if (
-        model.includes('mini') ||
-        model.includes('Flash') ||
-        model.includes('Haiku') ||
-        model.includes('DeepSeek')
-      ) {
-        savedAmount = 0.0038
-      } else if (model.includes('Pro') || model.includes('Sonnet')) {
-        savedAmount = 0.001
-      }
+      // Calculate savings metrics using actual backend estimated cost
+      // Assume baseline cost of $0.005 per query (GPT-4o full price) vs. actual routed cost
+      const baselineCost = 0.005
+      const actualCost = backendRoutingDetail.estimated_cost || 0
+      const savedAmount = Math.max(baselineCost - actualCost, 0)
       stats.savings = parseFloat((stats.savings + savedAmount).toFixed(4))
       stats.models[model] = (stats.models[model] || 0) + 1
       localStorage.setItem('routingStats', JSON.stringify(stats))

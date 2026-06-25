@@ -7,6 +7,7 @@ import logging
 import uuid
 from datetime import datetime, timezone
 from typing import Dict, Any
+from functools import lru_cache
 from fastapi import APIRouter, HTTPException, Depends, status
 
 from app.config import settings
@@ -20,17 +21,21 @@ logger = logging.getLogger("routemind.routes.chat")
 router = APIRouter()
 
 
-# Dependency Injection Providers
+# Dependency Injection Providers — cached as singletons so state (e.g.
+# ProviderManager's lazy-loaded provider instances) persists across requests.
+@lru_cache(maxsize=1)
 def get_classifier() -> BaseIntentClassifier:
     """Dependency injection helper returning the registered Intent Classifier."""
     return RuleBasedIntentClassifier()
 
 
+@lru_cache(maxsize=1)
 def get_router() -> LLMRouter:
     """Dependency injection helper returning the registered LLMRouter."""
     return LLMRouter()
 
 
+@lru_cache(maxsize=1)
 def get_provider_manager() -> ProviderManager:
     """Dependency injection helper returning the registered ProviderManager."""
     return ProviderManager()
@@ -147,13 +152,13 @@ async def process_chat_message(
             routing_decision.provider,
             str(e),
         )
-        # Standardized mock dictionary mapping
+        # Standardized mock dictionary mapping — keep user-facing text clean
         provider_response = {
             "response": (
-                f"[Mock Response from {routing_decision.provider.upper()}]\n\n"
+                f"Thank you for your question. I've processed your request "
+                f"using the **{routing_decision.model}** model via {routing_decision.provider.capitalize()}.\n\n"
                 f'You asked: "{request.message}"\n\n'
-                f"This prompt was classified as '{intent_result.intent}' (confidence: {intent_result.confidence}%) "
-                f"and routed to {routing_decision.provider.upper()} using the '{request.routing_policy}' policy."
+                f"*Note: This is a simulated response. Connect your API key to receive live model outputs.*"
             ),
             "selected_model": routing_decision.model,
             "provider": routing_decision.provider,

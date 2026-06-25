@@ -93,6 +93,12 @@ RouteMind/
 │   ├── .env                     # Local environment variables
 │   ├── .gitignore               # Python environment git ignores
 │   ├── requirements.txt         # Backend Python dependencies
+│   ├── tests/                   # Pytest integration & unit test suite
+│   │   ├── __init__.py
+│   │   ├── test_classifier.py
+│   │   ├── test_router.py
+│   │   ├── test_provider_manager.py
+│   │   └── test_chat_endpoint.py
 │   └── venv/                    # Python virtual environment (ignored)
 ├── src/                         # React Frontend Application
 │   ├── assets/                  # Graphics and static resources
@@ -103,7 +109,9 @@ RouteMind/
 │   │   ├── Footer.jsx           # Global landing page footer
 │   │   ├── Navbar.jsx           # Top navigation bar
 │   │   ├── RoutingCard.jsx      # UI displaying routing statistics & rationale
-│   │   ├── Sidebar.jsx          # Sidebar for history, policy selector & telemetry
+│   │   ├── SettingsModal.jsx    # Extracted settings & policy selector modal
+│   │   ├── Sidebar.jsx          # Sidebar for history orchestration
+│   │   ├── TelemetryModal.jsx   # Extracted live routing statistics dashboard
 │   │   ├── Tooltip.jsx          # Light hover tooltip wrapper
 │   │   └── TypingIndicator.jsx  # Multi-step animated loading indicators
 │   ├── context/                 # Context providers for global state
@@ -204,7 +212,13 @@ You can use either **npm** (default on local workspace) or **pnpm**:
    pip install -r requirements.txt
    ```
 
-3. **Start the API Server:**
+3. **Run Backend Tests:**
+
+   ```bash
+   python -m pytest tests/ -v
+   ```
+
+4. **Start the API Server:**
    ```bash
    uvicorn app.main:app --reload
    ```
