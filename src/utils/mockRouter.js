@@ -8,8 +8,134 @@
  * @param {string} query - The user's raw input string
  * @returns {{ model: string, confidence: string, cost: string, reason: string, latency: string }}
  */
-export function getMockRouting(query, file = null) {
+export function getMockRouting(query, file = null, policy = 'balanced') {
   const q = query.toLowerCase()
+
+  // 1. MAX ACCURACY POLICY OVERRIDES
+  if (policy === 'accuracy') {
+    if (file) {
+      const ext = file.name.split('.').pop().toLowerCase()
+      const isImage = ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext)
+      if (isImage) {
+        return {
+          model: 'GPT-4o',
+          confidence: '99%',
+          cost: '$0.0032',
+          reason: `Max Accuracy Policy: Forced GPT-4o high-precision Vision encoder for processing visual payload "${file.name}".`,
+          latency: '~1.3s'
+        }
+      }
+      return {
+        model: 'Gemini 1.5 Pro',
+        confidence: '98%',
+        cost: '$0.0035',
+        reason: `Max Accuracy Policy: Routed "${file.name}" to Gemini 1.5 Pro (tier-1 2M tokens context payload indexing).`,
+        latency: '~1.7s'
+      }
+    }
+
+    if (
+      q.includes('code') || q.includes('function') || q.includes('debug') ||
+      q.includes('react') || q.includes('python') || q.includes('javascript') ||
+      q.includes('rust') || q.includes('typescript') || q.includes('api') ||
+      q.includes('component') || q.includes('script') || q.includes('write a')
+    ) {
+      return {
+        model: 'Claude 3.5 Sonnet',
+        confidence: '99%',
+        cost: '$0.0048',
+        reason: 'Max Accuracy Policy: Forced Claude 3.5 Sonnet for maximum semantic and code syntax debugging benchmarks.',
+        latency: '~1.2s'
+      }
+    }
+
+    if (
+      q.includes('search') || q.includes('latest') || q.includes('news') ||
+      q.includes('research') || q.includes('find') || q.includes('who is') ||
+      q.includes('what is the') || q.includes('current') || q.includes('today')
+    ) {
+      return {
+        model: 'Perplexity Sonar Pro',
+        confidence: '97%',
+        cost: '$0.0030',
+        reason: 'Max Accuracy Policy: Forced Perplexity Sonar Pro for deep web queries with extensive citations.',
+        latency: '~1.5s'
+      }
+    }
+
+    // Default premium accuracy model
+    return {
+      model: 'GPT-4o',
+      confidence: '98%',
+      cost: '$0.0028',
+      reason: 'Max Accuracy Policy: Defaulting to GPT-4o for primary tier-1 conversational and reasoning depth.',
+      latency: '~1.0s'
+    }
+  }
+
+  // 2. COST OPTIMIZER POLICY OVERRIDES
+  if (policy === 'cost') {
+    if (file) {
+      const ext = file.name.split('.').pop().toLowerCase()
+      const isImage = ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext)
+      if (isImage) {
+        return {
+          model: 'Gemini 1.5 Flash',
+          confidence: '92%',
+          cost: '$0.00008',
+          reason: `Cost Optimizer Policy: Routed image "${file.name}" to Gemini 1.5 Flash to save 97% on token processing costs.`,
+          latency: '~0.6s'
+        }
+      }
+      return {
+        model: 'Gemini 1.5 Flash',
+        confidence: '90%',
+        cost: '$0.00008',
+        reason: `Cost Optimizer Policy: Routed document "${file.name}" to Gemini 1.5 Flash to index long-context context cheaply.`,
+        latency: '~0.8s'
+      }
+    }
+
+    if (
+      q.includes('code') || q.includes('function') || q.includes('debug') ||
+      q.includes('react') || q.includes('python') || q.includes('javascript') ||
+      q.includes('rust') || q.includes('typescript') || q.includes('api') ||
+      q.includes('component') || q.includes('script') || q.includes('write a')
+    ) {
+      return {
+        model: 'DeepSeek Coder',
+        confidence: '94%',
+        cost: '$0.0002',
+        reason: 'Cost Optimizer Policy: Routed to DeepSeek Coder to resolve code prompts at a fraction of standard API prices.',
+        latency: '~1.0s'
+      }
+    }
+
+    if (
+      q.includes('search') || q.includes('latest') || q.includes('news') ||
+      q.includes('research') || q.includes('find') || q.includes('who is') ||
+      q.includes('what is the') || q.includes('current') || q.includes('today')
+    ) {
+      return {
+        model: 'Perplexity Sonar',
+        confidence: '93%',
+        cost: '$0.0005',
+        reason: 'Cost Optimizer Policy: Selected basic Perplexity Sonar node to save 80% on live factual routing.',
+        latency: '~0.8s'
+      }
+    }
+
+    // Default cost-efficient model
+    return {
+      model: 'GPT-4o-mini',
+      confidence: '92%',
+      cost: '$0.00015',
+      reason: 'Cost Optimizer Policy: Routed to GPT-4o-mini for general chat query to maximize cost-efficiency.',
+      latency: '~0.5s'
+    }
+  }
+
+  // 3. BALANCED POLICY (DEFAULT ROUTEMIND HEURISTICS)
 
   if (file) {
     const ext = file.name.split('.').pop().toLowerCase()

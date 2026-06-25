@@ -128,8 +128,9 @@ const Chat = () => {
     setPendingModel(null)
     setLoadingStep(hasFiles ? 'Reading attachments...' : 'Analyzing Intent...')
 
-    // Fetch optimal routing parameters
-    const routingResult = getMockRouting(content.trim(), hasFiles ? attachedFiles[0] : null)
+    // Fetch optimal routing parameters based on active preference
+    const activePolicy = localStorage.getItem('routingPolicy') || 'balanced'
+    const routingResult = getMockRouting(content.trim(), hasFiles ? attachedFiles[0] : null, activePolicy)
     const { model, cost, confidence, reason } = routingResult
 
     let reply = `I have analyzed your query and successfully routed it to **${model}**. Let me know if you would like me to unpack these suggestions further!`
@@ -172,6 +173,33 @@ const Chat = () => {
               const existingMsgs = prev[chatIdAtSend] || []
               return { ...prev, [chatIdAtSend]: [...existingMsgs, assistantMsg] }
             })
+            
+            // Update live telemetry stats in localStorage
+            const defaultStats = {
+              totalQueries: 14,
+              savings: 0.85,
+              models: {
+                'GPT-4o': 5,
+                'GPT-4o-mini': 1,
+                'Claude 3.5 Sonnet': 3,
+                'Gemini 1.5 Pro': 3,
+                'Gemini 1.5 Flash': 1,
+                'DeepSeek Coder': 1
+              }
+            }
+            const storedStats = localStorage.getItem('routingStats')
+            const stats = storedStats ? JSON.parse(storedStats) : defaultStats
+            stats.totalQueries += 1
+            let savedAmount = 0.0025
+            if (model.includes('mini') || model.includes('Flash') || model.includes('DeepSeek')) {
+              savedAmount = 0.0038
+            } else if (model.includes('Pro') || model.includes('Sonnet')) {
+              savedAmount = 0.0010
+            }
+            stats.savings = parseFloat((stats.savings + savedAmount).toFixed(4))
+            stats.models[model] = (stats.models[model] || 0) + 1
+            localStorage.setItem('routingStats', JSON.stringify(stats))
+            window.dispatchEvent(new Event('telemetry-updated'))
             setChatHistory(prevHistory => {
               const chatIndex = prevHistory.findIndex(c => c.id === chatIdAtSend)
               if (chatIndex === -1) return prevHistory

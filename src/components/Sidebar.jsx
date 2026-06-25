@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { routingStats } from '../data/mockData'
+// routingStats imported on demand from localStorage where appropriate
 import { 
   MessageSquare, Plus, Settings, Sun, Moon, 
   PanelLeftClose, PanelLeft, Trash2, Edit2, X,
-  Laptop, Sparkles, Command, Shield, Search
+  Laptop, Sparkles, Shield, Search, Coins, Activity
 } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 
@@ -29,6 +29,42 @@ const Sidebar = ({
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false)
   const themeDropdownRef = useRef(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [routingPolicy, setRoutingPolicy] = useState(() => {
+    return localStorage.getItem('routingPolicy') || 'balanced'
+  })
+  const [telemetryOpen, setTelemetryOpen] = useState(false)
+  const [stats, setStats] = useState(() => {
+    const defaultStats = {
+      totalQueries: 14,
+      savings: 0.85,
+      models: {
+        'GPT-4o': 5,
+        'GPT-4o-mini': 1,
+        'Claude 3.5 Sonnet': 3,
+        'Gemini 1.5 Pro': 3,
+        'Gemini 1.5 Flash': 1,
+        'DeepSeek Coder': 1
+      }
+    }
+    const stored = localStorage.getItem('routingStats')
+    return stored ? JSON.parse(stored) : defaultStats
+  })
+
+  // Sync telemetry updates
+  useEffect(() => {
+    const handleUpdate = () => {
+      const stored = localStorage.getItem('routingStats')
+      if (stored) {
+        setStats(JSON.parse(stored))
+      }
+    }
+    window.addEventListener('storage', handleUpdate)
+    window.addEventListener('telemetry-updated', handleUpdate)
+    return () => {
+      window.removeEventListener('storage', handleUpdate)
+      window.removeEventListener('telemetry-updated', handleUpdate)
+    }
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -71,9 +107,10 @@ const Sidebar = ({
   // Global Keyboard Shortcuts & Modal Dismissal
   useEffect(() => {
     const handleGlobalShortcuts = (e) => {
-      // Escape closes settings modal
-      if (e.key === 'Escape' && settingsOpen) {
-        setSettingsOpen(false)
+      // Escape closes settings/telemetry modals
+      if (e.key === 'Escape') {
+        if (settingsOpen) setSettingsOpen(false)
+        if (telemetryOpen) setTelemetryOpen(false)
       }
       
       // CMD/CTRL+K to focus search input
@@ -101,7 +138,7 @@ const Sidebar = ({
 
     window.addEventListener('keydown', handleGlobalShortcuts)
     return () => window.removeEventListener('keydown', handleGlobalShortcuts)
-  }, [settingsOpen, isCollapsed, chatHistory, handleCreateNewChat, setIsCollapsed])
+  }, [settingsOpen, telemetryOpen, isCollapsed, chatHistory, handleCreateNewChat, setIsCollapsed])
 
   const handleStartRename = (id, title, e) => {
     e.stopPropagation()
@@ -328,13 +365,18 @@ const Sidebar = ({
         <div className="border-t border-border-app p-3 space-y-2 shrink-0 bg-sidebar-bg relative">
           
           {!isCollapsed && (
-            <div className="px-2.5 py-1.5 rounded-lg bg-card-bg border border-border-app/40 text-[10px] text-neutral-400 font-mono flex items-center justify-between select-none">
+            <button
+              onClick={() => setTelemetryOpen(true)}
+              className="w-full px-2.5 py-1.5 rounded-lg bg-card-bg hover:bg-sidebar-bg border border-border-app/40 hover:border-blue-500/30 text-[10px] text-neutral-400 font-mono flex items-center justify-between select-none transition-all active:scale-[0.98] outline-none focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 cursor-pointer"
+              title="Open Live Proxy Telemetry Dashboard"
+              aria-label="Open Live Proxy Telemetry Dashboard"
+            >
               <span className="flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                Routed: {routingStats.totalQueries} queries
+                Routed: {stats.totalQueries} queries
               </span>
-              <span className="text-blue-400 font-semibold text-[9px] tracking-wide font-mono bg-blue-950/20 px-1 py-0.5 rounded border border-blue-500/20">PROXY</span>
-            </div>
+              <span className="text-blue-400 font-semibold text-[9px] tracking-wide font-mono bg-blue-950/20 px-1 py-0.5 rounded border border-blue-500/20">TELEMETRY</span>
+            </button>
           )}
 
           <div className={`flex items-center gap-3 px-1.5 py-1 ${isCollapsed ? 'justify-center' : ''}`}>
@@ -452,55 +494,90 @@ const Sidebar = ({
                 </div>
                 <button 
                   onClick={() => setSettingsOpen(false)}
-                  className="text-neutral-400 hover:text-white p-1 rounded-md hover:bg-neutral-800 transition-colors"
+                  className="text-neutral-400 hover:text-primary p-1.5 rounded-lg hover:bg-card-bg transition-colors"
                 >
                   <X size={16} />
                 </button>
               </div>
-              <div className="p-5 space-y-4 text-xs">
-                <div className="space-y-2">
-                  <h4 className="text-neutral-400 font-semibold uppercase tracking-wider text-[10px]">Account Profile</h4>
+              <div className="p-6 space-y-6 text-xs select-none">
+                <div className="space-y-3">
+                  <h4 className="text-neutral-400 font-semibold uppercase tracking-wider text-[10px] tracking-widest">Account Profile</h4>
                   <div className="p-3 bg-card-bg border border-border-app rounded-lg flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-sidebar-bg border border-border-app flex items-center justify-center text-sm font-semibold text-blue-400">
+                    <div className="w-10 h-10 rounded-full bg-sidebar-bg border border-border-app flex items-center justify-center text-sm font-semibold text-blue-400 shrink-0">
                       AC
                     </div>
-                    <div>
-                      <p className="text-primary font-medium text-sm">Alex Chen</p>
-                      <p className="text-neutral-500 font-mono">alex@routemind.ai</p>
+                    <div className="space-y-0.5">
+                      <p className="text-primary font-semibold text-sm leading-none">Alex Chen</p>
+                      <p className="text-neutral-500 font-mono text-[11px]">alex@routemind.ai</p>
                     </div>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="text-neutral-400 font-semibold uppercase tracking-wider text-[10px]">Model Routing Preferences</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="p-2.5 bg-card-bg border border-blue-500/20 hover:border-blue-500/40 transition-colors cursor-pointer">
-                      <p className="text-primary font-medium mb-1 flex items-center gap-1.5">
-                        <Sparkles size={13} className="text-blue-400" /> Cost Optimizer
-                      </p>
-                      <p className="text-neutral-500 text-[10px]">Routes to the cheapest capable model for standard queries.</p>
-                    </div>
-                    <div className="p-2.5 bg-card-bg border border-border-app hover:border-blue-500/40 transition-colors cursor-pointer">
-                      <p className="text-neutral-400 font-medium mb-1 flex items-center gap-1.5">
-                        <Shield size={13} className="text-neutral-500" /> Max Accuracy
-                      </p>
-                      <p className="text-neutral-500 text-[10px]">Always defaults to primary tier-1 LLMs like Claude 3.5 Sonnet.</p>
-                    </div>
+                
+                <div className="space-y-3">
+                  <h4 className="text-neutral-400 font-semibold uppercase tracking-wider text-[10px] tracking-widest">Model Routing Preferences</h4>
+                  <div className="flex flex-col gap-2">
+                    {[
+                      { id: 'cost', title: 'Cost Optimizer', desc: 'Routes to cheaper models (DeepSeek, GPT-4o-mini).', icon: Coins, activeClass: 'border-green-500/30 bg-green-500/5 dark:bg-green-950/10 text-green-600 dark:text-green-400 font-semibold shadow-sm shadow-green-950/5' },
+                      { id: 'balanced', title: 'Balanced AI', desc: 'Default RouteMind proxies (Claude for code, Gemini for files).', icon: Sparkles, activeClass: 'border-blue-500/30 bg-blue-500/5 dark:bg-blue-950/10 text-blue-600 dark:text-blue-400 font-semibold shadow-sm shadow-blue-950/5' },
+                      { id: 'accuracy', title: 'Max Accuracy', desc: 'Primary tier-1 premium models (Claude 3.5, GPT-4o).', icon: Shield, activeClass: 'border-purple-500/30 bg-purple-500/5 dark:bg-purple-950/10 text-purple-600 dark:text-purple-400 font-semibold shadow-sm shadow-purple-950/5' }
+                    ].map((policy) => {
+                      const Icon = policy.icon
+                      const isSelected = routingPolicy === policy.id
+                      return (
+                        <button
+                          type="button"
+                          key={policy.id}
+                          onClick={() => {
+                            setRoutingPolicy(policy.id)
+                            localStorage.setItem('routingPolicy', policy.id)
+                            window.dispatchEvent(new Event('policy-updated'))
+                          }}
+                          className={`p-3 bg-card-bg border rounded-xl hover:border-blue-500/20 hover:bg-card-bg/80 transition-all cursor-pointer text-left flex items-start gap-3 w-full ${
+                            isSelected ? `${policy.activeClass} border-blue-500/50` : 'border-border-app text-neutral-400'
+                          }`}
+                        >
+                          <div className={`p-1.5 rounded-lg shrink-0 mt-0.5 ${isSelected ? 'bg-current/10 text-current' : 'bg-sidebar-bg text-neutral-500 border border-border-app/60 shadow-sm'}`}>
+                            <Icon size={13} className="text-current" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <p className={`font-semibold text-[11px] ${isSelected ? 'text-primary' : 'text-neutral-400'}`}>
+                                {policy.title}
+                              </p>
+                              {isSelected && (
+                                <span className="text-[9px] font-semibold uppercase tracking-wider font-mono text-current bg-current/10 px-1.5 py-0.5 rounded-md leading-none">
+                                  Selected
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-neutral-500 text-[10px] leading-relaxed mt-0.5">{policy.desc}</p>
+                          </div>
+                        </button>
+                      )
+                    })}
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="text-neutral-400 font-semibold uppercase tracking-wider text-[10px]">Keyboard Shortcuts</h4>
-                  <div className="space-y-1.5 font-mono text-[10px]">
-                    <div className="flex justify-between py-1 border-b border-border-app/40">
+
+                <div className="space-y-3">
+                  <h4 className="text-neutral-400 font-semibold uppercase tracking-wider text-[10px] tracking-widest">Keyboard Shortcuts</h4>
+                  <div className="space-y-2.5 font-mono text-[11px]">
+                    <div className="flex justify-between items-center py-2.5 border-b border-border-app/40">
                       <span className="text-neutral-500">New Conversation</span>
-                      <span className="text-primary flex items-center gap-0.5"><Command size={10} />N</span>
+                      <span className="text-primary flex items-center gap-1 font-semibold">
+                        <kbd className="px-1.5 py-0.5 bg-card-bg border border-border-app rounded text-[10px] font-sans shadow-sm">Ctrl</kbd> + <kbd className="px-1.5 py-0.5 bg-card-bg border border-border-app rounded text-[10px] font-sans shadow-sm">N</kbd>
+                      </span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-border-app/40">
+                    <div className="flex justify-between items-center py-2.5 border-b border-border-app/40">
                       <span className="text-neutral-500">Toggle Sidebar panel</span>
-                      <span className="text-primary flex items-center gap-0.5"><Command size={10} />\</span>
+                      <span className="text-primary flex items-center gap-1 font-semibold">
+                        <kbd className="px-1.5 py-0.5 bg-card-bg border border-border-app rounded text-[10px] font-sans shadow-sm">Ctrl</kbd> + <kbd className="px-1.5 py-0.5 bg-card-bg border border-border-app rounded text-[10px] font-sans shadow-sm">\</kbd>
+                      </span>
                     </div>
-                    <div className="flex justify-between py-1">
+                    <div className="flex justify-between items-center py-2.5">
                       <span className="text-neutral-500">Search Conversations</span>
-                      <span className="text-primary flex items-center gap-0.5"><Command size={10} />K</span>
+                      <span className="text-primary flex items-center gap-1 font-semibold">
+                        <kbd className="px-1.5 py-0.5 bg-card-bg border border-border-app rounded text-[10px] font-sans shadow-sm">Ctrl</kbd> + <kbd className="px-1.5 py-0.5 bg-card-bg border border-border-app rounded text-[10px] font-sans shadow-sm">K</kbd>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -508,9 +585,116 @@ const Sidebar = ({
               <div className="px-5 py-3 border-t border-border-app bg-sidebar-bg flex justify-end gap-2">
                 <button
                   onClick={() => setSettingsOpen(false)}
-                  className="bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-1.5 rounded text-xs transition-colors"
+                  className="bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-1.5 rounded text-xs transition-colors cursor-pointer"
                 >
                   Done
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {telemetryOpen && (
+          <div 
+            onClick={() => setTelemetryOpen(false)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-fade-in"
+          >
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              className="bg-sidebar-bg border border-border-app rounded-xl w-full max-w-lg shadow-2xl overflow-hidden"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="telemetry-title"
+            >
+              <div className="px-5 py-4 border-b border-border-app flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Activity size={18} className="text-blue-500" />
+                  <h3 id="telemetry-title" className="text-sm font-semibold text-primary">Live Routing Telemetry</h3>
+                </div>
+                <button 
+                  onClick={() => setTelemetryOpen(false)}
+                  className="text-neutral-400 hover:text-white p-1 rounded-md hover:bg-neutral-800 transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              
+              <div className="p-5 space-y-5 text-xs">
+                {/* Upper Telemetry Badges */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="p-3 bg-card-bg border border-border-app rounded-lg text-center">
+                    <p className="text-[9px] text-neutral-500 font-mono uppercase tracking-wider mb-1">Total Routed</p>
+                    <p className="text-lg font-bold text-primary font-mono">{stats.totalQueries}</p>
+                  </div>
+                  <div className="p-3 bg-card-bg border border-border-app rounded-lg text-center relative overflow-hidden">
+                    <p className="text-[9px] text-neutral-500 font-mono uppercase tracking-wider mb-1">Est. Savings</p>
+                    <p className="text-lg font-bold text-green-500 font-mono flex items-center justify-center gap-1">
+                      <span>${stats.savings.toFixed(3)}</span>
+                    </p>
+                  </div>
+                  <div className="p-3 bg-card-bg border border-border-app rounded-lg text-center">
+                    <p className="text-[9px] text-neutral-500 font-mono uppercase tracking-wider mb-1">Overhead Latency</p>
+                    <p className="text-lg font-bold text-blue-500 font-mono">&lt;12ms</p>
+                  </div>
+                </div>
+
+                {/* Model Distribution bars */}
+                <div className="space-y-3 bg-card-bg border border-border-app rounded-lg p-4">
+                  <h4 className="text-neutral-400 font-semibold uppercase tracking-wider text-[10px] mb-2 font-mono">Model Utilization Distribution</h4>
+                  <div className="space-y-2.5">
+                    {Object.entries(stats.models).map(([modelName, count]) => {
+                      const percentage = stats.totalQueries > 0 ? (count / stats.totalQueries) * 100 : 0
+                      
+                      // Theme-tailored colors for progress bars
+                      let colorClass = 'bg-blue-500'
+                      if (modelName.includes('Claude')) colorClass = 'bg-orange-500'
+                      else if (modelName.includes('Gemini')) colorClass = 'bg-red-500'
+                      else if (modelName.includes('DeepSeek')) colorClass = 'bg-green-500'
+                      else if (modelName.includes('Perplexity')) colorClass = 'bg-cyan-500'
+
+                      return (
+                        <div key={modelName} className="space-y-1">
+                          <div className="flex justify-between text-[11px] text-primary">
+                            <span className="font-mono">{modelName}</span>
+                            <span className="font-mono text-neutral-500">{count} queries ({percentage.toFixed(0)}%)</span>
+                          </div>
+                          <div className="h-1.5 bg-sidebar-bg rounded-full overflow-hidden border border-border-app/30">
+                            <div className={`h-full ${colorClass} rounded-full transition-all duration-500`} style={{ width: `${percentage}%` }}></div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Node Status Grid */}
+                <div className="space-y-2">
+                  <h4 className="text-neutral-400 font-semibold uppercase tracking-wider text-[10px] font-mono">Edge Deployment Status</h4>
+                  <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                    <div className="p-2 bg-card-bg border border-border-app rounded flex justify-between items-center">
+                      <span className="text-neutral-400">US-East-1 Edge</span>
+                      <span className="text-green-500 font-bold flex items-center gap-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                        ONLINE
+                      </span>
+                    </div>
+                    <div className="p-2 bg-card-bg border border-border-app rounded flex justify-between items-center">
+                      <span className="text-neutral-400">EU-Central-1 Edge</span>
+                      <span className="text-green-500 font-bold flex items-center gap-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                        ONLINE
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-5 py-3 border-t border-border-app bg-sidebar-bg flex justify-end gap-2">
+                <button
+                  onClick={() => setTelemetryOpen(false)}
+                  className="bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-1.5 rounded text-xs transition-colors cursor-pointer"
+                >
+                  Close
                 </button>
               </div>
             </div>
@@ -520,6 +704,7 @@ const Sidebar = ({
     </>
   )
 }
+
 
 const Tooltip = ({ text, isCollapsed, children }) => {
   if (!isCollapsed) return children
