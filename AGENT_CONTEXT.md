@@ -87,10 +87,19 @@ Stores **routing decisions only** — not prompt content:
 RouteMind/
 ├── .github/
 │   └── workflows/              # CI pipeline (lint → test → build)
-├── backend/                    # FastAPI backend (scaffold — in progress)
+├── backend/                    # FastAPI backend (Clean Architecture)
 │   ├── app/
 │   │   ├── __init__.py
-│   │   └── main.py             # FastAPI app entry: CORS config, / and /health routes only
+│   │   ├── config.py           # Centralized configuration and environment loading (python-dotenv & Pydantic)
+│   │   ├── main.py             # Composition root: CORS middleware, logging, and routing registrations
+│   │   ├── routes/             # Modular API routes
+│   │   │   ├── __init__.py     # Package marker
+│   │   │   ├── chat.py         # POST /chat endpoint (mock routing with schema validation)
+│   │   │   └── health.py       # GET /health & GET / root welcome endpoints
+│   │   └── schemas/            # Request and response contract validations
+│   │       ├── __init__.py     # Exposes schemas for external modules
+│   │       └── chat.py         # Pydantic schemas: ChatRequest and ChatResponse
+│   ├── .env                    # Local environment variables configuration
 │   ├── requirements.txt        # Python deps: fastapi, uvicorn, pydantic, python-dotenv
 │   └── .gitignore
 ├── src/
@@ -137,23 +146,29 @@ RouteMind/
 
 ## Backend — Current State (`backend/`)
 
-The backend is a **FastAPI scaffold** committed in the `df51ee7` commit. It is intentionally minimal — the structure is correct but the core routing logic is not yet implemented.
+The backend is refactored into a **Clean Architecture** structure, segregating configuration, route handlers, composition root entrypoints, and validation schemas.
 
 ### What exists
 
-```python
-# backend/app/main.py
-GET /        → {"message": "Welcome to RouteMind API"}
-GET /health  → {"status": "healthy"}
-```
+#### 1. Composition Root (`app/main.py`)
+Initializes the `FastAPI` instance. It configures the CORS middleware using loaded settings, sets up basic console logs with `logging.basicConfig` inside an async `lifespan` manager, and registers routers.
 
-CORS is configured with `allow_origins=["*"]` — acceptable for hackathon, must be locked to frontend domain before any public deployment.
+#### 2. Settings Configuration (`app/config.py`)
+Uses `python-dotenv` to parse settings from a local `.env` file into a Pydantic `Settings` model. Exposes CORS origins list, environment indicators, and API key placeholders.
+
+#### 3. Modular Routes (`app/routes/`)
+* **`health.py`** — GET `/` (Welcome greeting) and GET `/health` (Service operational status details).
+* **`chat.py`** — POST `/chat` (Mock routing endpoint verifying the schema and input validation).
+
+#### 4. Validated Schema Contracts (`app/schemas/`)
+* **`ChatRequest`** — Request schema validating `message` length/whitespaces, `conversation_id`, `routing_policy` (Literal: `balanced`, `speed`, `cost`, `quality`), list of `attachments`, `user_id`, and default ISO-8601 UTC `timestamp`.
+* **`ChatResponse`** — Output serialization contract tracking `response`, `selected_model`, `provider`, `reason`, `confidence`, `processing_time_ms`, `estimated_cost`, and `conversation_id`.
 
 ### What needs to be built
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| `/route` | POST | Main routing endpoint. Accepts `{ query, file_ref, policy }`. Returns `{ response, routing_metadata }` via SSE. |
+| `/chat` (LLM Integration) | POST | Integrate intent classifier (DistilBERT-class CPU model), run weighted routing table logic, call provider SDKs (Gemini, OpenAI, Anthropic), stream response via SSE, and log metadata to Supabase. |
 | `/feedback` | POST | Log user override/thumbs-down for classifier retraining signal. |
 | `/health/providers` | GET | Return cached provider health status (ping results). |
 
@@ -391,9 +406,8 @@ Three sequential jobs:
 
 | Area                | Issue                                                                                      | Priority |
 | ------------------- | ------------------------------------------------------------------------------------------ | -------- |
-| `backend/`          | `/route` endpoint not implemented — all core routing logic missing                         | **High** |
+| `backend/`          | Core LLM routing and classifier integration missing in `/chat` endpoint                     | **High** |
 | `backend/`          | `requirements.txt` missing provider SDKs (`openai`, `anthropic`, `httpx`, `supabase`)     | **High** |
-| `backend/`          | `allow_origins=["*"]` in CORS config — must be scoped before public deployment             | Medium   |
 | `ChatInput.jsx`     | `text-[11px]` on helper text — below 12px a11y floor, should be `text-xs`                 | Low      |
 | `Sidebar.jsx`       | `Tooltip.jsx` not keyboard/screen-reader accessible                                        | Low      |
 | `Chat.jsx`          | `handleNewChat` in header button is an inline lambda; should call the shared function      | Low      |

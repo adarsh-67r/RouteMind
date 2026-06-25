@@ -61,7 +61,15 @@ RouteMind/
 ├── backend/                     # Python FastAPI Backend API
 │   ├── app/
 │   │   ├── __init__.py
-│   │   └── main.py              # Main API setup with CORS & health checkpoints
+│   │   ├── config.py            # Centralized settings loading using dotenv & Pydantic
+│   │   ├── main.py              # Composition root registering CORS, logging, & routers
+│   │   ├── routes/              # Modular API routes
+│   │   │   ├── __init__.py      # Package marker
+│   │   │   ├── chat.py          # /chat endpoint using Pydantic request/response schemas
+│   │   │   └── health.py        # /health and root welcome API routes
+│   │   └── schemas/             # Pydantic data schemas
+│   │       ├── __init__.py      # Schema exports
+│   │       └── chat.py          # ChatRequest and ChatResponse schemas
 │   ├── .env                     # Local environment variables
 │   ├── .gitignore               # Python environment git ignores
 │   ├── requirements.txt         # Backend Python dependencies
@@ -161,7 +169,7 @@ Ensure you have Node.js (v18+) and Python (v3.9+) installed on your machine.
    ```bash
    uvicorn app.main:app --reload
    ```
-   The backend API will be available at `http://127.0.0.1:8000`. You can inspect the health check at `http://127.0.0.1:8000/health`.
+   The backend API will be available at `http://127.0.0.1:8000`. You can inspect the health check at `http://127.0.0.1:8000/health`, or open `http://127.0.0.1:8000/docs` to interactively view and test the schema endpoints (e.g. `POST /chat`).
 
 ---
 
