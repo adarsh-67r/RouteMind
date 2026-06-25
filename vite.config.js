@@ -7,6 +7,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    chunkSizeWarningLimit: 1600,
+  },
   test: {
     // Vitest config lives here alongside Vite
     environment: 'jsdom',

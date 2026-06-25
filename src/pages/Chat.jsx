@@ -149,7 +149,6 @@ const Chat = () => {
       }
     }
 
-    const step1 = hasFiles ? 'Reading document structure...' : 'Analyzing Intent...'
     const step2 = hasFiles ? 'Extracting semantic metadata...' : 'Comparing Models...'
     const step3 = hasFiles ? 'Selecting Best Model...' : 'Selecting Best Model...'
 

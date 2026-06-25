@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { routingStats } from '../data/mockData'
@@ -51,6 +51,23 @@ const Sidebar = ({
     }
   }, [editingId])
 
+  const handleChatSelect = (id) => {
+    onChatSelect(id)
+    setMobileOpen(false)
+  }
+
+  const handleCreateNewChat = useCallback(() => {
+    const newId = Date.now().toString()
+    const newChat = {
+      id: newId,
+      title: 'New Workspace Chat',
+      timestamp: 'Just now'
+    }
+    onNewChat(newChat)
+    setEditingId(newId)
+    setEditTitle('New Workspace Chat')
+  }, [onNewChat])
+
   // Global Keyboard Shortcuts & Modal Dismissal
   useEffect(() => {
     const handleGlobalShortcuts = (e) => {
@@ -84,24 +101,7 @@ const Sidebar = ({
 
     window.addEventListener('keydown', handleGlobalShortcuts)
     return () => window.removeEventListener('keydown', handleGlobalShortcuts)
-  }, [settingsOpen, isCollapsed, chatHistory])
-
-  const handleChatSelect = (id) => {
-    onChatSelect(id)
-    setMobileOpen(false)
-  }
-
-  const handleCreateNewChat = () => {
-    const newId = Date.now().toString()
-    const newChat = {
-      id: newId,
-      title: 'New Workspace Chat',
-      timestamp: 'Just now'
-    }
-    onNewChat(newChat)
-    setEditingId(newId)
-    setEditTitle('New Workspace Chat')
-  }
+  }, [settingsOpen, isCollapsed, chatHistory, handleCreateNewChat, setIsCollapsed])
 
   const handleStartRename = (id, title, e) => {
     e.stopPropagation()
