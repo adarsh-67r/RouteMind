@@ -7,7 +7,6 @@ import {
   Check, 
   ChevronDown,
   Info,
-  Terminal,
   Server,
   Layers,
   HelpCircle,
@@ -20,21 +19,8 @@ import {
   Sliders
 } from 'lucide-react'
 import Navbar from '../components/Navbar'
-
-// Animation transitions
-const fadeInUp = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }
-}
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.05
-    }
-  }
-}
+import Footer from '../components/Footer'
+import { fadeInUp, stagger } from '../utils/animations'
 
 // Sidebar links configuration
 const NAV_ITEMS = [
@@ -134,10 +120,10 @@ const Documentation = () => {
           {/* SECTION 1: Overview */}
           <motion.section 
             id="overview" 
-            initial="initial"
-            whileInView="animate"
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
+            variants={stagger}
             className="space-y-4 text-left ScrollTarget"
           >
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-1.5 text-blue-400 font-mono text-[10px] uppercase font-semibold">
@@ -157,10 +143,10 @@ const Documentation = () => {
           {/* SECTION 2: Why RouteMind */}
           <motion.section 
             id="why-routemind" 
-            initial="initial"
-            whileInView="animate"
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
+            variants={stagger}
             className="space-y-4 text-left ScrollTarget"
           >
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-1.5 text-blue-400 font-mono text-[10px] uppercase font-semibold">
@@ -204,10 +190,10 @@ const Documentation = () => {
           {/* SECTION 3: How Routing Works */}
           <motion.section 
             id="how-routing-works" 
-            initial="initial"
-            whileInView="animate"
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
+            variants={stagger}
             className="space-y-6 text-left ScrollTarget"
           >
             <div className="space-y-2">
@@ -263,10 +249,10 @@ const Documentation = () => {
           {/* SECTION 4: Supported Models */}
           <motion.section 
             id="supported-models" 
-            initial="initial"
-            whileInView="animate"
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
+            variants={stagger}
             className="space-y-4 text-left ScrollTarget"
           >
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-1.5 text-blue-400 font-mono text-[10px] uppercase font-semibold">
@@ -345,10 +331,10 @@ const Documentation = () => {
           {/* SECTION 5: Decision Factors */}
           <motion.section 
             id="decision-factors" 
-            initial="initial"
-            whileInView="animate"
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
+            variants={stagger}
             className="space-y-4 text-left ScrollTarget"
           >
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-1.5 text-blue-400 font-mono text-[10px] uppercase font-semibold">
@@ -411,10 +397,10 @@ const Documentation = () => {
           {/* SECTION 6: Architecture */}
           <motion.section 
             id="architecture" 
-            initial="initial"
-            whileInView="animate"
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
+            variants={stagger}
             className="space-y-6 text-left ScrollTarget"
           >
             <div className="space-y-2">
@@ -447,10 +433,10 @@ const Documentation = () => {
           {/* SECTION 7: FAQ Accordion */}
           <motion.section 
             id="faq" 
-            initial="initial"
-            whileInView="animate"
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
+            variants={stagger}
             className="space-y-6 text-left ScrollTarget"
           >
             <div className="space-y-2">
@@ -513,10 +499,10 @@ const Documentation = () => {
           {/* SECTION 8: Future Roadmap */}
           <motion.section 
             id="roadmap" 
-            initial="initial"
-            whileInView="animate"
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
+            variants={stagger}
             className="space-y-4 text-left ScrollTarget"
           >
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-1.5 text-blue-400 font-mono text-[10px] uppercase font-semibold">
@@ -550,10 +536,10 @@ const Documentation = () => {
 
           {/* FINAL SECTION */}
           <motion.section 
-            initial="initial"
-            whileInView="animate"
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
+            variants={stagger}
             className="text-center max-w-2xl mx-auto space-y-6 py-12 select-none border border-border-app/40 bg-card-bg/30 rounded-2xl p-8 relative"
           >
             <div className="absolute inset-0 bg-blue-500/2 blur-2xl pointer-events-none rounded-2xl"></div>
@@ -589,19 +575,7 @@ const Documentation = () => {
       </div>
 
       {/* Footer Block */}
-      <footer className="py-12 border-t border-border-app/40 bg-app-bg text-neutral-500 text-xs relative select-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <Terminal size={14} className="text-[#3B82F6]" />
-            <span className="font-semibold text-primary">RouteMind AI Engine</span>
-            <span className="text-neutral-700">|</span>
-            <span>Edge Nodes Enabled</span>
-          </div>
-          <p className="text-neutral-600 font-mono">
-            &copy; {new Date().getFullYear()} RouteMind Proxy Corp. Production Grade.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

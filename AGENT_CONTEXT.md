@@ -289,12 +289,7 @@ Quick reference showing which components are imported where. Useful for identify
 
 | # | File(s) | Issue | Severity |
 |---|---|---|---|
-| 1 | `RoutingCard.jsx` | **Orphaned dead code** (321 lines, 14KB). Not imported by any component. Was previously imported in `Chat.jsx` with `aria-hidden="true"` but import was removed. The component is well-built (confidence rings, factor bars, accordion details) — either integrate it into `ChatMessage.jsx` as a richer routing display, or delete the file. | 🔴 Dead code |
-| 2 | `Documentation.jsx` | **Re-defines `fadeInUp` and `stagger` locally** (lines 25-37) instead of importing from `src/utils/animations.js`. Violates the DRY convention stated in this document. Fix: replace local definitions with `import { fadeInUp, stagger } from '../utils/animations'`. Note: the local definition uses `initial/animate` keys instead of `hidden/show` — the import would need the page to use `hidden/show` variants, or `animations.js` needs an export compatible with both patterns. | 🟡 Convention violation |
-| 3 | `Documentation.jsx` | **Hardcodes its own footer markup** (lines 592-604) instead of importing the shared `Footer.jsx` component. Fix: `import Footer from '../components/Footer'` and replace the inline footer. | 🟡 Convention violation |
-| 4 | `mockData.js` | **Dead exports that are never imported:** `chatHistory`, `messages`, `routingInfo`, `routingStages`, `terminalQueries`, `suggestedPrompts`, `routingStats`. Only `TERMINAL_EXAMPLES`, `ROUTING_STAGES`, `MODEL_CANDIDATES`, and `defaultStats` are consumed. Safe to delete the unused exports. | 🟡 Dead code |
-| 5 | `Tooltip.jsx` | **Hardcodes `bg-[#181818]`** on the tooltip popup — breaks in light mode (dark box on light background). Should use `bg-card-bg` or `bg-sidebar-bg` for theme awareness. | 🟡 Light mode bug |
-| 6 | `Navbar.jsx` | **Logo container uses hardcoded dark-mode colors** (`bg-neutral-900`, `border-neutral-800`, `fill="#171717"` in SVG). In light mode the logo area appears as a dark rectangle. Should use theme-aware classes. | 🟡 Light mode bug |
+
 | 7 | `Sidebar.jsx` / `mockRouter.js` | **`policy-updated` event is dispatched but never consumed.** Sidebar dispatches `window.dispatchEvent(new Event('policy-updated'))` when routing policy changes, but no component listens for it. If real-time policy switching mid-session is needed, `Chat.jsx` should listen and re-read `localStorage.getItem('routingPolicy')` on this event. | 🟡 Incomplete |
 | 8 | `Chat.jsx` | **Hardcoded response strings** — all assistant replies are static strings. Needs real API integration to become functional. The `isStreaming` prop on `ChatMessage` is accepted but never set to `true`. | 🔵 Planned |
 | 9 | `main.jsx` | **No `React.StrictMode`** wrapping. Low priority but recommended for catching side-effect bugs during development. | 🟢 Low |
@@ -312,6 +307,12 @@ Quick reference showing which components are imported where. Useful for identify
 | G | `text-[11px]` below 12px accessibility floor in ChatInput | Fixed — uses `text-xs` |
 | H | Theme dropdown complexity in Sidebar | Fixed — replaced with single cycle-on-click button |
 | I | `Documetation.jsx` typo in filename | Fixed — renamed to `Documentation.jsx` |
+| J | `RoutingCard.jsx` orphaned | Fixed — integrated into `ChatMessage.jsx` |
+| K | `Documentation.jsx` local animations | Fixed — imported shared variants from `animations.js` and updated motion props |
+| L | `Documentation.jsx` inline footer | Fixed — imported shared `Footer.jsx` |
+| M | `mockData.js` dead exports | Fixed — deleted all unimported mock variables |
+| N | `Tooltip.jsx` light mode bug | Fixed — updated to theme-aware `bg-card-bg` |
+| O | `Navbar.jsx` logo light mode bug | Fixed — updated to theme-aware `bg-sidebar-bg` and SVG `currentColor` |
 
 ---
 

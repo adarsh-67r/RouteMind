@@ -11,14 +11,12 @@ import {
   ThumbsDown,
   Share2,
   Sparkles,
-  Cpu,
-  ShieldCheck,
-  Info,
   ExternalLink,
   Loader2
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
 import { formatFileSize, getFileIcon } from '../utils/fileHelpers'
+import RoutingCard from './RoutingCard'
 
 
 
@@ -167,8 +165,6 @@ const ChatMessage = ({ message, onRegenerate }) => {
   const isStreaming = message?.isStreaming ?? false
 
   const model = message?.routing?.model
-  const confidence = message?.routing?.confidence
-  const reason = message?.routing?.reason
   const showRoutingInfo = !!message?.routing
 
   const isUser = role === 'user'
@@ -314,30 +310,7 @@ const ChatMessage = ({ message, onRegenerate }) => {
             )}
           </div>
 
-          {showRoutingInfo && (model || confidence || reason) && (
-            <div className="mt-4 p-3.5 rounded-xl bg-card-bg border border-border-app flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs transition-all duration-200 hover:border-blue-500/10 shadow-sm select-none animate-fade-in stagger-2">
-              <div className="flex flex-wrap items-center gap-2">
-                {model && (
-                  <div className="flex items-center gap-1.5 bg-sidebar-bg border border-border-app px-2.5 py-0.5 rounded-md text-blue-400 font-medium font-mono text-[11px]">
-                    <Cpu size={11} className="text-blue-500/80" />
-                    <span>{model}</span>
-                  </div>
-                )}
-                {confidence && (
-                  <div className="flex items-center gap-1 bg-sidebar-bg border border-border-app px-2.5 py-0.5 rounded-md text-green-400 font-medium font-mono text-[11px]">
-                    <ShieldCheck size={11} className="text-green-500/80" />
-                    <span>{confidence} Confidence</span>
-                  </div>
-                )}
-              </div>
-              {reason && (
-                <div className="flex items-start gap-1.5 text-secondary text-[11px] leading-relaxed md:max-w-[450px]">
-                  <Info size={11} className="text-neutral-500 shrink-0 mt-0.5" />
-                  <span>{reason}</span>
-                </div>
-              )}
-            </div>
-          )}
+          {showRoutingInfo && <RoutingCard routing={message.routing} />}
 
           <div className="flex items-center gap-3 text-[10px] text-neutral-500 font-mono select-none pt-1">
             {model && (

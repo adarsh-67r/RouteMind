@@ -47,7 +47,7 @@ const Navbar = () => {
           className="flex items-center gap-3 group focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 rounded-lg p-1"
           aria-label="RouteMind Home"
         >
-          <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-neutral-900 border border-neutral-800 group-hover:border-blue-500/40 transition-colors duration-300">
+          <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-sidebar-bg border border-border-app group-hover:border-blue-500/40 transition-colors duration-300">
             <svg
               className="w-[22px] h-[22px] text-neutral-400 group-hover:text-blue-400 transition-colors duration-300"
               viewBox="0 0 32 32"
@@ -57,7 +57,7 @@ const Navbar = () => {
               <path d="M8 10C12 10 14 6 18 6H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-neutral-700 group-hover:text-neutral-600 transition-colors duration-300" />
               <path d="M8 16H24" stroke="#0066FF" strokeWidth="2" strokeLinecap="round" className="drop-shadow-[0_0_4px_rgba(0,102,255,0.6)]" />
               <path d="M8 22C12 22 14 26 18 26H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-neutral-700 group-hover:text-neutral-600 transition-colors duration-300" />
-              <rect x="6" y="8" width="4" height="16" rx="1" fill="#171717" stroke="currentColor" strokeWidth="1.5" className="text-neutral-600 group-hover:text-neutral-500 transition-colors duration-300" />
+              <rect x="6" y="8" width="4" height="16" rx="1" fill="currentColor" stroke="currentColor" strokeWidth="1.5" className="text-neutral-600 group-hover:text-neutral-500 transition-colors duration-300" />
               <circle cx="8" cy="16" r="1.5" fill="#0066FF" />
               <circle cx="24" cy="6" r="2" fill="#404040" />
               <circle cx="24" cy="16" r="3" fill="#0066FF" className="animate-pulse" />
