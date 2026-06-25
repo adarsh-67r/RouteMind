@@ -83,10 +83,10 @@ const RoutingCard = ({
         <div className="flex items-center gap-3">
           <Loader2 size={16} className="animate-spin text-blue-500" />
           <div className="space-y-1.5 flex-1">
-            <div className="text-xs font-semibold text-[#FAFAFA] font-mono tracking-wider uppercase">
+            <div className="text-xs font-semibold text-primary font-mono tracking-wider uppercase">
               RouteMind Routing...
             </div>
-            <div className="text-[11px] text-[#A1A1AA] flex items-center gap-2">
+            <div className="text-[11px] text-secondary flex items-center gap-2">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse"></span>
               {loadingStepVal}
             </div>
@@ -109,12 +109,12 @@ const RoutingCard = ({
           <div className="p-1 rounded bg-blue-950/30 border border-blue-500/10 text-blue-400">
             <Sliders size={12} className="group-hover/card:rotate-45 transition-transform duration-300" />
           </div>
-          <span className="text-[11px] font-semibold text-[#FAFAFA] tracking-wider uppercase font-mono">
+          <span className="text-[11px] font-semibold text-primary tracking-wider uppercase font-mono">
             RouteMind Decision
           </span>
         </div>
-        <div className="flex items-center gap-1 text-[10px] text-[#A1A1AA] font-mono">
-          <Clock size={10} className="text-neutral-600" />
+        <div className="flex items-center gap-1 text-[10px] text-secondary font-mono">
+          <Clock size={10} className="text-neutral-500" />
           <span>{timestampVal}</span>
         </div>
       </div>
@@ -122,18 +122,18 @@ const RoutingCard = ({
       {/* Primary Row: Model and Confidence */}
       <div className="flex items-center justify-between gap-4 mb-3">
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-neutral-900 border border-border-app text-blue-400 font-semibold font-mono text-xs select-none">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-sidebar-bg border border-border-app text-blue-600 dark:text-blue-400 font-semibold font-mono text-xs select-none">
             <Cpu size={12} className="text-blue-500" />
             <span>{modelVal}</span>
           </div>
-          <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-900/60 text-[#A1A1AA] font-mono border border-border-app/40">
+          <span className="text-[10px] px-2 py-0.5 rounded bg-sidebar-bg/60 text-secondary font-mono border border-border-app/40">
             Active Node
           </span>
         </div>
 
         {/* Confidence Ring Indicator */}
         <div className="flex items-center gap-2 bg-sidebar-bg border border-border-app py-1 px-2.5 rounded-lg select-none">
-          <span className="text-[10px] text-[#A1A1AA] font-mono font-medium">Confidence:</span>
+          <span className="text-[10px] text-secondary font-mono font-medium">Confidence:</span>
           <div className="relative flex items-center justify-center">
             <svg className="w-8 h-8 transform -rotate-90">
               <circle
@@ -157,7 +157,7 @@ const RoutingCard = ({
                 cy={16}
               />
             </svg>
-            <span className="absolute text-[10px] font-bold font-mono text-[#FAFAFA]">
+            <span className="absolute text-[10px] font-bold font-mono text-primary">
               {numericConfidence}%
             </span>
           </div>
@@ -165,7 +165,7 @@ const RoutingCard = ({
       </div>
 
       {/* Reason Description */}
-      <div className="text-xs text-[#A1A1AA] leading-relaxed mb-4 select-text">
+      <div className="text-xs text-secondary leading-relaxed mb-4 select-text">
         {reasonVal}
       </div>
 
@@ -178,44 +178,44 @@ const RoutingCard = ({
         
         {/* Intent Match */}
         <div className="space-y-1">
-          <div className="flex justify-between text-[11px] text-[#A1A1AA]">
+          <div className="flex justify-between text-[11px] text-secondary">
             <span>Intent Match</span>
-            <span className="font-mono text-[10px] text-[#FAFAFA]">{factorsVal.intentMatch}%</span>
+            <span className="font-mono text-[10px] text-primary">{factorsVal.intentMatch}%</span>
           </div>
-          <div className="h-1 bg-neutral-900 rounded-full overflow-hidden">
+          <div className="h-1 bg-card-bg rounded-full overflow-hidden">
             <div className="h-full bg-blue-500 rounded-full" style={{ width: `${factorsVal.intentMatch}%` }}></div>
           </div>
         </div>
 
         {/* Quality Score */}
         <div className="space-y-1">
-          <div className="flex justify-between text-[11px] text-[#A1A1AA]">
+          <div className="flex justify-between text-[11px] text-secondary">
             <span>Response Quality</span>
-            <span className="font-mono text-[10px] text-[#FAFAFA]">{factorsVal.quality}%</span>
+            <span className="font-mono text-[10px] text-primary">{factorsVal.quality}%</span>
           </div>
-          <div className="h-1 bg-neutral-900 rounded-full overflow-hidden">
+          <div className="h-1 bg-card-bg rounded-full overflow-hidden">
             <div className="h-full bg-[#22C55E] rounded-full" style={{ width: `${factorsVal.quality}%` }}></div>
           </div>
         </div>
 
         {/* Latency optimization */}
         <div className="space-y-1">
-          <div className="flex justify-between text-[11px] text-[#A1A1AA]">
+          <div className="flex justify-between text-[11px] text-secondary">
             <span>Latency Index</span>
-            <span className="font-mono text-[10px] text-[#FAFAFA]">{factorsVal.latency}%</span>
+            <span className="font-mono text-[10px] text-primary">{factorsVal.latency}%</span>
           </div>
-          <div className="h-1 bg-neutral-900 rounded-full overflow-hidden">
+          <div className="h-1 bg-card-bg rounded-full overflow-hidden">
             <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${factorsVal.latency}%` }}></div>
           </div>
         </div>
 
         {/* Cost Efficiency */}
         <div className="space-y-1">
-          <div className="flex justify-between text-[11px] text-[#A1A1AA]">
+          <div className="flex justify-between text-[11px] text-secondary">
             <span>Cost Efficiency</span>
-            <span className="font-mono text-[10px] text-[#FAFAFA]">{factorsVal.costEfficiency}%</span>
+            <span className="font-mono text-[10px] text-primary">{factorsVal.costEfficiency}%</span>
           </div>
-          <div className="h-1 bg-neutral-900 rounded-full overflow-hidden">
+          <div className="h-1 bg-card-bg rounded-full overflow-hidden">
             <div className="h-full bg-purple-500 rounded-full" style={{ width: `${factorsVal.costEfficiency}%` }}></div>
           </div>
         </div>
@@ -225,13 +225,13 @@ const RoutingCard = ({
       <div className="grid grid-cols-3 gap-2.5 mb-4">
         {/* Cost Badge */}
         <div className="bg-sidebar-bg border border-border-app rounded-lg p-2 flex flex-col justify-center text-center">
-          <span className="text-[9px] text-[#A1A1AA] font-mono uppercase tracking-wider mb-0.5">Expected Cost</span>
-          <span className="text-[11px] font-semibold text-[#FAFAFA] font-mono">{costVal}</span>
+          <span className="text-[9px] text-secondary font-mono uppercase tracking-wider mb-0.5">Expected Cost</span>
+          <span className="text-[11px] font-semibold text-primary font-mono">{costVal}</span>
         </div>
 
         {/* Savings Badge */}
         <div className="bg-sidebar-bg border border-border-app rounded-lg p-2 flex flex-col justify-center text-center">
-          <span className="text-[9px] text-[#A1A1AA] font-mono uppercase tracking-wider mb-0.5">Est. Savings</span>
+          <span className="text-[9px] text-secondary font-mono uppercase tracking-wider mb-0.5">Est. Savings</span>
           <span className="text-[11px] font-semibold text-[#22C55E] font-mono flex items-center justify-center gap-0.5">
             <TrendingUp size={10} />
             {savingsVal}
@@ -240,8 +240,8 @@ const RoutingCard = ({
 
         {/* Speed Badge */}
         <div className="bg-sidebar-bg border border-border-app rounded-lg p-2 flex flex-col justify-center text-center">
-          <span className="text-[9px] text-[#A1A1AA] font-mono uppercase tracking-wider mb-0.5">Response Speed</span>
-          <span className="text-[11px] font-semibold text-blue-400 font-mono flex items-center justify-center gap-0.5">
+          <span className="text-[9px] text-secondary font-mono uppercase tracking-wider mb-0.5">Response Speed</span>
+          <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 font-mono flex items-center justify-center gap-0.5">
             <Zap size={10} />
             {speedVal}
           </span>
@@ -251,7 +251,7 @@ const RoutingCard = ({
       {/* Toggle Accordion */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full py-1.5 flex items-center justify-center gap-1 rounded bg-sidebar-bg/40 hover:bg-sidebar-bg border border-border-app text-[10px] font-semibold text-[#FAFAFA] transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer"
+        className="w-full py-1.5 flex items-center justify-center gap-1 rounded bg-sidebar-bg/40 hover:bg-sidebar-bg border border-border-app text-[10px] font-semibold text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer"
         aria-expanded={isExpanded}
         aria-label="Toggle Decision Details"
       >
@@ -264,23 +264,23 @@ const RoutingCard = ({
         <div className="mt-3.5 pt-3.5 border-t border-border-app/80 grid grid-cols-2 gap-x-4 gap-y-3.5 text-[11px] animate-in fade-in slide-in-from-top-1 duration-200">
           <div>
             <div className="text-neutral-500 font-mono text-[9px] uppercase tracking-wider mb-0.5">Intent Category</div>
-            <div className="text-[#FAFAFA] font-medium">{detailsVal.intent}</div>
+            <div className="text-primary font-medium">{detailsVal.intent}</div>
           </div>
           <div>
             <div className="text-neutral-500 font-mono text-[9px] uppercase tracking-wider mb-0.5">Context Length</div>
-            <div className="text-[#FAFAFA] font-mono font-medium">{detailsVal.contextLength}</div>
+            <div className="text-primary font-mono font-medium">{detailsVal.contextLength}</div>
           </div>
           <div>
             <div className="text-neutral-500 font-mono text-[9px] uppercase tracking-wider mb-0.5">Provider Entity</div>
-            <div className="text-[#FAFAFA] font-medium">{detailsVal.provider}</div>
+            <div className="text-primary font-medium">{detailsVal.provider}</div>
           </div>
           <div>
             <div className="text-neutral-500 font-mono text-[9px] uppercase tracking-wider mb-0.5">Model Version</div>
-            <div className="text-[#FAFAFA] font-mono font-medium truncate" title={detailsVal.version}>{detailsVal.version}</div>
+            <div className="text-primary font-mono font-medium truncate" title={detailsVal.version}>{detailsVal.version}</div>
           </div>
           <div>
             <div className="text-neutral-500 font-mono text-[9px] uppercase tracking-wider mb-0.5">Composite Score</div>
-            <div className="text-[#FAFAFA] font-mono font-semibold text-blue-400">{detailsVal.score}</div>
+            <div className="text-blue-600 dark:text-blue-400 font-mono font-semibold">{detailsVal.score}</div>
           </div>
           <div>
             <div className="text-neutral-500 font-mono text-[9px] uppercase tracking-wider mb-0.5">Fallbacks Evaluated</div>
@@ -288,7 +288,7 @@ const RoutingCard = ({
               {detailsVal.fallbacks.map((fallback, idx) => (
                 <span
                   key={idx}
-                  className="px-1.5 py-0.5 rounded bg-neutral-900 border border-border-app/40 text-[9px] font-mono text-[#A1A1AA]"
+                  className="px-1.5 py-0.5 rounded bg-sidebar-bg border border-border-app text-[9px] font-mono text-secondary"
                 >
                   {fallback}
                 </span>

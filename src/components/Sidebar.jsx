@@ -137,7 +137,7 @@ const Sidebar = ({
             </div>
             
             <div className={`flex flex-col transition-all duration-200 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden translate-x-2' : 'opacity-100 w-auto translate-x-0'}`}>
-              <span className="text-[#FAFAFA] font-semibold text-base tracking-tight leading-none group-hover/logo:text-neutral-200 transition-colors">
+              <span className="text-primary font-semibold text-base tracking-tight leading-none group-hover/logo:text-primary/80 transition-colors">
                 RouteMind
               </span>
               <span className="text-[10px] text-neutral-500 font-medium tracking-wide mt-1.5 uppercase font-mono">
@@ -186,7 +186,7 @@ const Sidebar = ({
                 placeholder="Search history..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-card-bg border border-border-app rounded-md py-1.5 pl-8 pr-3 text-xs text-[#FAFAFA] placeholder-neutral-600 focus:outline-none focus:border-[#3B82F6]/50 focus:ring-0 transition-colors"
+                className="w-full bg-card-bg border border-border-app rounded-md py-1.5 pl-8 pr-3 text-xs text-primary placeholder-neutral-500 focus:outline-none focus:border-[#3B82F6]/50 focus:ring-0 transition-colors"
               />
               {searchQuery && (
                 <button 
@@ -249,7 +249,7 @@ const Sidebar = ({
                               if (e.key === 'Enter') handleSaveRename(chat.id)
                               if (e.key === 'Escape') handleCancelRename()
                             }}
-                            className="w-full bg-[#1f1f1f] text-primary border border-blue-500/50 rounded px-1.5 py-0.5 text-xs focus:outline-none"
+                            className="w-full bg-sidebar-bg text-primary border border-blue-500/50 rounded px-1.5 py-0.5 text-xs focus:outline-none"
                             onClick={(e) => e.stopPropagation()}
                           />
                         ) : (
@@ -267,7 +267,7 @@ const Sidebar = ({
                       <div className="absolute right-2 opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity duration-150">
                         <button
                           onClick={(e) => handleStartRename(chat.id, chat.title, e)}
-                          className="p-1 rounded text-neutral-500 hover:text-primary hover:bg-[#202020] transition-colors"
+                          className="p-1 rounded text-neutral-500 hover:text-primary hover:bg-card-bg transition-colors"
                           title="Rename"
                           aria-label={`Rename ${chat.title}`}
                         >
@@ -275,7 +275,7 @@ const Sidebar = ({
                         </button>
                         <button
                           onClick={(e) => handleDelete(chat.id, e)}
-                          className="p-1 rounded text-neutral-500 hover:text-red-400 hover:bg-[#202020] transition-colors"
+                          className="p-1 rounded text-neutral-500 hover:text-red-400 hover:bg-card-bg transition-colors"
                           title="Delete conversation"
                           aria-label={`Delete ${chat.title}`}
                         >

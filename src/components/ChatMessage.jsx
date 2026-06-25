@@ -79,16 +79,16 @@ const CodeBlock = ({ language, value }) => {
 }
 
 const markdownComponents = {
-  h1: ({ children }) => <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#FAFAFA] mt-7 mb-3.5 first:mt-0 font-sans border-b border-border-app/40 pb-2">{children}</h1>,
-  h2: ({ children }) => <h2 className="text-lg md:text-xl font-semibold tracking-tight text-[#FAFAFA] mt-6 mb-3 first:mt-0 font-sans">{children}</h2>,
-  h3: ({ children }) => <h3 className="text-base md:text-lg font-semibold tracking-tight text-[#FAFAFA] mt-5 mb-2 first:mt-0 font-sans">{children}</h3>,
-  h4: ({ children }) => <h4 className="text-sm md:text-base font-semibold tracking-tight text-[#FAFAFA] mt-4 mb-2 first:mt-0 font-sans">{children}</h4>,
-  p: ({ children }) => <p className="text-sm md:text-[15px] text-[#FAFAFA]/90 leading-relaxed mb-4 last:mb-0 font-sans font-normal selection:bg-blue-600/30 selection:text-white">{children}</p>,
-  ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-2 text-neutral-200 font-sans">{children}</ul>,
-  ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-2 text-neutral-200 font-sans">{children}</ol>,
+  h1: ({ children }) => <h1 className="text-xl md:text-2xl font-bold tracking-tight text-primary mt-7 mb-3.5 first:mt-0 font-sans border-b border-border-app/40 pb-2">{children}</h1>,
+  h2: ({ children }) => <h2 className="text-lg md:text-xl font-semibold tracking-tight text-primary mt-6 mb-3 first:mt-0 font-sans">{children}</h2>,
+  h3: ({ children }) => <h3 className="text-base md:text-lg font-semibold tracking-tight text-primary mt-5 mb-2 first:mt-0 font-sans">{children}</h3>,
+  h4: ({ children }) => <h4 className="text-sm md:text-base font-semibold tracking-tight text-primary mt-4 mb-2 first:mt-0 font-sans">{children}</h4>,
+  p: ({ children }) => <p className="text-sm md:text-[15px] text-primary/95 leading-relaxed mb-4 last:mb-0 font-sans font-normal selection:bg-blue-600/30 selection:text-white">{children}</p>,
+  ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-2 text-secondary font-sans">{children}</ul>,
+  ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-2 text-secondary font-sans">{children}</ol>,
   li: ({ children }) => <li className="text-sm md:text-[15px] leading-relaxed pl-0.5">{children}</li>,
   blockquote: ({ children }) => (
-    <blockquote className="border-l-2 border-blue-500 bg-card-bg px-4 py-3 my-4 text-[#A1A1AA] italic rounded-r-lg">
+    <blockquote className="border-l-2 border-blue-500 bg-card-bg px-4 py-3 my-4 text-secondary italic rounded-r-lg">
       {children}
     </blockquote>
   ),
@@ -97,7 +97,7 @@ const markdownComponents = {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-blue-400 hover:text-blue-300 underline underline-offset-4 decoration-blue-500/40 hover:decoration-blue-400 inline-flex items-center gap-0.5 transition-colors group/link font-medium"
+      className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline underline-offset-4 decoration-blue-500/40 hover:decoration-blue-400 inline-flex items-center gap-0.5 transition-colors group/link font-medium"
     >
       {children}
       <ExternalLink size={10} className="inline opacity-60 group-hover/link:opacity-100 transition-opacity ml-0.5 align-baseline" />
@@ -109,17 +109,17 @@ const markdownComponents = {
       <table className="w-full border-collapse text-left text-sm">{children}</table>
     </div>
   ),
-  thead: ({ children }) => <thead className="bg-card-bg border-b border-border-app text-xs font-semibold text-[#FAFAFA] uppercase select-none">{children}</thead>,
+  thead: ({ children }) => <thead className="bg-card-bg border-b border-border-app text-xs font-semibold text-primary uppercase select-none">{children}</thead>,
   tbody: ({ children }) => <tbody className="divide-y divide-border-app/60">{children}</tbody>,
   tr: ({ children }) => <tr className="hover:bg-card-bg/30 transition-colors">{children}</tr>,
-  th: ({ children }) => <th className="px-4 py-3 font-semibold text-neutral-200">{children}</th>,
-  td: ({ children }) => <td className="px-4 py-3 text-neutral-300 leading-normal">{children}</td>,
+  th: ({ children }) => <th className="px-4 py-3 font-semibold text-primary">{children}</th>,
+  td: ({ children }) => <td className="px-4 py-3 text-secondary leading-normal">{children}</td>,
   code({ className, children }) {
     const match = /language-(\w+)/.exec(className || '')
     const isInline = !match || !String(children).includes('\n')
     if (isInline) {
       return (
-        <code className="px-1.5 py-0.5 rounded bg-sidebar-bg border border-border-app font-mono text-[13px] text-blue-400/90 break-words">
+        <code className="px-1.5 py-0.5 rounded bg-sidebar-bg border border-border-app font-mono text-[13px] text-blue-600 dark:text-blue-400/90 break-words">
           {children}
         </code>
       )
@@ -200,10 +200,10 @@ const ChatMessage = ({
       <div className="w-full py-6 px-4 border-b border-border-app/20 bg-transparent group relative hover:bg-card-bg/20 transition-colors duration-200 animate-slide-in-right">
         <div className="max-w-[850px] mx-auto flex justify-end gap-4">
           <div className="max-w-[85%] flex flex-col items-end space-y-2 select-text">
-            <div className="rounded-2xl px-4 py-2.5 bg-card-bg border border-border-app text-[15px] text-[#FAFAFA] leading-relaxed break-words whitespace-pre-wrap selection:bg-blue-600/30 selection:text-white font-sans shadow-sm hover:border-border-app/80 transition-colors duration-200">
+            <div className="rounded-2xl px-4 py-2.5 bg-card-bg border border-border-app text-[15px] text-primary leading-relaxed break-words whitespace-pre-wrap selection:bg-blue-600/30 selection:text-white font-sans shadow-sm hover:border-border-app/80 transition-colors duration-200">
               {content}
             </div>
-            <div className="flex items-center gap-2 text-[10px] text-[#A1A1AA] font-mono select-none px-1.5">
+            <div className="flex items-center gap-2 text-[10px] text-secondary font-mono select-none px-1.5">
               <span>You</span>
               {timestamp && (
                 <>
@@ -217,7 +217,7 @@ const ChatMessage = ({
         <div className="absolute right-4 bottom-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-app-bg/90 backdrop-blur-sm border border-border-app rounded-lg p-1 shadow-lg select-none z-10">
           <button
             onClick={handleCopyMessage}
-            className="p-1.5 rounded-md hover:bg-neutral-800 text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer"
+            className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer"
             title="Copy Message"
             aria-label="Copy Message"
           >
@@ -225,7 +225,7 @@ const ChatMessage = ({
           </button>
           <button
             onClick={() => {}}
-            className="p-1.5 rounded-md hover:bg-neutral-800 text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer"
+            className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer"
             title="Share"
             aria-label="Share Message"
           >
@@ -247,8 +247,8 @@ const ChatMessage = ({
         </div>
 
         <div className="flex-1 space-y-4 min-w-0">
-          <div className="flex items-center justify-between text-xs font-semibold text-[#FAFAFA] select-none">
-            <span className="flex items-center gap-1.5 text-blue-400 font-mono tracking-wider uppercase text-[11px]">
+          <div className="flex items-center justify-between text-xs font-semibold text-primary select-none">
+            <span className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-mono tracking-wider uppercase text-[11px]">
               RouteMind AI
             </span>
             {timestamp && (
@@ -258,7 +258,7 @@ const ChatMessage = ({
             )}
           </div>
 
-          <div className="text-sm md:text-[15px] text-[#FAFAFA] leading-relaxed break-words font-sans select-text">
+          <div className="text-sm md:text-[15px] text-primary leading-relaxed break-words font-sans select-text">
             <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
               {content}
             </ReactMarkdown>
@@ -289,7 +289,7 @@ const ChatMessage = ({
                 )}
               </div>
               {reason && (
-                <div className="flex items-start gap-1.5 text-neutral-400 text-[11px] leading-relaxed md:max-w-[450px]">
+                <div className="flex items-start gap-1.5 text-secondary text-[11px] leading-relaxed md:max-w-[450px]">
                   <Info size={11} className="text-neutral-500 shrink-0 mt-0.5" />
                   <span>{reason}</span>
                 </div>
@@ -310,16 +310,16 @@ const ChatMessage = ({
       </div>
 
       <div className="absolute right-4 bottom-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-app-bg/90 backdrop-blur-sm border border-border-app rounded-lg p-1 shadow-lg select-none z-10">
-        <button onClick={handleCopyMessage} className="p-1.5 rounded-md hover:bg-neutral-800 text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Copy Message" aria-label="Copy Message">
+        <button onClick={handleCopyMessage} className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Copy Message" aria-label="Copy Message">
           {copiedMessage ? <Check size={13} className="text-green-400" /> : <Copy size={13} />}
         </button>
-        <button onClick={() => {}} className="p-1.5 rounded-md hover:bg-neutral-800 text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Regenerate Response" aria-label="Regenerate Response">
+        <button onClick={() => {}} className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Regenerate Response" aria-label="Regenerate Response">
           <RotateCcw size={13} />
         </button>
         <button
           onClick={() => setRated(rated === 'up' ? null : 'up')}
-          className={`p-1.5 rounded-md hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer ${
-            rated === 'up' ? 'text-blue-400 hover:text-blue-300' : 'text-[#A1A1AA] hover:text-[#FAFAFA]'
+          className={`p-1.5 rounded-md hover:bg-card-bg transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer ${
+            rated === 'up' ? 'text-blue-500 hover:text-blue-600' : 'text-secondary hover:text-primary'
           }`}
           title="Thumbs Up" aria-label="Thumbs Up"
         >
@@ -327,14 +327,14 @@ const ChatMessage = ({
         </button>
         <button
           onClick={() => setRated(rated === 'down' ? null : 'down')}
-          className={`p-1.5 rounded-md hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer ${
-            rated === 'down' ? 'text-red-400 hover:text-red-300' : 'text-[#A1A1AA] hover:text-[#FAFAFA]'
+          className={`p-1.5 rounded-md hover:bg-card-bg transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer ${
+            rated === 'down' ? 'text-red-500 hover:text-red-600' : 'text-secondary hover:text-primary'
           }`}
           title="Thumbs Down" aria-label="Thumbs Down"
         >
           <ThumbsDown size={13} fill={rated === 'down' ? 'currentColor' : 'none'} />
         </button>
-        <button onClick={() => {}} className="p-1.5 rounded-md hover:bg-neutral-800 text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Share" aria-label="Share Message">
+        <button onClick={() => {}} className="p-1.5 rounded-md hover:bg-card-bg text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer" title="Share" aria-label="Share Message">
           <Share2 size={13} />
         </button>
       </div>
