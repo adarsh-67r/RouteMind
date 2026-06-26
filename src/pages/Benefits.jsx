@@ -246,9 +246,7 @@ const Benefits = () => {
                     <span className="text-green-400 font-semibold">95%</span>
                   </div>
                   <div className="py-1">
-                    <span className="text-secondary block mb-1">
-                      Selection Parameter
-                    </span>
+                    <span className="text-secondary block mb-1">Selection Parameter</span>
                     <span className="text-primary leading-normal block bg-sidebar-bg/60 backdrop-blur-sm p-2 rounded border border-border-app/40">
                       Large context requirements (32,450 tokens matched) processed via Google
                       low-latency node.
@@ -339,10 +337,7 @@ const Benefits = () => {
                     'Multiple AI providers',
                     'Less context switching',
                   ].map((item, idx) => (
-                    <li
-                      key={idx}
-                      className="flex items-center gap-2 text-xs text-secondary"
-                    >
+                    <li key={idx} className="flex items-center gap-2 text-xs text-secondary">
                       <Check size={12} className="text-blue-500" />
                       <span>{item}</span>
                     </li>
@@ -470,9 +465,7 @@ const Benefits = () => {
                         <p className="text-primary mt-0.5">{task}</p>
                       </div>
                       <div>
-                        <span className="text-secondary">
-                          Selected Model:
-                        </span>
+                        <span className="text-secondary">Selected Model:</span>
                         <p className="text-blue-600 dark:text-blue-400 font-semibold mt-0.5 flex items-center gap-1">
                           <Cpu size={10} /> {model}
                         </p>
@@ -507,9 +500,7 @@ const Benefits = () => {
               <table className="w-full border-collapse text-left text-sm font-sans">
                 <thead className="bg-card-bg/70 border-b border-border-app text-xs font-semibold text-primary uppercase select-none">
                   <tr>
-                    <th className="px-6 py-4 font-semibold text-primary">
-                      Feature Parameter
-                    </th>
+                    <th className="px-6 py-4 font-semibold text-primary">Feature Parameter</th>
                     <th className="px-6 py-4 font-semibold text-red-500 dark:text-red-400/90">
                       Traditional Workflow
                     </th>
@@ -534,9 +525,7 @@ const Benefits = () => {
                     ],
                   ].map(([feature, before, after]) => (
                     <tr key={feature} className="hover:bg-card-bg/30 transition-colors">
-                      <td className="px-6 py-4 text-primary font-medium">
-                        {feature}
-                      </td>
+                      <td className="px-6 py-4 text-primary font-medium">{feature}</td>
                       <td className="px-6 py-4 text-secondary">{before}</td>
                       <td className="px-6 py-4 text-primary font-medium">
                         <span className="flex items-center gap-2">
