@@ -59,42 +59,45 @@ const Sidebar = ({
   const isResizing = useRef(false)
   const frameRef = useRef(null)
 
-  const handleResizeMouseDown = useCallback((e) => {
-    e.preventDefault()
-    isResizing.current = true
-    const startX = e.clientX
-    const startWidth = sidebarWidth
+  const handleResizeMouseDown = useCallback(
+    (e) => {
+      e.preventDefault()
+      isResizing.current = true
+      const startX = e.clientX
+      const startWidth = sidebarWidth
 
-    // Disable CSS transition while dragging so width tracks cursor exactly
-    const aside = e.currentTarget.closest('aside')
-    if (aside) aside.style.transition = 'none'
-    document.body.style.cursor = 'col-resize'
-    document.body.style.userSelect = 'none'
+      // Disable CSS transition while dragging so width tracks cursor exactly
+      const aside = e.currentTarget.closest('aside')
+      if (aside) aside.style.transition = 'none'
+      document.body.style.cursor = 'col-resize'
+      document.body.style.userSelect = 'none'
 
-    const onMouseMove = (moveEvent) => {
-      if (!isResizing.current) return
-      if (frameRef.current) cancelAnimationFrame(frameRef.current)
-      frameRef.current = requestAnimationFrame(() => {
-        const delta = moveEvent.clientX - startX
-        const next = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidth + delta))
-        setSidebarWidth(next)
-      })
-    }
+      const onMouseMove = (moveEvent) => {
+        if (!isResizing.current) return
+        if (frameRef.current) cancelAnimationFrame(frameRef.current)
+        frameRef.current = requestAnimationFrame(() => {
+          const delta = moveEvent.clientX - startX
+          const next = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidth + delta))
+          setSidebarWidth(next)
+        })
+      }
 
-    const onMouseUp = () => {
-      isResizing.current = false
-      if (frameRef.current) cancelAnimationFrame(frameRef.current)
-      document.body.style.cursor = ''
-      document.body.style.userSelect = ''
-      // Re-enable transition after drag ends
-      if (aside) aside.style.transition = ''
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseup', onMouseUp)
-    }
+      const onMouseUp = () => {
+        isResizing.current = false
+        if (frameRef.current) cancelAnimationFrame(frameRef.current)
+        document.body.style.cursor = ''
+        document.body.style.userSelect = ''
+        // Re-enable transition after drag ends
+        if (aside) aside.style.transition = ''
+        window.removeEventListener('mousemove', onMouseMove)
+        window.removeEventListener('mouseup', onMouseUp)
+      }
 
-    window.addEventListener('mousemove', onMouseMove)
-    window.addEventListener('mouseup', onMouseUp)
-  }, [sidebarWidth])
+      window.addEventListener('mousemove', onMouseMove)
+      window.addEventListener('mouseup', onMouseUp)
+    },
+    [sidebarWidth]
+  )
 
   // ── Telemetry sync ─────────────────────────────────────────────────────────
   useEffect(() => {
@@ -145,14 +148,18 @@ const Sidebar = ({
     const handleKeyDown = (e) => {
       const tag = document.activeElement?.tagName
       const isTyping =
-        tag === 'INPUT' ||
-        tag === 'TEXTAREA' ||
-        document.activeElement?.isContentEditable
+        tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable
 
       // Escape closes any open modal — always fires
       if (e.key === 'Escape') {
-        if (settingsOpen) { setSettingsOpen(false); return }
-        if (telemetryOpen) { setTelemetryOpen(false); return }
+        if (settingsOpen) {
+          setSettingsOpen(false)
+          return
+        }
+        if (telemetryOpen) {
+          setTelemetryOpen(false)
+          return
+        }
         return
       }
 
@@ -196,7 +203,10 @@ const Sidebar = ({
     setEditTitle(title)
   }
   const handleSaveRename = (id) => {
-    if (!editTitle.trim()) { setEditingId(null); return }
+    if (!editTitle.trim()) {
+      setEditingId(null)
+      return
+    }
     onRenameChat(id, editTitle)
     setEditingId(null)
   }
@@ -245,11 +255,42 @@ const Sidebar = ({
             className="flex items-center gap-3 select-none group/logo focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 rounded p-0.5"
           >
             <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-card-bg border border-border-app group-hover/logo:border-blue-500/40 transition-colors duration-200 shrink-0">
-              <svg className="w-[20px] h-[20px] text-neutral-400 group-hover/logo:text-blue-400 transition-colors duration-200" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8 10C12 10 14 6 18 6H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-neutral-300 dark:text-neutral-700" />
-                <path d="M8 16H24" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" className="drop-shadow-[0_0_4px_rgba(59,130,246,0.6)]" />
-                <path d="M8 22C12 22 14 26 18 26H24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-neutral-300 dark:text-neutral-700" />
-                <rect x="6" y="8" width="4" height="16" rx="1" className="fill-neutral-200 dark:fill-neutral-800 stroke-neutral-300 dark:stroke-neutral-700" strokeWidth="1.5" />
+              <svg
+                className="w-[20px] h-[20px] text-neutral-400 group-hover/logo:text-blue-400 transition-colors duration-200"
+                viewBox="0 0 32 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 10C12 10 14 6 18 6H24"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  className="text-neutral-300 dark:text-neutral-700"
+                />
+                <path
+                  d="M8 16H24"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  className="drop-shadow-[0_0_4px_rgba(59,130,246,0.6)]"
+                />
+                <path
+                  d="M8 22C12 22 14 26 18 26H24"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  className="text-neutral-300 dark:text-neutral-700"
+                />
+                <rect
+                  x="6"
+                  y="8"
+                  width="4"
+                  height="16"
+                  rx="1"
+                  className="fill-neutral-200 dark:fill-neutral-800 stroke-neutral-300 dark:stroke-neutral-700"
+                  strokeWidth="1.5"
+                />
                 <circle cx="8" cy="16" r="1.5" fill="#3B82F6" />
                 <circle cx="24" cy="6" r="2" className="fill-neutral-400 dark:fill-neutral-600" />
                 <circle cx="24" cy="16" r="3" fill="#3B82F6" className="animate-pulse" />
@@ -257,11 +298,17 @@ const Sidebar = ({
               </svg>
               <div className="absolute inset-0 bg-blue-500/5 blur-md rounded-lg -z-10" />
             </div>
-            <div className={`flex flex-col transition-all duration-200 ${
-              isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
-            }`}>
-              <span className="text-primary font-semibold text-base tracking-tight leading-none whitespace-nowrap">RouteMind</span>
-              <span className="text-[10px] text-neutral-500 font-medium tracking-wide mt-1.5 uppercase font-mono whitespace-nowrap">Intelligent AI Routing</span>
+            <div
+              className={`flex flex-col transition-all duration-200 ${
+                isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
+              }`}
+            >
+              <span className="text-primary font-semibold text-base tracking-tight leading-none whitespace-nowrap">
+                RouteMind
+              </span>
+              <span className="text-[10px] text-neutral-500 font-medium tracking-wide mt-1.5 uppercase font-mono whitespace-nowrap">
+                Intelligent AI Routing
+              </span>
             </div>
           </Link>
           <button
@@ -284,9 +331,13 @@ const Sidebar = ({
               aria-label="New conversation"
             >
               <Plus size={16} className="text-blue-400 shrink-0" />
-              <span className={`whitespace-nowrap transition-opacity duration-200 ${
-                isCollapsed ? 'hidden opacity-0' : 'block opacity-100'
-              }`}>New Chat</span>
+              <span
+                className={`whitespace-nowrap transition-opacity duration-200 ${
+                  isCollapsed ? 'hidden opacity-0' : 'block opacity-100'
+                }`}
+              >
+                New Chat
+              </span>
             </button>
           </Tooltip>
         </div>
@@ -304,7 +355,10 @@ const Sidebar = ({
                 className="w-full bg-card-bg border border-border-app rounded-md py-1.5 pl-8 pr-3 text-xs text-primary placeholder-neutral-500 focus:outline-none focus:border-[#3B82F6]/50 focus:ring-0 transition-colors"
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-2 text-neutral-500 hover:text-neutral-300 p-0.5 rounded">
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 text-neutral-500 hover:text-neutral-300 p-0.5 rounded"
+                >
                   <X size={12} />
                 </button>
               )}
@@ -344,7 +398,10 @@ const Sidebar = ({
                         : 'text-neutral-400 hover:bg-card-bg/50 hover:text-primary'
                     } ${isCollapsed ? 'justify-center p-2 rounded-lg border-l-0 pl-2' : ''}`}
                   >
-                    <MessageSquare size={15} className={`shrink-0 ${isActive ? 'text-blue-400' : 'text-neutral-500 group-hover:text-neutral-300'}`} />
+                    <MessageSquare
+                      size={15}
+                      className={`shrink-0 ${isActive ? 'text-blue-400' : 'text-neutral-500 group-hover:text-neutral-300'}`}
+                    />
                     {!isCollapsed && (
                       <div className="flex-1 min-w-0 pr-6">
                         {isEditing ? (
@@ -363,17 +420,29 @@ const Sidebar = ({
                         ) : (
                           <div className="flex flex-col">
                             <span className="truncate text-xs text-inherit">{chat.title}</span>
-                            <span className="text-[10px] text-neutral-600 font-mono mt-0.5 group-hover:text-neutral-500 transition-colors">{chat.timestamp}</span>
+                            <span className="text-[10px] text-neutral-600 font-mono mt-0.5 group-hover:text-neutral-500 transition-colors">
+                              {chat.timestamp}
+                            </span>
                           </div>
                         )}
                       </div>
                     )}
                     {!isCollapsed && !isEditing && (
                       <div className="absolute right-2 opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity duration-150">
-                        <button onClick={(e) => handleStartRename(chat.id, chat.title, e)} className="p-1 rounded text-neutral-500 hover:text-primary hover:bg-card-bg transition-colors" title="Rename" aria-label={`Rename ${chat.title}`}>
+                        <button
+                          onClick={(e) => handleStartRename(chat.id, chat.title, e)}
+                          className="p-1 rounded text-neutral-500 hover:text-primary hover:bg-card-bg transition-colors"
+                          title="Rename"
+                          aria-label={`Rename ${chat.title}`}
+                        >
                           <Edit2 size={12} />
                         </button>
-                        <button onClick={(e) => handleDelete(chat.id, e)} className="p-1 rounded text-neutral-500 hover:text-red-400 hover:bg-card-bg transition-colors" title="Delete" aria-label={`Delete ${chat.title}`}>
+                        <button
+                          onClick={(e) => handleDelete(chat.id, e)}
+                          className="p-1 rounded text-neutral-500 hover:text-red-400 hover:bg-card-bg transition-colors"
+                          title="Delete"
+                          aria-label={`Delete ${chat.title}`}
+                        >
                           <Trash2 size={12} />
                         </button>
                       </div>
@@ -397,14 +466,20 @@ const Sidebar = ({
                 <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse shrink-0" />
                 <span className="truncate">Routed: {stats.totalQueries} queries</span>
               </span>
-              <span className="text-blue-400 font-semibold text-[9px] tracking-wide font-mono bg-blue-950/20 px-1 py-0.5 rounded border border-blue-500/20 shrink-0 ml-2">TELEMETRY</span>
+              <span className="text-blue-400 font-semibold text-[9px] tracking-wide font-mono bg-blue-950/20 px-1 py-0.5 rounded border border-blue-500/20 shrink-0 ml-2">
+                TELEMETRY
+              </span>
             </button>
           )}
 
-          <div className={`flex items-center gap-3 px-1.5 py-1 min-w-0 ${isCollapsed ? 'justify-center' : ''}`}>
+          <div
+            className={`flex items-center gap-3 px-1.5 py-1 min-w-0 ${isCollapsed ? 'justify-center' : ''}`}
+          >
             <Tooltip text="Developer Account" isCollapsed={isCollapsed}>
               <div className="relative shrink-0">
-                <div className="w-8 h-8 rounded-full bg-card-bg border border-border-app flex items-center justify-center text-xs font-semibold text-blue-400 ring-2 ring-blue-500/10">AC</div>
+                <div className="w-8 h-8 rounded-full bg-card-bg border border-border-app flex items-center justify-center text-xs font-semibold text-blue-400 ring-2 ring-blue-500/10">
+                  AC
+                </div>
                 <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-sidebar-bg rounded-full" />
               </div>
             </Tooltip>
@@ -415,13 +490,17 @@ const Sidebar = ({
               </div>
             )}
             {!isCollapsed && (
-              <span className="px-1.5 py-0.5 rounded bg-blue-950/40 border border-blue-500/20 text-[9px] font-mono text-blue-400 select-none shrink-0">Pro</span>
+              <span className="px-1.5 py-0.5 rounded bg-blue-950/40 border border-blue-500/20 text-[9px] font-mono text-blue-400 select-none shrink-0">
+                Pro
+              </span>
             )}
           </div>
 
-          <div className={`flex items-center gap-1.5 pt-1 border-t border-border-app/40 ${
-            isCollapsed ? 'flex-col items-center' : 'justify-between'
-          }`}>
+          <div
+            className={`flex items-center gap-1.5 pt-1 border-t border-border-app/40 ${
+              isCollapsed ? 'flex-col items-center' : 'justify-between'
+            }`}
+          >
             <Tooltip text="Settings (Ctrl+,)" isCollapsed={isCollapsed}>
               <button
                 onClick={() => setSettingsOpen((p) => !p)}
@@ -431,7 +510,10 @@ const Sidebar = ({
                 <Settings size={15} />
               </button>
             </Tooltip>
-            <Tooltip text={`Theme: ${themeLabels[theme]} → ${themeLabels[nextThemeLabel]}`} isCollapsed={isCollapsed}>
+            <Tooltip
+              text={`Theme: ${themeLabels[theme]} → ${themeLabels[nextThemeLabel]}`}
+              isCollapsed={isCollapsed}
+            >
               <button
                 onClick={handleCycleTheme}
                 className="p-2 rounded-lg text-neutral-400 hover:text-primary hover:bg-card-bg border border-transparent hover:border-border-app transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 cursor-pointer"
@@ -440,7 +522,10 @@ const Sidebar = ({
                 <ThemeIcon size={15} />
               </button>
             </Tooltip>
-            <Tooltip text={isCollapsed ? 'Expand (Ctrl+\\)' : 'Collapse (Ctrl+\\)'} isCollapsed={isCollapsed}>
+            <Tooltip
+              text={isCollapsed ? 'Expand (Ctrl+\\)' : 'Collapse (Ctrl+\\)'}
+              isCollapsed={isCollapsed}
+            >
               <button
                 onClick={() => setIsCollapsed((p) => !p)}
                 className="p-2 rounded-lg text-neutral-400 hover:text-primary hover:bg-card-bg border border-transparent hover:border-border-app transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50"

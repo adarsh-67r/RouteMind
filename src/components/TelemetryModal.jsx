@@ -9,7 +9,9 @@ import { X, Activity } from 'lucide-react'
 const TelemetryModal = ({ isOpen, onClose, stats }) => {
   useEffect(() => {
     if (!isOpen) return
-    const handleKeyDown = (e) => { if (e.key === 'Escape') onClose() }
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
@@ -53,17 +55,27 @@ const TelemetryModal = ({ isOpen, onClose, stats }) => {
         {/* Scrollable body */}
         <div className="overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-neutral-800 scrollbar-track-transparent">
           <div className="p-4 space-y-4 text-xs">
-
             {/* Stats row — each card clips its value, never overflows */}
             <div className="grid grid-cols-3 gap-2">
               {[
                 { label: 'Total Routed', value: String(totalQueries), color: 'text-primary' },
                 { label: 'Est. Savings', value: `$${savings.toFixed(3)}`, color: 'text-green-500' },
-                { label: 'Overhead', value: avgOverhead ? `${Math.round(avgOverhead)}ms` : '<12ms', color: 'text-blue-400' },
+                {
+                  label: 'Overhead',
+                  value: avgOverhead ? `${Math.round(avgOverhead)}ms` : '<12ms',
+                  color: 'text-blue-400',
+                },
               ].map(({ label, value, color }) => (
-                <div key={label} className="p-2.5 bg-card-bg border border-border-app rounded-lg text-center overflow-hidden">
-                  <p className="text-[9px] text-neutral-500 font-mono uppercase tracking-wider mb-1 leading-tight">{label}</p>
-                  <p className={`text-base font-bold font-mono ${color} truncate`} title={value}>{value}</p>
+                <div
+                  key={label}
+                  className="p-2.5 bg-card-bg border border-border-app rounded-lg text-center overflow-hidden"
+                >
+                  <p className="text-[9px] text-neutral-500 font-mono uppercase tracking-wider mb-1 leading-tight">
+                    {label}
+                  </p>
+                  <p className={`text-base font-bold font-mono ${color} truncate`} title={value}>
+                    {value}
+                  </p>
                 </div>
               ))}
             </div>
@@ -84,8 +96,14 @@ const TelemetryModal = ({ isOpen, onClose, stats }) => {
                     let barColor = 'bg-neutral-500'
                     const lower = modelName.toLowerCase()
                     if (lower.includes('gemini')) barColor = 'bg-red-500'
-                    else if (lower.includes('llama') && !lower.includes('nvidia') && !lower.includes('meta/llama')) barColor = 'bg-orange-500'
-                    else if (lower.includes('nvidia') || lower.includes('meta/llama')) barColor = 'bg-green-500'
+                    else if (
+                      lower.includes('llama') &&
+                      !lower.includes('nvidia') &&
+                      !lower.includes('meta/llama')
+                    )
+                      barColor = 'bg-orange-500'
+                    else if (lower.includes('nvidia') || lower.includes('meta/llama'))
+                      barColor = 'bg-green-500'
                     else if (lower.includes('groq')) barColor = 'bg-orange-500'
 
                     return (
@@ -122,8 +140,13 @@ const TelemetryModal = ({ isOpen, onClose, stats }) => {
               </h4>
               <div className="grid grid-cols-2 gap-2">
                 {['US-East-1 Edge', 'EU-Central-1 Edge'].map((edge) => (
-                  <div key={edge} className="p-2 bg-card-bg border border-border-app rounded flex items-center justify-between gap-2 overflow-hidden">
-                    <span className="text-[10px] font-mono text-neutral-400 truncate" title={edge}>{edge}</span>
+                  <div
+                    key={edge}
+                    className="p-2 bg-card-bg border border-border-app rounded flex items-center justify-between gap-2 overflow-hidden"
+                  >
+                    <span className="text-[10px] font-mono text-neutral-400 truncate" title={edge}>
+                      {edge}
+                    </span>
                     <span className="text-green-500 font-bold text-[10px] font-mono flex items-center gap-1 shrink-0">
                       <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
                       ONLINE
@@ -132,7 +155,6 @@ const TelemetryModal = ({ isOpen, onClose, stats }) => {
                 ))}
               </div>
             </div>
-
           </div>
         </div>
 
