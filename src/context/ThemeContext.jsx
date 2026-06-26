@@ -86,7 +86,9 @@ export const ThemeProvider = ({ children }) => {
       mq.addEventListener ? mq.addEventListener('change', listener) : mq.addListener(listener)
       return () => {
         cleanup?.()
-        mq.removeEventListener ? mq.removeEventListener('change', listener) : mq.removeListener(listener)
+        mq.removeEventListener
+          ? mq.removeEventListener('change', listener)
+          : mq.removeListener(listener)
       }
     }
 
