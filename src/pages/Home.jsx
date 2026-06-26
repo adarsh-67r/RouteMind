@@ -419,8 +419,8 @@ const Home = () => {
             Experience AI Optimization
           </h2>
           <p className="text-secondary text-sm sm:text-base max-w-md mx-auto leading-relaxed">
-            Integrate our proxy layer and experience near-instant routing decisions without
-            changing your workflow.
+            Integrate our proxy layer and experience near-instant routing decisions without changing
+            your workflow.
           </p>
           <div className="flex justify-center pt-2">
             <Link
