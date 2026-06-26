@@ -2,42 +2,39 @@
 
 > Intelligent AI model routing — one interface, the right model, every time.
 
-RouteMind eliminates the decision fatigue of choosing between AI tools. Instead of manually switching between ChatGPT, Claude, Gemini, and Perplexity depending on your task, RouteMind analyzes your query and automatically routes it to the most suitable model — then explains why.
+RouteMind eliminates the decision fatigue of choosing between AI tools. Instead of manually switching between ChatGPT, Claude, Gemini, and others depending on your task, RouteMind analyses your query and automatically routes it to the most suitable model — then explains why.
 
 ---
 
 ## 🚀 Features
 
-RouteMind is packed with features designed to provide a premium, seamless AI experience:
+### 1. Intelligent Query Routing
 
-### 1. **Intelligent Query Routing**
+- **Intent Classification:** Dispatches each query to the best-fit model based on its nature (e.g. Coding → GPT-4o, Research → Gemini, Document → Claude).
+- **Multi-Step Routing Pipeline:** Real-time visual feedback for intent analysis → model comparison → model selection → response generation.
+- **Explainable AI Decisions:** Confidence score, estimated cost, latency, and routing reason surfaced alongside every response.
+- **Adaptive Routing Policies:** Toggle between _Cost_, _Speed_, _Balanced_, and _Quality_ policies.
 
-- **Intent Classification:** Dispatches each query to the best-fit model based on its nature (e.g., Coding $\rightarrow$ Claude, Research $\rightarrow$ Perplexity, Document Processing $\rightarrow$ Gemini, Reasoning $\rightarrow$ o3-mini).
-- **Multi-Step Simulated Routing Pipeline:** Real-time visual feedback indicating stages of intent analysis, model comparison, model selection, and response generation.
-- **Explainable AI Decisions:** Detailed routing stats including confidence score, estimated cost savings, and latency metrics displayed alongside the AI responses.
-- **Adaptive Routing Policies:** Toggle between _Cost-Effective_, _Balanced_, and _High-Performance_ policies to prioritize speed, budget, or output depth.
+### 2. Rich Chat Interface
 
-### 2. **Rich Chat Interface**
+- **Auto-Resizing Text Input:** Textarea grows as you type (clamped 56px–200px), auto-focuses on load.
+- **File Attachments:** Drag-and-drop or select documents, code files, and images (up to 20 MB). Validated file extensions: PDF, DOC/DOCX, TXT/MD, PNG/JPG/JPEG/WEBP, CSV, JSON, and common source-code extensions.
+- **Dynamic File Icons:** Format-matched icons for attached files inside message bubbles.
+- **Typing Indicator:** Step-by-step animated labels show which routing stage is active.
 
-- **Auto-Resizing Text Input:** Textarea automatically expands as you type (constrained between 56px and 200px) and features auto-focus on load.
-- **File Attachments & Uploads:** Drag-and-drop or select documents, code files, and images (up to 20MB) with dynamic validation for file extensions (PDF, DOC/DOCX, TXT/MD, PNG/JPG/JPEG/WEBP/GIF, and various programming source files).
-- **Dynamic File Icons:** Custom file icon helper matches format extensions and visualizes attachments cleanly in chat messages.
-- **Typing Indicator:** Dynamic steps visualization indicating which routing stage is currently active.
+### 3. Premium UX & Design
 
-### 3. **Premium User Experience & Design**
+- **Dark-first Theme:** Glassmorphism surfaces, glowing accents, Framer Motion transitions.
+- **Theme Management:** Light / Dark / System preference via `ThemeContext`.
+- **Global Notifications:** Toast system for errors, file-validation warnings, and info messages.
+- **Accessible Modals:** Focus trap + Escape-key dismiss on all modal overlays.
 
-- **Modern Aesthetic:** Curated dark-themed layout utilizing sleek glassmorphism, glowing accents, and smooth transitions powered by Framer Motion.
-- **Theme Management:** Fully supported Light, Dark, and System-preference themes managed via Context API.
-- **Global Notifications:** Toast system (`ToastContext`) dynamically triggers messages for errors, file validation warnings, or info notes.
-- **Accessibility-Compliant Modal:** Interactive modals (like Authentication Coming Soon) complete with focus traps and keyboard navigation (Escape to close).
+### 4. Scalable Backend
 
-### 4. **Scalable Backend & Configuration**
-
-- **FastAPI Server:** Clean python backend skeleton equipped with server health monitoring checks and standard CORS setup.
-- **Swappable LLM Provider Adapters:** Fully encapsulated client layer with standard error translating wrappers (OpenAI SDK integrated; Claude/Gemini placeholders).
-- **Decoupled Routing Services:** Dynamic model resolution by policy (`cost`, `speed`, `quality`) and auto-fallbacks for offline providers.
-- **Extensible Intent Classification:** Abstract classifier model mapping user messages to categorized intents with confidence heuristics.
-- **Production Configurations:** Production-ready single-page routing configurations (`vercel.json`) to prevent 404s on refresh.
+- **FastAPI:** Clean Python backend with health monitoring and CORS.
+- **Provider Adapter Pattern:** `BaseProvider` ABC — adding a new LLM = one new file.
+- **Rule-Based Router:** Intent × Policy → model selection with automatic fallback.
+- **Extensible Classifier:** Regex-heuristic `RuleBasedIntentClassifier` with confidence scoring.
 
 ---
 
@@ -65,172 +62,149 @@ RouteMind/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml               # GitHub Actions CI workflow (lint → test → build)
-├── backend/                     # Python FastAPI Backend API
+├── backend/                     # Python FastAPI Backend
 │   ├── app/
-│   │   ├── __init__.py
-│   │   ├── classifier/          # Deterministic & extensible intent classification
-│   │   │   ├── __init__.py
-│   │   │   └── intent_classifier.py # BaseIntentClassifier contract & RuleBasedIntentClassifier
-│   │   ├── config.py            # Centralized settings loading using dotenv & Pydantic
-│   │   ├── main.py              # Composition root registering CORS, logging, & routers
-│   │   ├── providers/           # Swappable LLM provider integration adapters
-│   │   │   ├── __init__.py
-│   │   │   ├── base.py          # Abstract BaseProvider & custom provider exceptions
-│   │   │   ├── claude_provider.py # Claude API TODO placeholder
-│   │   │   ├── gemini_provider.py # Gemini API TODO placeholder
-│   │   │   └── openai_provider.py # Live OpenAI SDK client integration with latency logs
-│   │   ├── routes/              # Modular API routes
-│   │   │   ├── __init__.py      # Package marker
-│   │   │   ├── chat.py          # /chat endpoint using Pydantic request/response schemas
-│   │   │   └── health.py        # /health and root welcome API routes
-│   │   ├── schemas/             # Pydantic data schemas
-│   │   │   ├── __init__.py      # Schema exports
-│   │   │   └── chat.py          # ChatRequest and ChatResponse schemas
-│   │   └── services/            # Orchestration & routing logic
-│   │       ├── __init__.py
-│   │       ├── provider_manager.py # Lazy-loading & availability monitor
-│   │       └── router.py        # Intent-driven rule router & fallback engine
-│   ├── .env                     # Local environment variables
-│   ├── .gitignore               # Python environment git ignores
-│   ├── requirements.txt         # Backend Python dependencies
-│   ├── tests/                   # Pytest integration & unit test suite
-│   │   ├── __init__.py
-│   │   ├── test_classifier.py
-│   │   ├── test_router.py
-│   │   ├── test_provider_manager.py
-│   │   └── test_chat_endpoint.py
-│   └── venv/                    # Python virtual environment (ignored)
-├── src/                         # React Frontend Application
-│   ├── assets/                  # Graphics and static resources
-│   ├── components/              # Shared UI components
-│   │   ├── AuthenticationComingSoonModal.jsx # Auth modal with accessibility focus trap
-│   │   ├── ChatInput.jsx        # Auto-resizing input, drag/drop file attachment
-│   │   ├── ChatMessage.jsx      # Message bubble rendering user files & RoutingCard
-│   │   ├── Footer.jsx           # Global landing page footer
-│   │   ├── Navbar.jsx           # Top navigation bar
-│   │   ├── RoutingCard.jsx      # UI displaying routing statistics & rationale
-│   │   ├── SettingsModal.jsx    # Extracted settings & policy selector modal
-│   │   ├── Sidebar.jsx          # Sidebar for history orchestration
-│   │   ├── TelemetryModal.jsx   # Extracted live routing statistics dashboard
-│   │   ├── Tooltip.jsx          # Light hover tooltip wrapper
-│   │   └── TypingIndicator.jsx  # Multi-step animated loading indicators
-│   ├── context/                 # Context providers for global state
-│   │   ├── ThemeContext.jsx     # Dark, light, and system themes configuration
-│   │   └── ToastContext.jsx     # Global toast notification wrapper
+│   │   ├── classifier/
+│   │   │   └── intent_classifier.py  # BaseIntentClassifier + RuleBasedIntentClassifier
+│   │   ├── config.py            # Pydantic Settings + dotenv loader
+│   │   ├── main.py              # CORS, logging, router registration (lifespan)
+│   │   ├── providers/
+│   │   │   ├── base.py          # Abstract BaseProvider + exception hierarchy
+│   │   │   ├── openai_provider.py   # Live OpenAI SDK integration
+│   │   │   ├── claude_provider.py   # ⚠️ Placeholder — NotImplementedError
+│   │   │   └── gemini_provider.py   # ⚠️ Placeholder — NotImplementedError
+│   │   ├── routes/
+│   │   │   ├── chat.py          # POST /chat — validates, classifies, routes, calls provider
+│   │   │   └── health.py        # GET / and GET /health
+│   │   ├── schemas/
+│   │   │   └── chat.py          # ChatRequest + ChatResponse (nested: response/routing/metadata)
+│   │   └── services/
+│   │       ├── provider_manager.py  # Lazy-loading provider registry + health cache
+│   │       └── router.py        # LLMRouter: intent × policy → RoutingDecision
+│   ├── .env                     # Local environment variables (never commit secrets)
+│   ├── requirements.txt         # Python dependencies
+│   └── tests/                   # Pytest suite
+│       ├── test_classifier.py
+│       ├── test_router.py
+│       ├── test_provider_manager.py
+│       └── test_chat_endpoint.py
+├── src/                         # React Frontend
+│   ├── components/
+│   │   ├── ChatInput.jsx
+│   │   ├── ChatMessage.jsx
+│   │   ├── RoutingCard.jsx
+│   │   ├── Sidebar.jsx
+│   │   ├── SettingsModal.jsx
+│   │   ├── TelemetryModal.jsx
+│   │   ├── TypingIndicator.jsx
+│   │   ├── Tooltip.jsx
+│   │   ├── Navbar.jsx
+│   │   ├── Footer.jsx
+│   │   └── AuthenticationComingSoonModal.jsx
+│   ├── context/
+│   │   ├── ThemeContext.jsx
+│   │   └── ToastContext.jsx
 │   ├── data/
-│   │   └── mockData.js          # Shared mock models definitions & default stats
-│   ├── services/                # API client services communicating with backend
-│   │   ├── api.js               # Fetch wrapper with timeouts and error wrapping
-│   │   └── chatService.js       # Chat /health and /chat endpoints mappings
-│   ├── utils/                   # Helper utilities
-│   │   ├── animations.js        # Framer Motion animations preset
-│   │   ├── fileHelpers.jsx      # File icon assignment and size formatting
-│   │   └── mockRouter.js        # Legacy local mock routing handler (preserved)
-│   ├── test/                    # Front-end unit tests
+│   │   └── mockData.js
+│   ├── pages/
+│   │   ├── Chat.jsx
+│   │   ├── Home.jsx
+│   │   ├── Benefits.jsx
+│   │   └── Documentation.jsx
+│   ├── services/
+│   │   ├── api.js               # Fetch wrapper with AbortController timeout
+│   │   └── chatService.js       # POST /chat + GET /health mappings
+│   ├── utils/
+│   │   ├── mockRouter.js
+│   │   ├── fileHelpers.jsx
+│   │   └── animations.js
+│   ├── test/
 │   │   ├── mockRouter.test.js
-│   │   └── setup.js             # Vitest global setup configuration
-│   ├── App.jsx                  # Main router config & views wrapper
-│   ├── index.css                # Base tailwind styles and animation keyframes
-│   └── main.jsx                 # Entry point mounting App
-├── index.html                   # HTML Entry template
-├── eslint.config.js             # ESLint flat config file
-├── vite.config.js               # Vite configurations
-├── vercel.json                  # Single-Page App deployment rewrites
-├── package.json                 # Frontend scripts and Node packages
-└── README.md                    # Project documentation
+│   │   └── setup.js
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+├── index.html
+├── vercel.json
+├── vite.config.js
+├── eslint.config.js
+├── package.json
+├── AGENT_CONTEXT.md
+└── README.md
 ```
 
 ---
 
 ## ⚡ Getting Started
 
-Ensure you have Node.js (v18+) and Python (v3.9+) installed on your machine.
+Requires Node.js v18+ and Python v3.9+.
 
 ### Frontend Setup
 
-You can use either **npm** (default on local workspace) or **pnpm**:
+```bash
+# Install dependencies
+npm install        # or: pnpm install
 
-1. **Install Frontend Dependencies:**
+# Start dev server (http://localhost:5173)
+npm run dev        # or: pnpm dev
 
-   ```bash
-   npm install
-   # OR
-   pnpm install
-   ```
+# Production build
+npm run build      # or: pnpm build
+npm run preview    # or: pnpm preview
 
-2. **Start Frontend Development Server:**
-
-   ```bash
-   npm run dev
-   # OR
-   pnpm dev
-   ```
-
-   Open `http://localhost:5173` in your browser.
-
-3. **Production Build & Preview:**
-
-   ```bash
-   npm run build
-   npm run preview
-   # OR
-   pnpm build
-   pnpm preview
-   ```
-
-4. **Linting and Testing:**
-
-   ```bash
-   # Run ESLint check
-   npm run lint  # or pnpm lint
-
-   # Run Vitest unit tests (watch mode)
-   npm run test  # or pnpm test
-
-   # Run Vitest unit tests (single pass)
-   npm run test:run  # or pnpm test:run
-   ```
+# Lint + test
+npm run lint       # ESLint check
+npm run test:run   # Vitest single pass
+npm run test       # Vitest watch mode
+```
 
 ### Backend Setup
 
-1. **Create and Activate Python Virtual Environment:**
+```bash
+cd backend
 
-   ```bash
-   cd backend
-   python -m venv venv
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate        # macOS/Linux
+venv\Scripts\activate           # Windows
 
-   # Windows (PowerShell/CMD):
-   venv\Scripts\activate
+# Install dependencies
+pip install -r requirements.txt
 
-   # macOS/Linux:
-   source venv/bin/activate
-   ```
+# Run tests
+python -m pytest tests/ -v
 
-2. **Install Python Dependencies:**
+# Start API server (http://127.0.0.1:8000)
+uvicorn app.main:app --reload
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+Interactive API docs available at `http://127.0.0.1:8000/docs`.
 
-3. **Run Backend Tests:**
+### Environment Variables (`.env`)
 
-   ```bash
-   python -m pytest tests/ -v
-   ```
+Create `backend/.env` with:
 
-4. **Start the API Server:**
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-   The backend API will be available at `http://127.0.0.1:8000`. You can inspect the health check at `http://127.0.0.1:8000/health`, or open `http://127.0.0.1:8000/docs` to interactively view and test the schema endpoints (e.g. `POST /chat`).
+```env
+# Required for any real LLM calls
+OPENAI_API_KEY=sk-...
+
+# Required once Claude/Gemini providers are implemented
+ANTHROPIC_API_KEY=sk-ant-...
+GEMINI_API_KEY=AIza...
+
+# CORS — add your Vercel deployment URL here
+CORS_ORIGINS=["http://localhost:5173","http://localhost:3000","https://your-app.vercel.app"]
+
+ENVIRONMENT=development
+```
 
 ---
 
-## 📡 API Production Contracts
+## 📡 API Reference
 
-The backend enforces strict schemas for the pipeline using Pydantic models. Below is the structure of the JSON payloads transferred between the frontend and backend.
+### `POST /chat`
 
-### Request Payload (`POST /chat`)
+**Request:**
 
 ```json
 {
@@ -239,16 +213,18 @@ The backend enforces strict schemas for the pipeline using Pydantic models. Belo
   "routing_policy": "quality",
   "attachments": ["server_design.pdf"],
   "user_id": "usr_9x12bc8f",
-  "timestamp": "2026-06-25T15:41:00Z"
+  "timestamp": "2026-06-26T07:00:00Z"
 }
 ```
 
-### Response Payload (`POST /chat`)
+`routing_policy` must be one of: `balanced` | `speed` | `cost` | `quality`
+
+**Response:**
 
 ```json
 {
   "response": {
-    "content": "[Mock Response from OPENAI]\n\nYou asked: \"Write a fast Rust HTTP server...\"",
+    "content": "Here is a minimal actix-web server...",
     "conversation_id": "conv_8f3a9e2d",
     "attachments": ["server_design.pdf"]
   },
@@ -264,29 +240,75 @@ The backend enforces strict schemas for the pipeline using Pydantic models. Belo
   },
   "metadata": {
     "request_id": "req_84d72f9a1",
-    "timestamp": "2026-06-25T15:41:04.123456Z",
+    "timestamp": "2026-06-26T07:00:04.123456Z",
     "status": "success",
     "api_version": "1.0.0"
   }
 }
 ```
 
+### `GET /health`
+
+Returns service status and registered provider list.
+
+---
+
+## 🔀 Routing Logic
+
+### Intent → Provider Mapping
+
+| Intent      | `balanced` / `cost`      | `speed`                  | `quality`                               |
+| :---------- | :----------------------- | :----------------------- | :-------------------------------------- |
+| `coding`    | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o`                     |
+| `research`  | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `gemini` / `gemini-1.5-pro`             |
+| `document`  | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `claude` / `claude-3-5-sonnet-20241022` |
+| `reasoning` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o`                     |
+| `writing`   | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `claude` / `claude-3-5-sonnet-20241022` |
+| `general`   | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o`                     |
+
+> ⚠️ `balanced` and `cost` currently map to identical models — no cost-weighted scoring is implemented yet.
+
+### Fallback Chain
+
+If the selected provider is unavailable: `openai` → `gemini` → `claude`. The first healthy provider wins.
+
+---
+
+## ⚠️ Known Bugs
+
+| #   | Severity  | File                   | Description                                                                                                                                     |
+| :-- | :-------- | :--------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | 🔴 High   | `claude_provider.py`   | All methods raise `NotImplementedError` — no live Claude calls possible                                                                         |
+| 2   | 🔴 High   | `gemini_provider.py`   | All methods raise `NotImplementedError` — no live Gemini calls possible                                                                         |
+| 3   | 🔴 High   | `requirements.txt`     | Missing `anthropic`, `google-generativeai`, `pytest` packages                                                                                   |
+| 4   | 🔴 High   | `config.py`            | `ANTHROPIC_API_KEY` and `GEMINI_API_KEY` not declared in `Settings` model                                                                       |
+| 5   | 🟡 Medium | `routes/chat.py`       | Uses `list_registered_providers()` instead of `get_available_providers()` — dead providers (Claude/Gemini) treated as available at routing time |
+| 6   | 🟡 Medium | `config.py`            | `CORS_ORIGINS` default missing `localhost:5173` and production Vercel URL                                                                       |
+| 7   | 🟡 Medium | `services/api.js`      | 15 s `AbortController` timeout too short for GPT-4o / Gemini Pro on long responses                                                              |
+| 8   | 🟢 Low    | `intent_classifier.py` | Intent tie-breaking is non-deterministic (dict key order)                                                                                       |
+| 9   | 🟢 Low    | `router.py`            | `balanced` and `cost` policies resolve to identical models — no cost-weighted scoring                                                           |
+| 10  | 🟢 Low    | `routes/chat.py`       | Flat `tokens × 0.000015` cost formula regardless of provider or model tier                                                                      |
+| 11  | 🟢 Low    | `ChatInput.jsx`        | Helper text uses `text-[11px]` — below the 12 px accessibility floor                                                                            |
+| 12  | 🟢 Low    | `Tooltip.jsx`          | Hover-only; not keyboard or screen-reader accessible                                                                                            |
+| 13  | 🟢 Low    | `Chat.jsx`             | `handleNewChat` in header is an inline lambda instead of calling the shared handler                                                             |
+| 14  | 🟢 Low    | `chatService.js`       | No SSE streaming — full response is buffered before rendering                                                                                   |
+
 ---
 
 ## ⚙️ CI/CD Pipeline
 
-Every push and pull request targeting the `main` branch triggers the GitHub Actions workflow (`ci.yml`):
+Every push and pull request to `main` triggers the GitHub Actions workflow (`ci.yml`):
 
-1. **Lint** — ESLint with React guidelines verifies code styling constraints.
-2. **Test** — Vitest runs unit tests to ensure query intent logic works correctly.
-3. **Build** — Vite executes a production build to check for bundler or syntax issues.
+1. **Lint** — ESLint with React rules
+2. **Test** — Vitest unit tests (`pnpm test:run`)
+3. **Build** — Vite production build
 
 ---
 
-## 🌐 Current Status & Deployment
+## 🌐 Deployment
 
-- **Current Status:** Full-stack integration complete. Frontend chat prompt flows through the services API layer and queries the live FastAPI backend routing pipeline (intent classifier, routing policy resolver, provider adapters), with local mock fallback mapping when API keys are absent.
-- **Vercel Routing:** Custom `vercel.json` rewrite configuration allows single-page route paths to load smoothly on fresh refreshes.
+- **Frontend:** Vercel. `vercel.json` rewrites all routes to `index.html` (standard SPA pattern). Push to `main` auto-deploys.
+- **Backend:** Not yet deployed. Planned target: Railway (FastAPI + Uvicorn).
 
 ---
 
