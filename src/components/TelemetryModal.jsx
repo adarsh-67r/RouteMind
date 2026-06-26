@@ -60,15 +60,21 @@ const TelemetryModal = ({ isOpen, onClose, stats }) => {
           {/* Stats grid */}
           <div className="grid grid-cols-3 gap-3">
             <div className="p-3 bg-card-bg border border-border-app rounded-lg text-center">
-              <p className="text-[9px] text-neutral-500 font-mono uppercase tracking-wider mb-1">Total Routed</p>
+              <p className="text-[9px] text-neutral-500 font-mono uppercase tracking-wider mb-1">
+                Total Routed
+              </p>
               <p className="text-lg font-bold text-primary font-mono">{totalQueries}</p>
             </div>
             <div className="p-3 bg-card-bg border border-border-app rounded-lg text-center">
-              <p className="text-[9px] text-neutral-500 font-mono uppercase tracking-wider mb-1">Est. Savings</p>
+              <p className="text-[9px] text-neutral-500 font-mono uppercase tracking-wider mb-1">
+                Est. Savings
+              </p>
               <p className="text-lg font-bold text-green-500 font-mono">${savings.toFixed(3)}</p>
             </div>
             <div className="p-3 bg-card-bg border border-border-app rounded-lg text-center">
-              <p className="text-[9px] text-neutral-500 font-mono uppercase tracking-wider mb-1">Overhead Latency</p>
+              <p className="text-[9px] text-neutral-500 font-mono uppercase tracking-wider mb-1">
+                Overhead Latency
+              </p>
               <p className="text-lg font-bold text-blue-500 font-mono">
                 {avgOverhead ? `${Math.round(avgOverhead)}ms` : '<12ms'}
               </p>
@@ -81,7 +87,9 @@ const TelemetryModal = ({ isOpen, onClose, stats }) => {
               Model Utilization Distribution
             </h4>
             {Object.keys(models).length === 0 ? (
-              <p className="text-[11px] text-neutral-600 font-mono text-center py-2">No data yet — send a message to see routing stats.</p>
+              <p className="text-[11px] text-neutral-600 font-mono text-center py-2">
+                No data yet — send a message to see routing stats.
+              </p>
             ) : (
               <div className="space-y-2.5">
                 {Object.entries(models).map(([modelName, count]) => {
@@ -93,17 +101,23 @@ const TelemetryModal = ({ isOpen, onClose, stats }) => {
                     (modelName.toLowerCase().includes('llama') &&
                       !modelName.toLowerCase().includes('nvidia') &&
                       !modelName.toLowerCase().includes('meta/llama'))
-                  ) colorClass = 'bg-orange-500'
+                  )
+                    colorClass = 'bg-orange-500'
                   else if (
                     modelName.toLowerCase().includes('nvidia') ||
                     modelName.toLowerCase().includes('meta/llama')
-                  ) colorClass = 'bg-green-500'
+                  )
+                    colorClass = 'bg-green-500'
 
                   return (
                     <div key={modelName} className="space-y-1">
                       <div className="flex justify-between text-[11px] text-primary">
-                        <span className="font-mono truncate max-w-[55%]" title={modelName}>{modelName}</span>
-                        <span className="font-mono text-neutral-500 shrink-0 ml-2">{count}q ({percentage.toFixed(0)}%)</span>
+                        <span className="font-mono truncate max-w-[55%]" title={modelName}>
+                          {modelName}
+                        </span>
+                        <span className="font-mono text-neutral-500 shrink-0 ml-2">
+                          {count}q ({percentage.toFixed(0)}%)
+                        </span>
                       </div>
                       <div className="h-1.5 bg-sidebar-bg rounded-full overflow-hidden border border-border-app/30">
                         <div
@@ -120,7 +134,9 @@ const TelemetryModal = ({ isOpen, onClose, stats }) => {
 
           {/* Edge status */}
           <div className="space-y-2">
-            <h4 className="text-neutral-400 font-semibold uppercase tracking-wider text-[10px] font-mono">Edge Deployment Status</h4>
+            <h4 className="text-neutral-400 font-semibold uppercase tracking-wider text-[10px] font-mono">
+              Edge Deployment Status
+            </h4>
             <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
               <div className="p-2 bg-card-bg border border-border-app rounded flex justify-between items-center gap-2">
                 <span className="text-neutral-400 truncate">US-East-1 Edge</span>

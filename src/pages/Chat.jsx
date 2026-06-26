@@ -44,7 +44,9 @@ const Chat = () => {
   const currentMessages = conversationsMessages[activeChatId] || []
 
   useEffect(() => {
-    return () => { timeoutRefs.current.forEach(clearTimeout) }
+    return () => {
+      timeoutRefs.current.forEach(clearTimeout)
+    }
   }, [])
 
   useEffect(() => {
@@ -89,7 +91,11 @@ const Chat = () => {
     messageIdRef.current += 1
 
     const filesMetadata = hasFiles
-      ? attachedFiles.map((f) => ({ name: f.name, size: f.size, type: f.type || f.name.split('.').pop() }))
+      ? attachedFiles.map((f) => ({
+          name: f.name,
+          size: f.size,
+          type: f.type || f.name.split('.').pop(),
+        }))
       : []
 
     const userMsg = {
@@ -110,12 +116,18 @@ const Chat = () => {
     setLoadingStep(hasFiles ? 'Reading attachments...' : 'Analyzing Intent...')
 
     const attachments = hasFiles ? attachedFiles.map((f) => f.name) : null
-    const apiCallPromise = chatService.sendMessage(content.trim(), chatIdAtSend, routingPolicy, attachments)
+    const apiCallPromise = chatService.sendMessage(
+      content.trim(),
+      chatIdAtSend,
+      routingPolicy,
+      attachments
+    )
 
-    const delay = (ms) => new Promise((resolve) => {
-      const t = setTimeout(resolve, ms)
-      timeoutRefs.current.push(t)
-    })
+    const delay = (ms) =>
+      new Promise((resolve) => {
+        const t = setTimeout(resolve, ms)
+        timeoutRefs.current.push(t)
+      })
 
     try {
       await delay(1000)
@@ -139,14 +151,17 @@ const Chat = () => {
         const existingMsgs = prev[chatIdAtSend] || []
         return {
           ...prev,
-          [chatIdAtSend]: [...existingMsgs, {
-            id: assistantMsgId,
-            role: 'assistant',
-            content: '',
-            time: 'Just now',
-            isStreaming: true,
-            routing: backendResponse,
-          }],
+          [chatIdAtSend]: [
+            ...existingMsgs,
+            {
+              id: assistantMsgId,
+              role: 'assistant',
+              content: '',
+              time: 'Just now',
+              isStreaming: true,
+              routing: backendResponse,
+            },
+          ],
         }
       })
 
@@ -167,7 +182,9 @@ const Chat = () => {
 
       // Update telemetry stats
       const storedStats = localStorage.getItem('routingStats')
-      const stats = storedStats ? JSON.parse(storedStats) : { totalQueries: 0, savings: 0.0, models: {} }
+      const stats = storedStats
+        ? JSON.parse(storedStats)
+        : { totalQueries: 0, savings: 0.0, models: {} }
       stats.totalQueries += 1
 
       const actualCost = backendResponse.estimated_cost_usd ?? 0
@@ -187,7 +204,8 @@ const Chat = () => {
       const providerLatency = backendResponse.latency_ms ?? 0
       const overhead = Math.max(1, processingTime - providerLatency)
       stats.totalOverhead = (stats.totalOverhead || 0) + overhead
-      stats.avgOverhead = stats.totalQueries > 0 ? stats.totalOverhead / stats.totalQueries : overhead
+      stats.avgOverhead =
+        stats.totalQueries > 0 ? stats.totalOverhead / stats.totalQueries : overhead
 
       localStorage.setItem('routingStats', JSON.stringify(stats))
       window.dispatchEvent(new Event('telemetry-updated'))
@@ -197,7 +215,11 @@ const Chat = () => {
         if (chatIndex === -1) return prevHistory
         const chat = prevHistory[chatIndex]
         if (isFirstMessage && chat.title === 'New Workspace Chat') {
-          const titleText = content.trim() ? content : hasFiles ? `File: ${attachedFiles[0].name}` : 'New Workspace Chat'
+          const titleText = content.trim()
+            ? content
+            : hasFiles
+              ? `File: ${attachedFiles[0].name}`
+              : 'New Workspace Chat'
           const shortened = titleText.length > 25 ? `${titleText.substring(0, 25)}...` : titleText
           const updated = [...prevHistory]
           updated[chatIndex] = { ...chat, title: shortened }
@@ -213,13 +235,16 @@ const Chat = () => {
         const existingMsgs = prev[chatIdAtSend] || []
         return {
           ...prev,
-          [chatIdAtSend]: [...existingMsgs, {
-            id: assistantMsgId,
-            role: 'assistant',
-            content: `⚠️ **RouteMind API Error:** ${err.message || 'The server returned an unexpected error or is offline.'}`,
-            time: 'Just now',
-            isStreaming: false,
-          }],
+          [chatIdAtSend]: [
+            ...existingMsgs,
+            {
+              id: assistantMsgId,
+              role: 'assistant',
+              content: `⚠️ **RouteMind API Error:** ${err.message || 'The server returned an unexpected error or is offline.'}`,
+              time: 'Just now',
+              isStreaming: false,
+            },
+          ],
         }
       })
     } finally {
@@ -235,7 +260,10 @@ const Chat = () => {
     if (index === -1) return
     let promptMsg = null
     for (let i = index - 1; i >= 0; i--) {
-      if (messages[i].role === 'user') { promptMsg = messages[i]; break }
+      if (messages[i].role === 'user') {
+        promptMsg = messages[i]
+        break
+      }
     }
     if (!promptMsg) return
     setConversationsMessages((prev) => ({
@@ -290,7 +318,10 @@ const Chat = () => {
               <Menu size={20} />
             </button>
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <Link to="/" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold text-xs tracking-wider font-mono uppercase transition-all duration-200 shrink-0">
+              <Link
+                to="/"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold text-xs tracking-wider font-mono uppercase transition-all duration-200 shrink-0"
+              >
                 RouteMind
               </Link>
               <span className="text-neutral-300 dark:text-neutral-700 text-xs shrink-0">/</span>
@@ -351,8 +382,12 @@ const Chat = () => {
                     onClick={() => handleSendMessage(prompt)}
                     className={`p-4 bg-card-bg hover:bg-sidebar-bg border border-border-app hover:border-blue-500/30 rounded-xl text-left transition-all duration-200 hover:-translate-y-0.5 group focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 cursor-pointer animate-slide-up-fade ${cardDelays[idx]}`}
                   >
-                    <p className="text-xs font-semibold text-primary group-hover:text-primary transition-colors">{prompt}</p>
-                    <p className="text-[10px] text-neutral-600 dark:text-neutral-500 mt-1 leading-normal">Click to submit query directly to RouteMind proxy.</p>
+                    <p className="text-xs font-semibold text-primary group-hover:text-primary transition-colors">
+                      {prompt}
+                    </p>
+                    <p className="text-[10px] text-neutral-600 dark:text-neutral-500 mt-1 leading-normal">
+                      Click to submit query directly to RouteMind proxy.
+                    </p>
                   </button>
                 ))}
               </div>
@@ -362,7 +397,9 @@ const Chat = () => {
               {currentMessages.map((msg) => (
                 <ChatMessage key={msg.id} message={msg} onRegenerate={handleRegenerateResponse} />
               ))}
-              {isLoading && <TypingIndicator loadingStep={loadingStep} selectedModel={pendingModel} />}
+              {isLoading && (
+                <TypingIndicator loadingStep={loadingStep} selectedModel={pendingModel} />
+              )}
               <div ref={messagesEndRef} />
             </div>
           )}
