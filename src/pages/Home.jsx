@@ -370,19 +370,22 @@ const Home = () => {
             {[
               {
                 icon: <Zap size={16} />,
-                iconBg: 'bg-blue-100 dark:bg-blue-950/20 border-blue-300 dark:border-blue-500/10 text-blue-600 dark:text-[#3B82F6]',
+                iconBg:
+                  'bg-blue-100 dark:bg-blue-950/20 border-blue-300 dark:border-blue-500/10 text-blue-600 dark:text-[#3B82F6]',
                 title: 'Intelligent Routing',
                 desc: 'Automatically analyze code prompts and long documents to match with optimal model specifications on the fly.',
               },
               {
                 icon: <ShieldCheck size={16} />,
-                iconBg: 'bg-green-100 dark:bg-green-950/20 border-green-300 dark:border-green-500/10 text-green-600 dark:text-[#22C55E]',
+                iconBg:
+                  'bg-green-100 dark:bg-green-950/20 border-green-300 dark:border-green-500/10 text-green-600 dark:text-[#22C55E]',
                 title: 'Explainable Decisions',
                 desc: 'Full transparency. Every decision shows model comparisons, latency measurements, and scoring logic breakdown.',
               },
               {
                 icon: <Coins size={16} />,
-                iconBg: 'bg-yellow-100 dark:bg-yellow-950/20 border-yellow-300 dark:border-yellow-500/10 text-yellow-600 dark:text-[#F59E0B]',
+                iconBg:
+                  'bg-yellow-100 dark:bg-yellow-950/20 border-yellow-300 dark:border-yellow-500/10 text-yellow-600 dark:text-[#F59E0B]',
                 title: 'Cost Optimization',
                 desc: 'Route simpler intent queries to fast, cost-efficient models. Save up to 80% on standard inference pricing.',
               },
