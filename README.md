@@ -41,18 +41,18 @@ RouteMind eliminates the decision fatigue of choosing between AI tools. Instead 
 
 ## 🛠️ Tech Stack
 
-| Layer                  | Choice                                                        |
-| :--------------------- | :------------------------------------------------------------ |
-| **Frontend Framework** | React 19 + Vite 8                                             |
-| **Backend Framework**  | FastAPI (Python 3.x) + Uvicorn                                |
-| **Styling**            | Tailwind CSS v4                                               |
-| **Routing**            | React Router v7                                               |
-| **Animations**         | Framer Motion                                                 |
+| Layer                  | Choice                                                       |
+| :--------------------- | :----------------------------------------------------------- |
+| **Frontend Framework** | React 19 + Vite 8                                            |
+| **Backend Framework**  | FastAPI (Python 3.x) + Uvicorn                               |
+| **Styling**            | Tailwind CSS v4                                              |
+| **Routing**            | React Router v7                                              |
+| **Animations**         | Framer Motion                                                |
 | **Markdown Rendering** | `react-markdown` + `react-syntax-highlighter` + `remark-gfm` |
-| **Icons**              | Lucide React                                                  |
-| **Unit Testing**       | Vitest + React Testing Library + JSDOM                        |
-| **CI/CD**              | GitHub Actions (`ci.yml`)                                     |
-| **Deployment Routing** | Vercel SPA Rewrites (`vercel.json`)                           |
+| **Icons**              | Lucide React                                                 |
+| **Unit Testing**       | Vitest + React Testing Library + JSDOM                       |
+| **CI/CD**              | GitHub Actions (`ci.yml`)                                    |
+| **Deployment Routing** | Vercel SPA Rewrites (`vercel.json`)                          |
 
 ---
 
@@ -261,27 +261,27 @@ Returns service status and per-provider health state.
 
 ### Intent → Provider Mapping
 
-| Intent | `balanced` | `speed` | `cost` | `quality` | Failover Chain |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `coding` | groq / llama-3.3-70b | groq / llama-3.1-8b | groq / llama-3.1-8b | groq / llama-3.3-70b | groq → nvidia → gemini → openrouter |
-| `research` | gemini / flash | gemini / flash | gemini / flash | gemini / pro | gemini → nvidia → groq → openrouter |
-| `document` | gemini / flash | gemini / flash | gemini / flash | gemini / pro | gemini → nvidia → groq → openrouter |
-| `reasoning` | nvidia / llama-3.1-70b | nvidia / llama-3.1-8b | nvidia / llama-3.1-8b | nvidia / llama-3.1-70b | nvidia → gemini → groq → openrouter |
-| `analysis` | nvidia / llama-3.1-70b | nvidia / llama-3.1-8b | nvidia / llama-3.1-8b | nvidia / llama-3.1-70b | nvidia → gemini → groq → openrouter |
-| `writing` | openrouter / deepseek-r1 | groq / llama-3.1-8b | openrouter / free | openrouter / deepseek-r1 | openrouter → groq → gemini → nvidia |
-| `general` | gemini / flash | gemini / flash | gemini / flash | gemini / pro | gemini → nvidia → groq → openrouter |
+| Intent      | `balanced`               | `speed`               | `cost`                | `quality`                | Failover Chain                      |
+| :---------- | :----------------------- | :-------------------- | :-------------------- | :----------------------- | :---------------------------------- |
+| `coding`    | groq / llama-3.3-70b     | groq / llama-3.1-8b   | groq / llama-3.1-8b   | groq / llama-3.3-70b     | groq → nvidia → gemini → openrouter |
+| `research`  | gemini / flash           | gemini / flash        | gemini / flash        | gemini / pro             | gemini → nvidia → groq → openrouter |
+| `document`  | gemini / flash           | gemini / flash        | gemini / flash        | gemini / pro             | gemini → nvidia → groq → openrouter |
+| `reasoning` | nvidia / llama-3.1-70b   | nvidia / llama-3.1-8b | nvidia / llama-3.1-8b | nvidia / llama-3.1-70b   | nvidia → gemini → groq → openrouter |
+| `analysis`  | nvidia / llama-3.1-70b   | nvidia / llama-3.1-8b | nvidia / llama-3.1-8b | nvidia / llama-3.1-70b   | nvidia → gemini → groq → openrouter |
+| `writing`   | openrouter / deepseek-r1 | groq / llama-3.1-8b   | openrouter / free     | openrouter / deepseek-r1 | openrouter → groq → gemini → nvidia |
+| `general`   | gemini / flash           | gemini / flash        | gemini / flash        | gemini / pro             | gemini → nvidia → groq → openrouter |
 
 ### Composite Scoring Weights
 
 Each healthy provider is scored across five dimensions before selection:
 
-| Factor | Weight |
-| :--- | :--- |
-| Specialization capability | 35% |
-| Latency (from health monitor EMA) | 20% |
-| Cost efficiency | 15% |
-| Health status | 15% |
-| Historical success rate | 15% |
+| Factor                            | Weight |
+| :-------------------------------- | :----- |
+| Specialization capability         | 35%    |
+| Latency (from health monitor EMA) | 20%    |
+| Cost efficiency                   | 15%    |
+| Health status                     | 15%    |
+| Historical success rate           | 15%    |
 
 ### Failover Chains
 
@@ -296,16 +296,16 @@ If the selected provider fails, RouteMind retries up to 3 times then executes a 
 
 ## ⚠️ Known Bugs
 
-| # | Severity | File | Description |
-| :-- | :-- | :-- | :-- |
-| 1 | 🟡 Medium | `services/api.js` | 15 s `AbortController` timeout too short for large Gemini / NVIDIA responses |
-| 2 | 🟢 Low | `intent_classifier.py` | Intent tie-breaking is non-deterministic (dict iteration order) |
-| 3 | 🟢 Low | `router.py` | `balanced` and `cost` policies resolve to identical models — no cost-weighted delta |
-| 4 | 🟢 Low | `routes/chat.py` | Flat `tokens × 0.000015` cost formula applied regardless of provider or model tier |
-| 5 | 🟢 Low | `ChatInput.jsx` | Helper text uses `text-[11px]` — below the 12 px accessibility floor |
-| 6 | 🟢 Low | `Tooltip.jsx` | Hover-only; not keyboard or screen-reader accessible |
-| 7 | 🟢 Low | `Chat.jsx` | `handleNewChat` in header is an inline lambda instead of calling the shared handler |
-| 8 | 🟢 Low | `chatService.js` | No SSE streaming — full response is buffered before rendering |
+| #   | Severity  | File                   | Description                                                                         |
+| :-- | :-------- | :--------------------- | :---------------------------------------------------------------------------------- |
+| 1   | 🟡 Medium | `services/api.js`      | 15 s `AbortController` timeout too short for large Gemini / NVIDIA responses        |
+| 2   | 🟢 Low    | `intent_classifier.py` | Intent tie-breaking is non-deterministic (dict iteration order)                     |
+| 3   | 🟢 Low    | `router.py`            | `balanced` and `cost` policies resolve to identical models — no cost-weighted delta |
+| 4   | 🟢 Low    | `routes/chat.py`       | Flat `tokens × 0.000015` cost formula applied regardless of provider or model tier  |
+| 5   | 🟢 Low    | `ChatInput.jsx`        | Helper text uses `text-[11px]` — below the 12 px accessibility floor                |
+| 6   | 🟢 Low    | `Tooltip.jsx`          | Hover-only; not keyboard or screen-reader accessible                                |
+| 7   | 🟢 Low    | `Chat.jsx`             | `handleNewChat` in header is an inline lambda instead of calling the shared handler |
+| 8   | 🟢 Low    | `chatService.js`       | No SSE streaming — full response is buffered before rendering                       |
 
 ---
 

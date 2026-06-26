@@ -53,12 +53,12 @@ Adding a new provider = create one file implementing `BaseProvider` + register i
 
 **Active providers:**
 
-| Provider | File | Models |
-| :--- | :--- | :--- |
-| Google Gemini | `gemini_provider.py` | gemini-2.5-pro, gemini-2.5-flash, gemini-2.5-flash-lite |
-| Groq | `groq_provider.py` | llama-3.3-70b-versatile, llama-3.1-8b-instant |
-| NVIDIA NIM | `nvidia_provider.py` | meta/llama-3.1-70b-instruct, meta/llama-3.1-8b-instruct |
-| OpenRouter | `openrouter_provider.py` | deepseek/deepseek-r1-0528:free, qwen/qwen3-coder:free, cohere/north-mini-code:free |
+| Provider      | File                     | Models                                                                             |
+| :------------ | :----------------------- | :--------------------------------------------------------------------------------- |
+| Google Gemini | `gemini_provider.py`     | gemini-2.5-pro, gemini-2.5-flash, gemini-2.5-flash-lite                            |
+| Groq          | `groq_provider.py`       | llama-3.3-70b-versatile, llama-3.1-8b-instant                                      |
+| NVIDIA NIM    | `nvidia_provider.py`     | meta/llama-3.1-70b-instruct, meta/llama-3.1-8b-instruct                            |
+| OpenRouter    | `openrouter_provider.py` | deepseek/deepseek-r1-0528:free, qwen/qwen3-coder:free, cohere/north-mini-code:free |
 
 ### Health Monitor (`services/health_monitor.py`)
 
@@ -192,12 +192,14 @@ Exception hierarchy rooted at `BaseRouteMindError`. Sub-classes: `ProviderError`
 ### `app/schemas/chat.py`
 
 Pydantic models:
+
 - `ChatRequest` — `message`, `conversation_id`, `routing_policy`, `attachments`, `user_id`, `timestamp`
 - `ChatResponse` (flat) — `success`, `response`, `conversation_id`, `routing_metadata` (dict), `estimated_cost`, `usage` (`TokenUsage`)
 
 ### `app/routes/chat.py`
 
 Orchestrates the full request pipeline:
+
 1. Validate `ChatRequest`
 2. Call `RuleBasedIntentClassifier` → intent + complexity
 3. Call `LLMRouter.route()` → `RoutingDecision`
@@ -237,19 +239,20 @@ Lazy-loading provider registry. Providers are instantiated on first use and cach
 
 `LLMRouter` computes a composite score for each provider candidate:
 
-| Factor | Weight |
-| :--- | :--- |
-| Specialization (per-intent capability) | 35% |
-| Latency (from health monitor EMA) | 20% |
-| Cost efficiency | 15% |
-| Health status | 15% |
-| Historical success rate | 15% |
+| Factor                                 | Weight |
+| :------------------------------------- | :----- |
+| Specialization (per-intent capability) | 35%    |
+| Latency (from health monitor EMA)      | 20%    |
+| Cost efficiency                        | 15%    |
+| Health status                          | 15%    |
+| Historical success rate                | 15%    |
 
 Intent × policy → base candidate list, then scored and sorted. Top scorer wins. Fallback chain is returned alongside the primary decision.
 
 ### `app/services/health_monitor.py`
 
 Background async task started at lifespan. Polls each provider's `health_check()` on a configurable interval. Tracks:
+
 - `ema_latency_ms` — exponential moving average of response latency
 - `consecutive_failures` — resets on success
 - `blocked_until` — timestamp-based block list (5 min for auth errors)
@@ -262,28 +265,28 @@ Background async task started at lifespan. Polls each provider's `health_check()
 
 ## Policies & Router Logic
 
-| Policy | Behaviour | Notes |
-| :--- | :--- | :--- |
-| `quality` | Frontier / largest models | gemini-2.5-pro, llama-3.3-70b, llama-3.1-70b |
-| `speed` | Lowest-latency models | gemini-2.5-flash-lite, llama-3.1-8b, north-mini-code |
-| `cost` | Cheapest (free-tier preferred) | Same model set as `speed` — see Known Bugs #3 |
-| `balanced` | Optimised compromise | Pro or flash depending on complexity tier |
+| Policy     | Behaviour                      | Notes                                                |
+| :--------- | :----------------------------- | :--------------------------------------------------- |
+| `quality`  | Frontier / largest models      | gemini-2.5-pro, llama-3.3-70b, llama-3.1-70b         |
+| `speed`    | Lowest-latency models          | gemini-2.5-flash-lite, llama-3.1-8b, north-mini-code |
+| `cost`     | Cheapest (free-tier preferred) | Same model set as `speed` — see Known Bugs #3        |
+| `balanced` | Optimised compromise           | Pro or flash depending on complexity tier            |
 
 ---
 
 ## Known Bugs
 
-| # | Severity | File | Description |
-| :-- | :-- | :-- | :-- |
-| 1 | 🟡 Medium | `services/api.js` | 15 s timeout too short for large Gemini / NVIDIA responses |
-| 2 | 🟡 Medium | `routes/chat.py` | Uses `list_registered_providers()` not `get_available_providers()` — unhealthy providers treated as available at routing time |
-| 3 | 🟢 Low | `router.py` | `balanced` and `cost` policies resolve to identical models — no cost-weighted scoring delta |
-| 4 | 🟢 Low | `config/pricing.py` | Flat `tokens × 0.000015` cost formula regardless of provider or model tier |
-| 5 | 🟢 Low | `intent_classifier.py` | Tie-breaking is non-deterministic (dict iteration order) |
-| 6 | 🟢 Low | `ChatInput.jsx` | Helper text uses `text-[11px]` — below 12 px a11y floor |
-| 7 | 🟢 Low | `Tooltip.jsx` | Hover-only; not keyboard or screen-reader accessible |
-| 8 | 🟢 Low | `Chat.jsx` | `handleNewChat` in header is an inline lambda instead of the shared handler |
-| 9 | 🟢 Low | `chatService.js` | No SSE streaming — full response buffered before render |
+| #   | Severity  | File                   | Description                                                                                                                   |
+| :-- | :-------- | :--------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
+| 1   | 🟡 Medium | `services/api.js`      | 15 s timeout too short for large Gemini / NVIDIA responses                                                                    |
+| 2   | 🟡 Medium | `routes/chat.py`       | Uses `list_registered_providers()` not `get_available_providers()` — unhealthy providers treated as available at routing time |
+| 3   | 🟢 Low    | `router.py`            | `balanced` and `cost` policies resolve to identical models — no cost-weighted scoring delta                                   |
+| 4   | 🟢 Low    | `config/pricing.py`    | Flat `tokens × 0.000015` cost formula regardless of provider or model tier                                                    |
+| 5   | 🟢 Low    | `intent_classifier.py` | Tie-breaking is non-deterministic (dict iteration order)                                                                      |
+| 6   | 🟢 Low    | `ChatInput.jsx`        | Helper text uses `text-[11px]` — below 12 px a11y floor                                                                       |
+| 7   | 🟢 Low    | `Tooltip.jsx`          | Hover-only; not keyboard or screen-reader accessible                                                                          |
+| 8   | 🟢 Low    | `Chat.jsx`             | `handleNewChat` in header is an inline lambda instead of the shared handler                                                   |
+| 9   | 🟢 Low    | `chatService.js`       | No SSE streaming — full response buffered before render                                                                       |
 
 ---
 
@@ -310,11 +313,11 @@ Background async task started at lifespan. Polls each provider's `health_check()
 
 ## Environment Variables Quick Reference
 
-| Variable | Required | Description |
-| :--- | :--- | :--- |
-| `GEMINI_API_KEY` | Yes | Google AI Studio key |
-| `GROQ_API_KEY` | Yes | Groq Console key |
-| `NVIDIA_NIM_API_KEY` | Yes | NVIDIA NGC key |
-| `OPENROUTER_API_KEY` | Yes | OpenRouter key |
-| `CORS_ORIGINS` | Yes | JSON array of allowed origins including deployed frontend URL |
-| `ENVIRONMENT` | No | `development` or `production` (defaults to `development`) |
+| Variable             | Required | Description                                                   |
+| :------------------- | :------- | :------------------------------------------------------------ |
+| `GEMINI_API_KEY`     | Yes      | Google AI Studio key                                          |
+| `GROQ_API_KEY`       | Yes      | Groq Console key                                              |
+| `NVIDIA_NIM_API_KEY` | Yes      | NVIDIA NGC key                                                |
+| `OPENROUTER_API_KEY` | Yes      | OpenRouter key                                                |
+| `CORS_ORIGINS`       | Yes      | JSON array of allowed origins including deployed frontend URL |
+| `ENVIRONMENT`        | No       | `development` or `production` (defaults to `development`)     |
