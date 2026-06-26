@@ -40,18 +40,18 @@ RouteMind eliminates the decision fatigue of choosing between AI tools. Instead 
 
 ## 🛠️ Tech Stack
 
-| Layer | Choice |
-| :--- | :--- |
-| **Frontend Framework** | React 19 + Vite 8 |
-| **Backend Framework** | FastAPI (Python 3.x) + Uvicorn |
-| **Styling** | Tailwind CSS v4 |
-| **Routing** | React Router v7 |
-| **Animations** | Framer Motion |
+| Layer                  | Choice                                                       |
+| :--------------------- | :----------------------------------------------------------- |
+| **Frontend Framework** | React 19 + Vite 8                                            |
+| **Backend Framework**  | FastAPI (Python 3.x) + Uvicorn                               |
+| **Styling**            | Tailwind CSS v4                                              |
+| **Routing**            | React Router v7                                              |
+| **Animations**         | Framer Motion                                                |
 | **Markdown Rendering** | `react-markdown` + `react-syntax-highlighter` + `remark-gfm` |
-| **Icons** | Lucide React |
-| **Unit Testing** | Vitest + React Testing Library + JSDOM |
-| **CI/CD** | GitHub Actions (`ci.yml`) |
-| **Deployment Routing** | Vercel SPA Rewrites (`vercel.json`) |
+| **Icons**              | Lucide React                                                 |
+| **Unit Testing**       | Vitest + React Testing Library + JSDOM                       |
+| **CI/CD**              | GitHub Actions (`ci.yml`)                                    |
+| **Deployment Routing** | Vercel SPA Rewrites (`vercel.json`)                          |
 
 ---
 
@@ -257,14 +257,14 @@ Returns service status and registered provider list.
 
 ### Intent → Provider Mapping
 
-| Intent | `balanced` / `cost` | `speed` | `quality` |
-| :--- | :--- | :--- | :--- |
-| `coding` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o` |
-| `research` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `gemini` / `gemini-1.5-pro` |
-| `document` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `claude` / `claude-3-5-sonnet-20241022` |
-| `reasoning` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o` |
-| `writing` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `claude` / `claude-3-5-sonnet-20241022` |
-| `general` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o` |
+| Intent      | `balanced` / `cost`      | `speed`                  | `quality`                               |
+| :---------- | :----------------------- | :----------------------- | :-------------------------------------- |
+| `coding`    | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o`                     |
+| `research`  | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `gemini` / `gemini-1.5-pro`             |
+| `document`  | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `claude` / `claude-3-5-sonnet-20241022` |
+| `reasoning` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o`                     |
+| `writing`   | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `claude` / `claude-3-5-sonnet-20241022` |
+| `general`   | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o`                     |
 
 > ⚠️ `balanced` and `cost` currently map to identical models — no cost-weighted scoring is implemented yet.
 
@@ -276,22 +276,22 @@ If the selected provider is unavailable: `openai` → `gemini` → `claude`. The
 
 ## ⚠️ Known Bugs
 
-| # | Severity | File | Description |
-| :--- | :--- | :--- | :--- |
-| 1 | 🔴 High | `claude_provider.py` | All methods raise `NotImplementedError` — no live Claude calls possible |
-| 2 | 🔴 High | `gemini_provider.py` | All methods raise `NotImplementedError` — no live Gemini calls possible |
-| 3 | 🔴 High | `requirements.txt` | Missing `anthropic`, `google-generativeai`, `pytest` packages |
-| 4 | 🔴 High | `config.py` | `ANTHROPIC_API_KEY` and `GEMINI_API_KEY` not declared in `Settings` model |
-| 5 | 🟡 Medium | `routes/chat.py` | Uses `list_registered_providers()` instead of `get_available_providers()` — dead providers (Claude/Gemini) treated as available at routing time |
-| 6 | 🟡 Medium | `config.py` | `CORS_ORIGINS` default missing `localhost:5173` and production Vercel URL |
-| 7 | 🟡 Medium | `services/api.js` | 15 s `AbortController` timeout too short for GPT-4o / Gemini Pro on long responses |
-| 8 | 🟢 Low | `intent_classifier.py` | Intent tie-breaking is non-deterministic (dict key order) |
-| 9 | 🟢 Low | `router.py` | `balanced` and `cost` policies resolve to identical models — no cost-weighted scoring |
-| 10 | 🟢 Low | `routes/chat.py` | Flat `tokens × 0.000015` cost formula regardless of provider or model tier |
-| 11 | 🟢 Low | `ChatInput.jsx` | Helper text uses `text-[11px]` — below the 12 px accessibility floor |
-| 12 | 🟢 Low | `Tooltip.jsx` | Hover-only; not keyboard or screen-reader accessible |
-| 13 | 🟢 Low | `Chat.jsx` | `handleNewChat` in header is an inline lambda instead of calling the shared handler |
-| 14 | 🟢 Low | `chatService.js` | No SSE streaming — full response is buffered before rendering |
+| #   | Severity  | File                   | Description                                                                                                                                     |
+| :-- | :-------- | :--------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | 🔴 High   | `claude_provider.py`   | All methods raise `NotImplementedError` — no live Claude calls possible                                                                         |
+| 2   | 🔴 High   | `gemini_provider.py`   | All methods raise `NotImplementedError` — no live Gemini calls possible                                                                         |
+| 3   | 🔴 High   | `requirements.txt`     | Missing `anthropic`, `google-generativeai`, `pytest` packages                                                                                   |
+| 4   | 🔴 High   | `config.py`            | `ANTHROPIC_API_KEY` and `GEMINI_API_KEY` not declared in `Settings` model                                                                       |
+| 5   | 🟡 Medium | `routes/chat.py`       | Uses `list_registered_providers()` instead of `get_available_providers()` — dead providers (Claude/Gemini) treated as available at routing time |
+| 6   | 🟡 Medium | `config.py`            | `CORS_ORIGINS` default missing `localhost:5173` and production Vercel URL                                                                       |
+| 7   | 🟡 Medium | `services/api.js`      | 15 s `AbortController` timeout too short for GPT-4o / Gemini Pro on long responses                                                              |
+| 8   | 🟢 Low    | `intent_classifier.py` | Intent tie-breaking is non-deterministic (dict key order)                                                                                       |
+| 9   | 🟢 Low    | `router.py`            | `balanced` and `cost` policies resolve to identical models — no cost-weighted scoring                                                           |
+| 10  | 🟢 Low    | `routes/chat.py`       | Flat `tokens × 0.000015` cost formula regardless of provider or model tier                                                                      |
+| 11  | 🟢 Low    | `ChatInput.jsx`        | Helper text uses `text-[11px]` — below the 12 px accessibility floor                                                                            |
+| 12  | 🟢 Low    | `Tooltip.jsx`          | Hover-only; not keyboard or screen-reader accessible                                                                                            |
+| 13  | 🟢 Low    | `Chat.jsx`             | `handleNewChat` in header is an inline lambda instead of calling the shared handler                                                             |
+| 14  | 🟢 Low    | `chatService.js`       | No SSE streaming — full response is buffered before rendering                                                                                   |
 
 ---
 

@@ -50,6 +50,7 @@ async def health_check(self) -> bool
 Adding a new provider = implement `BaseProvider` + register in `ProviderManager`. No other changes.
 
 Normalised delta format (target for streaming):
+
 ```
 { token: string, done: boolean, metadata: object }
 ```
@@ -158,6 +159,7 @@ Composition root. Creates the `FastAPI` instance inside an async `lifespan` cont
 Pydantic `Settings` model loaded from `backend/.env` via `python-dotenv`.
 
 **Current declared fields:**
+
 ```python
 OPENAI_API_KEY: str = ""
 CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:8000"]
@@ -176,6 +178,7 @@ Two Pydantic v2 models:
 **`ChatRequest`** fields: `message` (str, stripped, 1–4000 chars), `conversation_id` (str, default uuid4), `routing_policy` (Literal `balanced|speed|cost|quality`, default `balanced`), `attachments` (list[str], default []), `user_id` (str, default `anonymous`), `timestamp` (datetime, default utcnow).
 
 **`ChatResponse`** — nested structure:
+
 ```python
 response: {
     content: str,
@@ -223,6 +226,7 @@ The core pipeline endpoint. Execution order:
 ### `app/providers/base.py`
 
 Abstract base class:
+
 ```python
 class BaseProvider(ABC):
     @abstractmethod
@@ -232,6 +236,7 @@ class BaseProvider(ABC):
 ```
 
 Exception hierarchy:
+
 - `ProviderError` (base)
   - `ProviderAuthenticationError`
   - `ProviderAPIError`
@@ -267,14 +272,14 @@ Registered providers: `openai`, `claude`, `gemini`.
 
 **Intent → model mapping (actual values from source):**
 
-| Intent | `balanced`/`cost` model | `speed` model | `quality` model |
-| :--- | :--- | :--- | :--- |
-| `coding` | `openai/gpt-4o-mini` | `openai/gpt-4o-mini` | `openai/gpt-4o` |
-| `research` | `openai/gpt-4o-mini` | `openai/gpt-4o-mini` | `gemini/gemini-1.5-pro` |
-| `document` | `openai/gpt-4o-mini` | `openai/gpt-4o-mini` | `claude/claude-3-5-sonnet-20241022` |
-| `reasoning` | `openai/gpt-4o-mini` | `openai/gpt-4o-mini` | `openai/gpt-4o` |
-| `writing` | `openai/gpt-4o-mini` | `openai/gpt-4o-mini` | `claude/claude-3-5-sonnet-20241022` |
-| `general` | `openai/gpt-4o-mini` | `openai/gpt-4o-mini` | `openai/gpt-4o` |
+| Intent      | `balanced`/`cost` model | `speed` model        | `quality` model                     |
+| :---------- | :---------------------- | :------------------- | :---------------------------------- |
+| `coding`    | `openai/gpt-4o-mini`    | `openai/gpt-4o-mini` | `openai/gpt-4o`                     |
+| `research`  | `openai/gpt-4o-mini`    | `openai/gpt-4o-mini` | `gemini/gemini-1.5-pro`             |
+| `document`  | `openai/gpt-4o-mini`    | `openai/gpt-4o-mini` | `claude/claude-3-5-sonnet-20241022` |
+| `reasoning` | `openai/gpt-4o-mini`    | `openai/gpt-4o-mini` | `openai/gpt-4o`                     |
+| `writing`   | `openai/gpt-4o-mini`    | `openai/gpt-4o-mini` | `claude/claude-3-5-sonnet-20241022` |
+| `general`   | `openai/gpt-4o-mini`    | `openai/gpt-4o-mini` | `openai/gpt-4o`                     |
 
 > ⚠️ **Bug #9:** `balanced` and `cost` map to identical models. No cost-weighted scoring is implemented.
 
@@ -289,6 +294,7 @@ Fallback chain (if selected provider unavailable): `openai` → `gemini` → `cl
 ### `requirements.txt`
 
 Currently installed:
+
 ```
 fastapi==0.138.0
 uvicorn==0.49.0
@@ -299,34 +305,34 @@ openai>=1.0.0
 
 > ⚠️ **Bug #3 (High):** Missing packages needed for full implementation:
 
-| Package | Needed for |
-| :--- | :--- |
-| `anthropic` | Claude provider SDK |
-| `google-generativeai` | Gemini provider SDK |
-| `pytest` | Backend test runner |
-| `httpx` | Async HTTP (health pings, future SSE) |
-| `supabase` | Routing decision logging (roadmap) |
+| Package               | Needed for                            |
+| :-------------------- | :------------------------------------ |
+| `anthropic`           | Claude provider SDK                   |
+| `google-generativeai` | Gemini provider SDK                   |
+| `pytest`              | Backend test runner                   |
+| `httpx`               | Async HTTP (health pings, future SSE) |
+| `supabase`            | Routing decision logging (roadmap)    |
 
 ---
 
 ## Known Bugs — Full List
 
-| # | Severity | File | Description |
-| :--- | :--- | :--- | :--- |
-| 1 | 🔴 High | `claude_provider.py` | All methods raise `NotImplementedError` — no live Claude calls |
-| 2 | 🔴 High | `gemini_provider.py` | All methods raise `NotImplementedError` — no live Gemini calls |
-| 3 | 🔴 High | `requirements.txt` | Missing `anthropic`, `google-generativeai`, `pytest` |
-| 4 | 🔴 High | `config.py` | `ANTHROPIC_API_KEY` / `GEMINI_API_KEY` not declared in `Settings` |
-| 5 | 🟡 Medium | `routes/chat.py` | Uses `list_registered_providers()` not `get_available_providers()` — dead providers treated as routable |
-| 6 | 🟡 Medium | `config.py` | `CORS_ORIGINS` default missing `localhost:5173` and Vercel prod URL |
-| 7 | 🟡 Medium | `services/api.js` | 15 s timeout too short for GPT-4o / Gemini Pro on long responses |
-| 8 | 🟢 Low | `intent_classifier.py` | Intent tie-breaking non-deterministic (dict iteration order) |
-| 9 | 🟢 Low | `router.py` | `balanced` and `cost` map to identical models — no real cost scoring |
-| 10 | 🟢 Low | `routes/chat.py` | Flat `tokens × 0.000015` cost formula ignores provider/model tier |
-| 11 | 🟢 Low | `ChatInput.jsx` | `text-[11px]` on helper text — below 12 px a11y floor |
-| 12 | 🟢 Low | `Tooltip.jsx` | Hover-only — not keyboard/screen-reader accessible |
-| 13 | 🟢 Low | `Chat.jsx` | `handleNewChat` in header is an inline lambda instead of shared handler |
-| 14 | 🟢 Low | `chatService.js` | No SSE streaming — full response buffered before render |
+| #   | Severity  | File                   | Description                                                                                             |
+| :-- | :-------- | :--------------------- | :------------------------------------------------------------------------------------------------------ |
+| 1   | 🔴 High   | `claude_provider.py`   | All methods raise `NotImplementedError` — no live Claude calls                                          |
+| 2   | 🔴 High   | `gemini_provider.py`   | All methods raise `NotImplementedError` — no live Gemini calls                                          |
+| 3   | 🔴 High   | `requirements.txt`     | Missing `anthropic`, `google-generativeai`, `pytest`                                                    |
+| 4   | 🔴 High   | `config.py`            | `ANTHROPIC_API_KEY` / `GEMINI_API_KEY` not declared in `Settings`                                       |
+| 5   | 🟡 Medium | `routes/chat.py`       | Uses `list_registered_providers()` not `get_available_providers()` — dead providers treated as routable |
+| 6   | 🟡 Medium | `config.py`            | `CORS_ORIGINS` default missing `localhost:5173` and Vercel prod URL                                     |
+| 7   | 🟡 Medium | `services/api.js`      | 15 s timeout too short for GPT-4o / Gemini Pro on long responses                                        |
+| 8   | 🟢 Low    | `intent_classifier.py` | Intent tie-breaking non-deterministic (dict iteration order)                                            |
+| 9   | 🟢 Low    | `router.py`            | `balanced` and `cost` map to identical models — no real cost scoring                                    |
+| 10  | 🟢 Low    | `routes/chat.py`       | Flat `tokens × 0.000015` cost formula ignores provider/model tier                                       |
+| 11  | 🟢 Low    | `ChatInput.jsx`        | `text-[11px]` on helper text — below 12 px a11y floor                                                   |
+| 12  | 🟢 Low    | `Tooltip.jsx`          | Hover-only — not keyboard/screen-reader accessible                                                      |
+| 13  | 🟢 Low    | `Chat.jsx`             | `handleNewChat` in header is an inline lambda instead of shared handler                                 |
+| 14  | 🟢 Low    | `chatService.js`       | No SSE streaming — full response buffered before render                                                 |
 
 ---
 
@@ -334,12 +340,12 @@ openai>=1.0.0
 
 `App.jsx` wraps everything in `ThemeProvider` → `ToastProvider`, then `react-router-dom`:
 
-| Route | Component | Notes |
-| :--- | :--- | :--- |
-| `/` | `Home.jsx` | Landing page with Navbar + Footer |
-| `/chat` | `Chat.jsx` | Main product interface; no Navbar/Footer |
-| `/benefits` | `Benefits.jsx` | Marketing page |
-| `/docs` | `Documentation.jsx` | Docs page |
+| Route       | Component           | Notes                                    |
+| :---------- | :------------------ | :--------------------------------------- |
+| `/`         | `Home.jsx`          | Landing page with Navbar + Footer        |
+| `/chat`     | `Chat.jsx`          | Main product interface; no Navbar/Footer |
+| `/benefits` | `Benefits.jsx`      | Marketing page                           |
+| `/docs`     | `Documentation.jsx` | Docs page                                |
 
 `vercel.json` rewrites all routes to `index.html` (standard SPA pattern).
 
@@ -351,15 +357,15 @@ All session state owned by `Chat.jsx`, passed as props. No global store.
 
 ### State Variables
 
-| Variable | Type | Purpose |
-| :--- | :--- | :--- |
-| `activeChatId` | `string` | ID of the currently visible conversation |
-| `chatHistory` | `Array<{id, title, timestamp}>` | Sidebar session list |
-| `conversationsMessages` | `Record<chatId, Message[]>` | All messages keyed by chat ID |
-| `isLoading` | `boolean` | True while routing pipeline animation runs |
-| `loadingStep` | `string` | Current step label shown in `TypingIndicator` |
-| `pendingModel` | `string \| null` | Model name revealed at step 3 of loading animation |
-| `timeoutRefs` | `useRef(Array)` | All active `setTimeout` handles — cleared on unmount |
+| Variable                | Type                            | Purpose                                              |
+| :---------------------- | :------------------------------ | :--------------------------------------------------- |
+| `activeChatId`          | `string`                        | ID of the currently visible conversation             |
+| `chatHistory`           | `Array<{id, title, timestamp}>` | Sidebar session list                                 |
+| `conversationsMessages` | `Record<chatId, Message[]>`     | All messages keyed by chat ID                        |
+| `isLoading`             | `boolean`                       | True while routing pipeline animation runs           |
+| `loadingStep`           | `string`                        | Current step label shown in `TypingIndicator`        |
+| `pendingModel`          | `string \| null`                | Model name revealed at step 3 of loading animation   |
+| `timeoutRefs`           | `useRef(Array)`                 | All active `setTimeout` handles — cleared on unmount |
 
 ### Message Shape
 
@@ -408,12 +414,12 @@ All session state owned by `Chat.jsx`, passed as props. No global store.
 
 ## Policies & Router Logic
 
-| Policy | Behaviour | Current Implementation |
-| :--- | :--- | :--- |
-| `quality` | Frontier models | GPT-4o, Claude 3.5 Sonnet, Gemini 1.5 Pro per intent |
-| `speed` | Low-latency | GPT-4o-mini across all intents |
-| `balanced` | Cost + quality tradeoff | ⚠️ Same as `cost` — not differentiated |
-| `cost` | Cheapest option | GPT-4o-mini across all intents |
+| Policy     | Behaviour               | Current Implementation                               |
+| :--------- | :---------------------- | :--------------------------------------------------- |
+| `quality`  | Frontier models         | GPT-4o, Claude 3.5 Sonnet, Gemini 1.5 Pro per intent |
+| `speed`    | Low-latency             | GPT-4o-mini across all intents                       |
+| `balanced` | Cost + quality tradeoff | ⚠️ Same as `cost` — not differentiated               |
+| `cost`     | Cheapest option         | GPT-4o-mini across all intents                       |
 
 ---
 
@@ -459,10 +465,10 @@ Provides `showToast(message, type: 'success'|'error'|'info')`. Renders fixed toa
 
 ### `localStorage` Keys
 
-| Key | Written by | Read by | Purpose |
-| :--- | :--- | :--- | :--- |
-| `routingPolicy` | Sidebar policy selector | `Chat.jsx` at send time | Active routing preference |
-| `routingStats` | `Chat.jsx` post-response | Sidebar telemetry panel | Cumulative session stats |
+| Key             | Written by               | Read by                 | Purpose                   |
+| :-------------- | :----------------------- | :---------------------- | :------------------------ |
+| `routingPolicy` | Sidebar policy selector  | `Chat.jsx` at send time | Active routing preference |
+| `routingStats`  | `Chat.jsx` post-response | Sidebar telemetry panel | Cumulative session stats  |
 
 ---
 
@@ -470,21 +476,21 @@ Provides `showToast(message, type: 'success'|'error'|'info')`. Renders fixed toa
 
 ### Frontend (`src/test/`)
 
-| File | Coverage |
-| :--- | :--- |
+| File                 | Coverage                                                                             |
+| :------------------- | :----------------------------------------------------------------------------------- |
 | `mockRouter.test.js` | `getMockRouting()` — code queries, research, attachments, policy overrides, fallback |
-| `setup.js` | `@testing-library/jest-dom` import |
+| `setup.js`           | `@testing-library/jest-dom` import                                                   |
 
 Run: `pnpm test:run` (single pass) or `pnpm test` (watch). CI runs `pnpm test:run` after lint.
 
 ### Backend (`backend/tests/`)
 
-| File | Coverage |
-| :--- | :--- |
-| `test_classifier.py` | `RuleBasedIntentClassifier` intent detection |
-| `test_router.py` | `LLMRouter` policy resolution and fallback |
-| `test_provider_manager.py` | Provider lazy-loading and health checks |
-| `test_chat_endpoint.py` | `POST /chat` schema validation and pipeline integration |
+| File                       | Coverage                                                |
+| :------------------------- | :------------------------------------------------------ |
+| `test_classifier.py`       | `RuleBasedIntentClassifier` intent detection            |
+| `test_router.py`           | `LLMRouter` policy resolution and fallback              |
+| `test_provider_manager.py` | Provider lazy-loading and health checks                 |
+| `test_chat_endpoint.py`    | `POST /chat` schema validation and pipeline integration |
 
 Run: `python -m pytest tests/ -v` from `backend/`.
 
@@ -511,14 +517,14 @@ Run: `python -m pytest tests/ -v` from `backend/`.
 
 Custom Tailwind v4 tokens under `@theme`:
 
-| Token | Usage |
-| :--- | :--- |
-| `bg-app-bg` | Page background (dark: `#0E0E0E`) |
-| `bg-card-bg` | Card/input surfaces |
-| `bg-sidebar-bg` | Sidebar background |
-| `border-border-app` | All borders |
-| `text-primary` | Primary text |
-| `text-secondary` | Muted/secondary text |
+| Token               | Usage                             |
+| :------------------ | :-------------------------------- |
+| `bg-app-bg`         | Page background (dark: `#0E0E0E`) |
+| `bg-card-bg`        | Card/input surfaces               |
+| `bg-sidebar-bg`     | Sidebar background                |
+| `border-border-app` | All borders                       |
+| `text-primary`      | Primary text                      |
+| `text-secondary`    | Muted/secondary text              |
 
 Custom animations: `animate-slide-up-fade`, `animate-slide-in-right`, `stagger-1` through `stagger-4` — defined as `@keyframes` in `index.css`.
 
@@ -528,26 +534,26 @@ Custom animations: `animate-slide-up-fade`, `animate-slide-in-right`, `stagger-1
 
 ### Frontend (`package.json`)
 
-| Package | Purpose |
-| :--- | :--- |
-| `react` + `react-dom` | UI framework |
-| `react-router-dom` | Client-side routing |
-| `react-markdown` + `remark-gfm` | Markdown in assistant messages |
-| `react-syntax-highlighter` | Code block highlighting (Prism/vscDarkPlus) |
-| `lucide-react` | Icons |
-| `framer-motion` | Animations |
-| `tailwindcss` v4 | Styling |
+| Package                         | Purpose                                     |
+| :------------------------------ | :------------------------------------------ |
+| `react` + `react-dom`           | UI framework                                |
+| `react-router-dom`              | Client-side routing                         |
+| `react-markdown` + `remark-gfm` | Markdown in assistant messages              |
+| `react-syntax-highlighter`      | Code block highlighting (Prism/vscDarkPlus) |
+| `lucide-react`                  | Icons                                       |
+| `framer-motion`                 | Animations                                  |
+| `tailwindcss` v4                | Styling                                     |
 
 ### Backend (`requirements.txt`)
 
-| Package | Version | Status |
-| :--- | :--- | :--- |
-| `fastapi` | 0.138.0 | ✅ Installed |
-| `uvicorn` | 0.49.0 | ✅ Installed |
-| `pydantic` | 2.13.4 | ✅ Installed |
-| `python-dotenv` | 1.2.2 | ✅ Installed |
-| `openai` | >=1.0.0 | ✅ Installed |
-| `anthropic` | latest | ⚠️ Missing |
-| `google-generativeai` | latest | ⚠️ Missing |
-| `pytest` | latest | ⚠️ Missing |
-| `httpx` | latest | ⚠️ Missing |
+| Package               | Version | Status       |
+| :-------------------- | :------ | :----------- |
+| `fastapi`             | 0.138.0 | ✅ Installed |
+| `uvicorn`             | 0.49.0  | ✅ Installed |
+| `pydantic`            | 2.13.4  | ✅ Installed |
+| `python-dotenv`       | 1.2.2   | ✅ Installed |
+| `openai`              | >=1.0.0 | ✅ Installed |
+| `anthropic`           | latest  | ⚠️ Missing   |
+| `google-generativeai` | latest  | ⚠️ Missing   |
+| `pytest`              | latest  | ⚠️ Missing   |
+| `httpx`               | latest  | ⚠️ Missing   |
