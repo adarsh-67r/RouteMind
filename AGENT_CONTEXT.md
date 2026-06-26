@@ -156,18 +156,23 @@ RouteMind/
 ## Backend — File-by-File Reference
 
 ### `app/main.py`
+
 Composition root. Configures CORS, initializes the global exception handlers (formatting `BaseRouteMindError` and `RequestValidationError` to unified JSON schemas), and configures startup/shutdown lifespan callbacks to trigger the background health monitoring loop.
 
 ### `app/config/__init__.py`
+
 Pydantic settings manager parsing variables loaded from `.env`. Centralizes credentials for `GEMINI_API_KEY`, `GROQ_API_KEY`, `NVIDIA_NIM_API_KEY`, `OPENROUTER_API_KEY` and CORS lists.
 
 ### `app/schemas/chat.py`
+
 Contains request and response Pydantic models. Refactored to a fully flat `ChatResponse` model for easy client consumption. Implements backward-compatible fields: `success`, `response`, `estimated_cost`, `usage` (`TokenUsage`), and `routing_metadata`.
 
 ### `app/routes/chat.py`
+
 Orchestrates request processing: intention extraction → target routing decision → fallback chains validation → healthy node prioritization → API request with 3x retry → result mapping and serialization.
 
 ### `app/providers/`
+
 - `base.py` — Defines `BaseProvider` interface and custom `ProviderError` types.
 - `gemini_provider.py` — Operates live Gemini API requests.
 - `groq_provider.py` — Operates live Groq completions using Llama models.
@@ -175,26 +180,29 @@ Orchestrates request processing: intention extraction → target routing decisio
 - `openrouter_provider.py` — Hooks to OpenRouter completions (`cohere/north-mini-code:free`).
 
 ### `app/services/router.py`
+
 Calculates dynamic composite scores per provider candidate using weighting policy parameters (Latency, Cost, Quality, Health, Success Rate). Maps specialized tasks directly to Groq, Gemini, or NVIDIA.
 
 ---
 
 ## Policies & Router Logic
 
-| Policy     | Behavior                | Target Model Mappings                                 |
-| :--------- | :---------------------- | :---------------------------------------------------- |
-| `quality`  | Frontier models         | Llama-3.3-70b, Gemini-2.5-pro, Llama-3.1-405b         |
-| `speed`    | Low-latency             | Gemini-2.5-flash, Llama-3.1-8b, North-Mini-Code       |
-| `cost`     | Cheapest option         | Gemini-2.5-flash, Llama-3.1-8b, North-Mini-Code       |
-| `balanced` | Optimized compromises   | Pro or flash models depending on complexity evaluation |
+| Policy     | Behavior              | Target Model Mappings                                  |
+| :--------- | :-------------------- | :----------------------------------------------------- |
+| `quality`  | Frontier models       | Llama-3.3-70b, Gemini-2.5-pro, Llama-3.1-405b          |
+| `speed`    | Low-latency           | Gemini-2.5-flash, Llama-3.1-8b, North-Mini-Code        |
+| `cost`     | Cheapest option       | Gemini-2.5-flash, Llama-3.1-8b, North-Mini-Code        |
+| `balanced` | Optimized compromises | Pro or flash models depending on complexity evaluation |
 
 ---
 
 ## Test Suite
 
 ### Frontend (`src/test/`)
+
 - `fileHelpers.test.js` — Unit tests covering formatting and size validation.
 - Run: `npm run test:run`
 
 ### Backend (`backend/tests/`)
+
 - Run: `.\venv\Scripts\pytest -v` from the backend directory.

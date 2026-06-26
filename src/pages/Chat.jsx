@@ -8,7 +8,6 @@ import TypingIndicator from '../components/TypingIndicator'
 import { chatService } from '../services/chatService'
 import { useToast } from '../context/ToastContext'
 
-
 const Chat = () => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -229,7 +228,8 @@ const Chat = () => {
       const providerLatency = backendResponse.latency_ms ?? 0
       const overhead = Math.max(1, processingTime - providerLatency)
       stats.totalOverhead = (stats.totalOverhead || 0) + overhead
-      stats.avgOverhead = stats.totalQueries > 0 ? (stats.totalOverhead / stats.totalQueries) : overhead
+      stats.avgOverhead =
+        stats.totalQueries > 0 ? stats.totalOverhead / stats.totalQueries : overhead
 
       localStorage.setItem('routingStats', JSON.stringify(stats))
       window.dispatchEvent(new Event('telemetry-updated'))

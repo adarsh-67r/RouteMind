@@ -18,12 +18,7 @@ const STAGES = [
  * Provider candidates shown during the "evaluating" animation.
  * These are real provider names in the RouteMind system.
  */
-const CANDIDATES = [
-  'Gemini 2.5 Flash',
-  'Llama 3.3 (Groq)',
-  'NVIDIA NIM',
-  'OpenRouter',
-]
+const CANDIDATES = ['Gemini 2.5 Flash', 'Llama 3.3 (Groq)', 'NVIDIA NIM', 'OpenRouter']
 
 const TypingIndicator = ({ loadingStep, selectedModel, selectionReason }) => {
   const [currentStep, setCurrentStep] = useState(0)

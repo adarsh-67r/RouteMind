@@ -150,9 +150,10 @@ const Documentation = () => {
                 model for a user's task.
               </p>
               <p>
-                Instead of manually choosing between Gemini, Groq, NVIDIA NIM, or other providers, users
-                simply ask their question and RouteMind handles the decision-making process. The
-                goal is to simplify AI usage while improving quality, transparency, and efficiency.
+                Instead of manually choosing between Gemini, Groq, NVIDIA NIM, or other providers,
+                users simply ask their question and RouteMind handles the decision-making process.
+                The goal is to simplify AI usage while improving quality, transparency, and
+                efficiency.
               </p>
             </motion.div>
           </motion.section>
@@ -184,8 +185,8 @@ const Documentation = () => {
               className="space-y-4 text-sm sm:text-[15px] text-secondary leading-relaxed font-medium"
             >
               <p>
-                Different AI models excel at different tasks. For instance, Groq may
-                perform better for coding and low-latency requests, Google's Gemini excels at long document
+                Different AI models excel at different tasks. For instance, Groq may perform better
+                for coding and low-latency requests, Google's Gemini excels at long document
                 contexts, and NVIDIA NIM provides maximum accuracy and reasoning depth.
               </p>
               <p>
@@ -556,7 +557,7 @@ const Documentation = () => {
               {[
                 {
                   q: 'Why not use Gemini directly?',
-                  a: 'Gemini is a single model ecosystem. If you need low-latency coding, Groq\'s Llama 3.3 is often superior. If you need reasoning depth, NVIDIA NIM\'s Llama 3.1 405b wins. RouteMind gives you all specialists under one workflow without multiple billing accounts.',
+                  a: "Gemini is a single model ecosystem. If you need low-latency coding, Groq's Llama 3.3 is often superior. If you need reasoning depth, NVIDIA NIM's Llama 3.1 405b wins. RouteMind gives you all specialists under one workflow without multiple billing accounts.",
                 },
                 {
                   q: 'Why not use OpenRouter?',

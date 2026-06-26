@@ -261,17 +261,17 @@ Returns service status and registered provider list.
 
 ### Intent → Provider Mapping
 
-| Intent      | `balanced` / `cost`      | `speed`                  | `quality`                               | Preferred Order (Failover List)         |
-| :---------- | :----------------------- | :----------------------- | :-------------------------------------- | :-------------------------------------- |
-| `coding`    | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o-mini` | `openai` / `gpt-4o`                     | `openai` → `groq` → `gemini` → `nvidia` |
-| `writing`   | `claude` / `claude-3-5-sonnet` | `claude` / `claude-3-5-haiku` | `claude` / `claude-3-5-sonnet` | `claude` → `gemini` → `openai` → `nvidia` |
-| `research`  | `gemini` / `gemini-1.5-flash` | `gemini` / `gemini-1.5-flash` | `gemini` / `gemini-1.5-pro`      | `gemini` → `openai` → `claude` → `nvidia` |
-| `document`  | `gemini` / `gemini-1.5-flash` | `gemini` / `gemini-1.5-flash` | `gemini` / `gemini-1.5-pro`      | `gemini` → `openai` → `claude` → `nvidia` |
-| `reasoning` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` → `gemini` → `groq` → `openai` |
-| `analysis`  | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` → `gemini` → `groq` → `openai` |
-| `planning`  | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` → `gemini` → `groq` → `openai` |
-| `strategy`  | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` → `gemini` → `groq` → `openai` |
-| `general`   | `gemini` / `gemini-1.5-flash` | `gemini` / `gemini-1.5-flash` | `gemini` / `gemini-1.5-pro`      | `gemini` → `nvidia` → `groq` → `openai` |
+| Intent      | `balanced` / `cost`                       | `speed`                                   | `quality`                                 | Preferred Order (Failover List)           |
+| :---------- | :---------------------------------------- | :---------------------------------------- | :---------------------------------------- | :---------------------------------------- |
+| `coding`    | `openai` / `gpt-4o-mini`                  | `openai` / `gpt-4o-mini`                  | `openai` / `gpt-4o`                       | `openai` → `groq` → `gemini` → `nvidia`   |
+| `writing`   | `claude` / `claude-3-5-sonnet`            | `claude` / `claude-3-5-haiku`             | `claude` / `claude-3-5-sonnet`            | `claude` → `gemini` → `openai` → `nvidia` |
+| `research`  | `gemini` / `gemini-1.5-flash`             | `gemini` / `gemini-1.5-flash`             | `gemini` / `gemini-1.5-pro`               | `gemini` → `openai` → `claude` → `nvidia` |
+| `document`  | `gemini` / `gemini-1.5-flash`             | `gemini` / `gemini-1.5-flash`             | `gemini` / `gemini-1.5-pro`               | `gemini` → `openai` → `claude` → `nvidia` |
+| `reasoning` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` → `gemini` → `groq` → `openai`   |
+| `analysis`  | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` → `gemini` → `groq` → `openai`   |
+| `planning`  | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` → `gemini` → `groq` → `openai`   |
+| `strategy`  | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` / `meta/llama-3.1-405b-instruct` | `nvidia` → `gemini` → `groq` → `openai`   |
+| `general`   | `gemini` / `gemini-1.5-flash`             | `gemini` / `gemini-1.5-flash`             | `gemini` / `gemini-1.5-pro`               | `gemini` → `nvidia` → `groq` → `openai`   |
 
 > ⚠️ Reasoning-related intents (`reasoning`, `analysis`, `planning`, `strategy`) automatically override default policy models to always route to the premium high-capacity models (e.g., `meta/llama-3.1-405b-instruct` on NVIDIA NIM, `gemini-1.5-pro` on Gemini, etc.) for complex logic evaluation.
 
@@ -279,9 +279,9 @@ Returns service status and registered provider list.
 
 If the selected provider is unavailable, RouteMind executes a 3-provider failover chain. The first healthy provider in the sequence is invoked:
 
-* **NVIDIA Primary:** `nvidia` → `gemini` → `groq`
-* **Gemini Primary:** `gemini` → `nvidia` → `groq`
-* **Groq Primary:** `groq` → `nvidia` → `gemini`
+- **NVIDIA Primary:** `nvidia` → `gemini` → `groq`
+- **Gemini Primary:** `gemini` → `nvidia` → `groq`
+- **Groq Primary:** `groq` → `nvidia` → `gemini`
 
 ---
 

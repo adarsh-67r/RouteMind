@@ -70,8 +70,18 @@ const TelemetryModal = ({ isOpen, onClose, stats }) => {
 
                 let colorClass = 'bg-neutral-500'
                 if (modelName.toLowerCase().includes('gemini')) colorClass = 'bg-red-500'
-                else if (modelName.toLowerCase().includes('groq') || (modelName.toLowerCase().includes('llama') && !modelName.toLowerCase().includes('nvidia') && !modelName.toLowerCase().includes('meta/llama'))) colorClass = 'bg-orange-500'
-                else if (modelName.toLowerCase().includes('nvidia') || modelName.toLowerCase().includes('meta/llama')) colorClass = 'bg-green-500'
+                else if (
+                  modelName.toLowerCase().includes('groq') ||
+                  (modelName.toLowerCase().includes('llama') &&
+                    !modelName.toLowerCase().includes('nvidia') &&
+                    !modelName.toLowerCase().includes('meta/llama'))
+                )
+                  colorClass = 'bg-orange-500'
+                else if (
+                  modelName.toLowerCase().includes('nvidia') ||
+                  modelName.toLowerCase().includes('meta/llama')
+                )
+                  colorClass = 'bg-green-500'
 
                 return (
                   <div key={modelName} className="space-y-1">

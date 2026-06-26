@@ -1,23 +1,7 @@
 import { useState } from 'react'
-import {
-  Cpu,
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-  Clock,
-  Zap,
-  TrendingUp,
-  Sliders,
-} from 'lucide-react'
+import { Cpu, ChevronDown, ChevronUp, Loader2, Clock, Zap, TrendingUp, Sliders } from 'lucide-react'
 
-const RoutingCard = ({
-  routing,
-  model,
-  reason,
-  isLoading,
-  loadingStep,
-  timestamp,
-}) => {
+const RoutingCard = ({ routing, model, reason, isLoading, loadingStep, timestamp }) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
   // With flat schema, all fields are directly on `routing` — no nested `.metrics`
@@ -36,7 +20,8 @@ const RoutingCard = ({
       : 'N/A'
 
   // Format numeric confidence for radial/circular graphics
-  const numericConfidence = confidenceVal !== 'N/A' ? parseInt(String(confidenceVal).replace('%', '')) || 0 : 0
+  const numericConfidence =
+    confidenceVal !== 'N/A' ? parseInt(String(confidenceVal).replace('%', '')) || 0 : 0
 
   const reasonVal = routing?.routing_reason ?? routing?.reason ?? reason ?? 'N/A'
 
@@ -47,7 +32,10 @@ const RoutingCard = ({
     const cost = routing?.estimated_cost_usd ?? 0
     const baselineCost = totalTokens * 0.000003 // Gemini 1.5 Pro baseline
     if (baselineCost > 0) {
-      const pct = Math.max(0, Math.min(99, Math.round(((baselineCost - cost) / baselineCost) * 100)))
+      const pct = Math.max(
+        0,
+        Math.min(99, Math.round(((baselineCost - cost) / baselineCost) * 100))
+      )
       savingsVal = `${pct}%`
     }
   } else {
@@ -63,18 +51,38 @@ const RoutingCard = ({
   const speedVal = routing?.response_speed ?? 'N/A'
 
   const factorsVal = {
-    intentMatch: routing?.intent_match !== undefined && routing?.intent_match !== null ? routing.intent_match : 'N/A',
-    quality: routing?.response_quality !== undefined && routing?.response_quality !== null ? routing.response_quality : 'N/A',
-    latency: routing?.latency_index !== undefined && routing?.latency_index !== null ? routing.latency_index : 'N/A',
-    costEfficiency: routing?.cost_efficiency !== undefined && routing?.cost_efficiency !== null ? routing.cost_efficiency : 'N/A',
+    intentMatch:
+      routing?.intent_match !== undefined && routing?.intent_match !== null
+        ? routing.intent_match
+        : 'N/A',
+    quality:
+      routing?.response_quality !== undefined && routing?.response_quality !== null
+        ? routing.response_quality
+        : 'N/A',
+    latency:
+      routing?.latency_index !== undefined && routing?.latency_index !== null
+        ? routing.latency_index
+        : 'N/A',
+    costEfficiency:
+      routing?.cost_efficiency !== undefined && routing?.cost_efficiency !== null
+        ? routing.cost_efficiency
+        : 'N/A',
   }
 
   const detailsVal = {
-    intent: routing?.intent ? (routing.intent.charAt(0).toUpperCase() + routing.intent.slice(1)) : 'N/A',
-    contextLength: routing?.context_length !== undefined && routing?.context_length !== null ? `${routing.context_length} tokens` : 'N/A',
+    intent: routing?.intent
+      ? routing.intent.charAt(0).toUpperCase() + routing.intent.slice(1)
+      : 'N/A',
+    contextLength:
+      routing?.context_length !== undefined && routing?.context_length !== null
+        ? `${routing.context_length} tokens`
+        : 'N/A',
     provider: routing?.provider_entity ?? 'N/A',
     version: routing?.model_version ?? 'N/A',
-    score: routing?.composite_score !== undefined && routing?.composite_score !== null ? `${routing.composite_score}/100` : 'N/A',
+    score:
+      routing?.composite_score !== undefined && routing?.composite_score !== null
+        ? `${routing.composite_score}/100`
+        : 'N/A',
     fallbacks: routing?.fallbacks_evaluated ?? [],
   }
 
@@ -91,7 +99,10 @@ const RoutingCard = ({
   const stroke = 2.5
   const normalizedRadius = radius - stroke * 2
   const circumference = normalizedRadius * 2 * Math.PI
-  const strokeDashoffset = confidenceVal !== 'N/A' && confidenceVal !== '' ? circumference - (numericConfidence / 100) * circumference : circumference
+  const strokeDashoffset =
+    confidenceVal !== 'N/A' && confidenceVal !== ''
+      ? circumference - (numericConfidence / 100) * circumference
+      : circumference
 
   // Circular Confidence indicator colors based on score
   const getConfidenceColor = (score) => {
@@ -215,13 +226,20 @@ const RoutingCard = ({
           <div className="flex justify-between text-[11px] text-secondary">
             <span>Intent Match</span>
             <span className="font-mono text-[10px] text-primary">
-              {factorsVal.intentMatch !== 'N/A' && factorsVal.intentMatch !== '' ? `${factorsVal.intentMatch}%` : 'N/A'}
+              {factorsVal.intentMatch !== 'N/A' && factorsVal.intentMatch !== ''
+                ? `${factorsVal.intentMatch}%`
+                : 'N/A'}
             </span>
           </div>
           <div className="h-1 bg-card-bg rounded-full overflow-hidden">
             <div
               className="h-full bg-blue-500 rounded-full"
-              style={{ width: factorsVal.intentMatch !== 'N/A' && factorsVal.intentMatch !== '' ? `${factorsVal.intentMatch}%` : '0%' }}
+              style={{
+                width:
+                  factorsVal.intentMatch !== 'N/A' && factorsVal.intentMatch !== ''
+                    ? `${factorsVal.intentMatch}%`
+                    : '0%',
+              }}
             ></div>
           </div>
         </div>
@@ -231,13 +249,20 @@ const RoutingCard = ({
           <div className="flex justify-between text-[11px] text-secondary">
             <span>Response Quality</span>
             <span className="font-mono text-[10px] text-primary">
-              {factorsVal.quality !== 'N/A' && factorsVal.quality !== '' ? `${factorsVal.quality}%` : 'N/A'}
+              {factorsVal.quality !== 'N/A' && factorsVal.quality !== ''
+                ? `${factorsVal.quality}%`
+                : 'N/A'}
             </span>
           </div>
           <div className="h-1 bg-card-bg rounded-full overflow-hidden">
             <div
               className="h-full bg-[#22C55E] rounded-full"
-              style={{ width: factorsVal.quality !== 'N/A' && factorsVal.quality !== '' ? `${factorsVal.quality}%` : '0%' }}
+              style={{
+                width:
+                  factorsVal.quality !== 'N/A' && factorsVal.quality !== ''
+                    ? `${factorsVal.quality}%`
+                    : '0%',
+              }}
             ></div>
           </div>
         </div>
@@ -247,13 +272,20 @@ const RoutingCard = ({
           <div className="flex justify-between text-[11px] text-secondary">
             <span>Latency Index</span>
             <span className="font-mono text-[10px] text-primary">
-              {factorsVal.latency !== 'N/A' && factorsVal.latency !== '' ? `${factorsVal.latency}%` : 'N/A'}
+              {factorsVal.latency !== 'N/A' && factorsVal.latency !== ''
+                ? `${factorsVal.latency}%`
+                : 'N/A'}
             </span>
           </div>
           <div className="h-1 bg-card-bg rounded-full overflow-hidden">
             <div
               className="h-full bg-cyan-500 rounded-full"
-              style={{ width: factorsVal.latency !== 'N/A' && factorsVal.latency !== '' ? `${factorsVal.latency}%` : '0%' }}
+              style={{
+                width:
+                  factorsVal.latency !== 'N/A' && factorsVal.latency !== ''
+                    ? `${factorsVal.latency}%`
+                    : '0%',
+              }}
             ></div>
           </div>
         </div>
@@ -263,13 +295,20 @@ const RoutingCard = ({
           <div className="flex justify-between text-[11px] text-secondary">
             <span>Cost Efficiency</span>
             <span className="font-mono text-[10px] text-primary">
-              {factorsVal.costEfficiency !== 'N/A' && factorsVal.costEfficiency !== '' ? `${factorsVal.costEfficiency}%` : 'N/A'}
+              {factorsVal.costEfficiency !== 'N/A' && factorsVal.costEfficiency !== ''
+                ? `${factorsVal.costEfficiency}%`
+                : 'N/A'}
             </span>
           </div>
           <div className="h-1 bg-card-bg rounded-full overflow-hidden">
             <div
               className="h-full bg-purple-500 rounded-full"
-              style={{ width: factorsVal.costEfficiency !== 'N/A' && factorsVal.costEfficiency !== '' ? `${factorsVal.costEfficiency}%` : '0%' }}
+              style={{
+                width:
+                  factorsVal.costEfficiency !== 'N/A' && factorsVal.costEfficiency !== ''
+                    ? `${factorsVal.costEfficiency}%`
+                    : '0%',
+              }}
             ></div>
           </div>
         </div>
@@ -332,7 +371,10 @@ const RoutingCard = ({
             <div className="text-neutral-600 dark:text-neutral-400 font-mono text-[9px] uppercase tracking-wider mb-0.5">
               Selected Model
             </div>
-            <div className="text-primary font-mono font-medium truncate" title={routing?.selected_model ?? routing?.model ?? model ?? 'N/A'}>
+            <div
+              className="text-primary font-mono font-medium truncate"
+              title={routing?.selected_model ?? routing?.model ?? model ?? 'N/A'}
+            >
               {routing?.selected_model ?? routing?.model ?? model ?? 'N/A'}
             </div>
           </div>
@@ -341,7 +383,9 @@ const RoutingCard = ({
               Intent
             </div>
             <div className="text-primary font-medium">
-              {routing?.intent ? (routing.intent.charAt(0).toUpperCase() + routing.intent.slice(1)) : 'N/A'}
+              {routing?.intent
+                ? routing.intent.charAt(0).toUpperCase() + routing.intent.slice(1)
+                : 'N/A'}
             </div>
           </div>
           <div>
@@ -349,7 +393,9 @@ const RoutingCard = ({
               Routing Policy
             </div>
             <div className="text-primary font-medium">
-              {routing?.routing_policy ? (routing.routing_policy.charAt(0).toUpperCase() + routing.routing_policy.slice(1)) : 'N/A'}
+              {routing?.routing_policy
+                ? routing.routing_policy.charAt(0).toUpperCase() + routing.routing_policy.slice(1)
+                : 'N/A'}
             </div>
           </div>
           <div>
@@ -363,7 +409,9 @@ const RoutingCard = ({
               Latency
             </div>
             <div className="text-primary font-mono font-medium">
-              {routing?.latency_ms !== undefined && routing?.latency_ms !== null ? `${parseFloat(routing.latency_ms).toFixed(0)} ms` : 'N/A'}
+              {routing?.latency_ms !== undefined && routing?.latency_ms !== null
+                ? `${parseFloat(routing.latency_ms).toFixed(0)} ms`
+                : 'N/A'}
             </div>
           </div>
           <div>
@@ -371,7 +419,9 @@ const RoutingCard = ({
               Prompt Tokens
             </div>
             <div className="text-primary font-mono font-medium">
-              {routing?.prompt_tokens !== undefined && routing?.prompt_tokens !== null ? routing.prompt_tokens : 'N/A'}
+              {routing?.prompt_tokens !== undefined && routing?.prompt_tokens !== null
+                ? routing.prompt_tokens
+                : 'N/A'}
             </div>
           </div>
           <div>
@@ -379,7 +429,9 @@ const RoutingCard = ({
               Completion Tokens
             </div>
             <div className="text-primary font-mono font-medium">
-              {routing?.completion_tokens !== undefined && routing?.completion_tokens !== null ? routing.completion_tokens : 'N/A'}
+              {routing?.completion_tokens !== undefined && routing?.completion_tokens !== null
+                ? routing.completion_tokens
+                : 'N/A'}
             </div>
           </div>
           <div>
@@ -387,7 +439,9 @@ const RoutingCard = ({
               Total Tokens
             </div>
             <div className="text-primary font-mono font-medium">
-              {routing?.total_tokens !== undefined && routing?.total_tokens !== null ? routing.total_tokens : 'N/A'}
+              {routing?.total_tokens !== undefined && routing?.total_tokens !== null
+                ? routing.total_tokens
+                : 'N/A'}
             </div>
           </div>
           <div>
@@ -401,7 +455,11 @@ const RoutingCard = ({
               Fallback Used
             </div>
             <div className="text-primary font-medium">
-              {routing?.fallback_used !== undefined && routing?.fallback_used !== null ? (routing.fallback_used ? 'Yes' : 'No') : 'N/A'}
+              {routing?.fallback_used !== undefined && routing?.fallback_used !== null
+                ? routing.fallback_used
+                  ? 'Yes'
+                  : 'No'
+                : 'N/A'}
             </div>
           </div>
           <div>

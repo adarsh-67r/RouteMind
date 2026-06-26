@@ -133,8 +133,8 @@ const Benefits = () => {
                       <span className="text-primary font-bold">Groq (Llama 3.3)</span>
                     </div>
                     <div className="text-[10px] text-neutral-600 dark:text-neutral-400 leading-normal">
-                      Reason: Low latency coding and debugging performance for React 19 concurrent render
-                      states.
+                      Reason: Low latency coding and debugging performance for React 19 concurrent
+                      render states.
                     </div>
                   </div>
                 </div>
@@ -404,7 +404,8 @@ const Benefits = () => {
                 sub: 'Refactoring & Review',
                 task: 'Review React Architecture',
                 model: 'Llama 3.3 70b',
-                reason: 'Selected due to low latency code understanding and debugging capabilities on Groq.',
+                reason:
+                  'Selected due to low latency code understanding and debugging capabilities on Groq.',
               },
               {
                 tag: 'RES',
